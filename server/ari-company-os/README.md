@@ -17,7 +17,7 @@ node bin/ari-manager.js event /path/to/reviewed-event.json
 
 The task/event CLI is a trusted, local operator interface, not an authenticated public API. No network listener is exposed. Do not put credentials or personal data in task payloads. `approve-development <task-id>` records the local owner's explicit approval for a development task awaiting review. It never grants release approval.
 
-Main Manager runs every 900000ms (15 minutes). Scheduler deadlines and queue-file events wake it immediately, independently of that periodic cycle. The queue watcher uses native events with a 250ms stat fallback. Project scanning defaults to 15000ms; verification starts after a fresh 300000ms (5 minute) quiet window. If source changes again during the quiet window, the timer resets from the latest change. Poll/debounce overrides are only for controlled tests. The installed service explicitly restores production-independent local defaults.
+Main Manager runs every 900000ms (15 minutes). Scheduler deadlines and queue-file events wake it immediately, independently of that periodic cycle. The queue watcher uses native events with a 250ms stat fallback. Project scanning defaults to 15000ms; verification starts after a fresh 600000ms (10 minute) quiet window. If source changes again during the quiet window, the timer resets from the latest change. Coding Agent completion hands off to Verification immediately without waiting for the quiet window. Poll/debounce overrides are only for controlled tests. The installed service explicitly restores production-independent local defaults.
 
 Task lifecycle: `PENDING → READY → IN_PROGRESS → VERIFYING → COMPLETED`; exceptions `BLOCKED`, `FAILED`, `HUMAN_REVIEW`, `CANCELLED`. Dependencies require COMPLETED predecessors. Result and followup creation are one queue transaction. Active dedupe includes human-review tasks. Concurrency serializes each project's work even when supplied group names differ. Writer workflows additionally lock the shared Git directory and create task-specific automation worktrees. No cross-host distributed lease is implemented.
 
@@ -53,7 +53,7 @@ Profiles record required capability coverage. Empty mappings stop at HUMAN_REVIE
 | Growth | Monday 06:00 |
 | Competitor | Wednesday 05:30 |
 | Government Grant | Weekdays 06:00; pre-founder status |
-| Verification | Coding handoff immediately, or code quiet for 5 minutes |
+| Verification | Coding handoff immediately, or code quiet for 10 minutes |
 | Repair / Release gate / high risk | Immediately on their respective events |
 
 On startup the scheduler catches up only today's due slots. Persistent date/owner keys prevent repeat processing after restart. Older missed days are not fabricated. External data adapters are deliberately unconnected: Finance/Growth/Customer/Competitor/Grant tasks block with DATA_SOURCE_NOT_CONNECTED. Reports label external facts UNVERIFIED. Grant deadline helper supports D-30/14/7/3 and escalates registration eligibility.
