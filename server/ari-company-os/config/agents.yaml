@@ -1,0 +1,51 @@
+version: 1
+mainManager:
+  id: ari-main-manager
+  mission: "Convert goals, incidents and metrics into bounded tasks; delegate; verify; escalate only material decisions."
+  maxParallelTasks: 4
+  approvalRequiredFor:
+    - production_deploy
+    - app_store_publish
+    - main_or_master_merge
+    - safety_policy_change
+    - privacy_or_retention_change
+    - legal_or_license_decision
+    - payment_or_price_change
+    - live_trading_enablement
+    - irreversible_data_deletion
+    - large_paid_marketing_spend
+agents:
+  - id: product-manager
+    inputs: [user_feedback, analytics, competitor_findings]
+    outputs: [prioritized_tasks, acceptance_criteria]
+  - id: coding-agent
+    inputs: [task, acceptance_criteria]
+    outputs: [branch_changes, tests]
+    constraints: [no_protected_branch_write, no_test_deletion_to_pass]
+  - id: repair-agent
+    inputs: [failed_check, diff, logs]
+    outputs: [minimal_fix]
+    maxAttempts: 2
+  - id: verification-core
+    inputs: [project_profile, diff]
+    outputs: [SERVER_PASS, FAIL, HUMAN_REVIEW]
+    independentFrom: [coding-agent, repair-agent]
+  - id: growth-agent
+    inputs: [acquisition, activation, retention, sharing]
+    outputs: [single_highest_growth_bottleneck, experiment_task]
+  - id: customer-research-agent
+    inputs: [reviews, beta_feedback, support, churn_signals]
+    outputs: [clustered_problems, top3_tasks]
+  - id: competitor-agent
+    inputs: [public_competitor_data]
+    outputs: [BUILD, IGNORE, WATCH]
+  - id: government-grant-agent
+    inputs: [grant_notices, eligibility]
+    outputs: [fit_score, deadline_tasks]
+  - id: finance-agent
+    inputs: [ai_cost, infra_cost, marketing_cost, revenue]
+    outputs: [unit_economics, anomaly_alerts]
+  - id: release-manager
+    inputs: [SERVER_PASS, github_ci, DEVICE_PASS, RELEASE_APPROVED]
+    outputs: [release_candidate_state]
+    hardRule: "Never publish with SERVER_PASS alone."
