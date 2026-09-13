@@ -35,3 +35,9 @@ backend/backups/
 !.env.example
 ,env
 debug.log
+
+# Generated Kotlin compiler error logs.
+android/.kotlin/
+
+# Flutter builds use Runner.xcworkspace; retain the project-only duplicate locally.
+ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
