@@ -1,0 +1,34 @@
+project: onaria
+repo: Naharuya/soul-bible
+protected_branches: [main]
+debounce_seconds: 1200
+max_auto_repair_attempts: 2
+require_human_for:
+  - safety_policy_change
+  - privacy_policy_change
+  - production_deploy
+  - app_store_publish
+checks:
+  - name: backend-tests
+    cwd: backend
+    command: npm test
+  - name: safety-regression
+    cwd: backend
+    command: node --test test/*safety*.test.js test/*crisis*.test.js
+    allow_no_match: true
+  - name: rag-smoke
+    cwd: backend
+    command: npm run eval:retrieval
+  - name: flutter-test
+    command: flutter test
+  - name: flutter-analyze
+    command: flutter analyze
+build:
+  command: flutter build apk --debug
+  artifact: build/app/outputs/flutter-apk/app-debug.apk
+release_policy:
+  server_pass_required: true
+  device_pass_required: true
+  release_approved_required: true
+  auto_merge: false
+  auto_publish: false
