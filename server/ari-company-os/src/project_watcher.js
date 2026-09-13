@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 import { QuietWindowDebouncer } from './debounce.js';
 
 const execFileAsync = promisify(execFile);
+export const DEFAULT_VERIFICATION_QUIET_MS = 5 * 60 * 1000;
 
 export async function projectFingerprint(cwd, metadataOnly = false) {
   const [{ stdout: head }, { stdout: branch }] = await Promise.all([
@@ -26,7 +27,7 @@ export async function projectFingerprint(cwd, metadataOnly = false) {
 }
 
 export class ProjectWatcher {
-  constructor({ projects, onQuietChange, pollMs = 15000, quietMs = 20 * 60 * 1000, logger = console, statePath = null } = {}) {
+  constructor({ projects, onQuietChange, pollMs = 15000, quietMs = DEFAULT_VERIFICATION_QUIET_MS, logger = console, statePath = null } = {}) {
     this.projects = projects;
     this.onQuietChange = onQuietChange;
     this.pollMs = pollMs;
