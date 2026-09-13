@@ -1,4 +1,5 @@
 import '../src/safety/crisis_detector.dart';
+import '../src/conversation/conversation_models.dart';
 
 /// Prefer examples authored together with the question. Older/offline responses
 /// use intent-specific examples; unrelated stage fallbacks remain forbidden.
@@ -6,6 +7,7 @@ List<String> conversationQuestionExamples(
   String question, {
   List<String> answerExamples = const [],
   String userMessage = '',
+  EmotionType? emotion,
   List<String> situationExamples = const [],
 }) {
   // Ignore preceding statements so their vocabulary cannot choose the answers.
@@ -17,11 +19,21 @@ List<String> conversationQuestionExamples(
           .trim() ??
       '';
   if (q.isEmpty) return const [];
+  // Explicit difficult feelings in the current question/user message take
+  // precedence over the emotion selected at the start of the conversation.
+  final difficult = RegExp(r'걱정|불안|두려|힘들|힘든|슬프|슬펐|슬픈|서운|잘못|괴로|외로|화가|기쁘지|행복하지');
+  final positive = !difficult.hasMatch('$q $userMessage') &&
+      (const {
+        EmotionType.joy, EmotionType.happiness, EmotionType.gratitude,
+        EmotionType.anticipation, EmotionType.admiration, EmotionType.overwhelmed,
+      }.contains(emotion) || RegExp(r'기뻐|기뻤|기쁨|기쁜|기뻐요|기뻐서|기뻐했|기쁘|행복|즐거|즐겁|감사|고마|설레|감탄|벅차').hasMatch(userMessage));
+  final together = RegExp(r'함께|친구|가족|사람|웃고|웃으며').hasMatch(userMessage);
   final supplied = answerExamples
       .map((value) => value.trim())
       .where((value) =>
           value.isNotEmpty &&
           value.length <= 60 &&
+          (!positive || !difficult.hasMatch(value)) &&
           !RegExp(r'[?？\n]|https?:|\d+\s*[:장절]').hasMatch(value) &&
           !const CrisisDetector().assess(value).isCrisis)
       .toSet()
@@ -76,6 +88,13 @@ List<String> conversationQuestionExamples(
     ];
   }
   if (RegExp(r'(마음에 남|기억에 남).*(무엇|어떤)|(무엇|어떤).*(마음에 남|기억에 남)').hasMatch(q)) {
+    if (positive) {
+      return [
+        together ? '저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요.' : '저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요.',
+        '저는 마음이 따뜻해지던 순간이 기억에 남아요.',
+        '저는 저도 모르게 미소 짓던 순간이 기억에 남아요.',
+      ];
+    }
     return const [
       '저는 상대방이 제게 했던 말이 가장 마음에 남아요.',
       '저는 제 마음을 제대로 표현하지 못한 순간이 기억에 남아요.',
@@ -83,6 +102,13 @@ List<String> conversationQuestionExamples(
     ];
   }
   if (RegExp(r'어떤 생각|무슨 생각|떠오른 생각|떠오르는 생각').hasMatch(q)) {
+    if (positive) {
+      return [
+        together ? '저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.' : '저는 이런 순간을 오래 기억하고 싶다고 생각했어요.',
+        '저는 오늘 이 순간이 참 소중하다고 생각했어요.',
+        '저는 이 기쁜 마음을 나누고 싶다고 생각했어요.',
+      ];
+    }
     return const [
       '저는 내가 또 잘못한 건 아닐까 생각했어요.',
       '저는 앞으로도 계속 힘들까 봐 걱정했어요.',
@@ -104,6 +130,13 @@ List<String> conversationQuestionExamples(
     ];
   }
   if (RegExp(r'(몸|신체).*(어떤|어떻|느껴|느끼)|(어떤|어떻).*(몸|신체)').hasMatch(q)) {
+    if (positive) {
+      return const [
+        '저는 입가에 저절로 미소가 지어져요.',
+        '저는 가슴이 따뜻해지는 느낌이 들어요.',
+        '저는 몸이 가볍고 기운이 나는 것 같아요.',
+      ];
+    }
     return const [
       '저는 어깨에 힘이 들어가 있어요.',
       '저는 가슴이 두근거리는 느낌이 들어요.',
@@ -137,6 +170,13 @@ List<String> conversationQuestionExamples(
     return situationExamples;
   }
   if (RegExp(r'어떤 마음|어떤 감정|무슨 감정|(마음|감정|기분)(은|이)?\s*(어떤가|어떠|무엇)').hasMatch(q)) {
+    if (positive) {
+      return const [
+        '저는 기쁘고 즐거운 마음이 가장 컸어요.',
+        '저는 고맙고 따뜻한 마음이 들었어요.',
+        '저는 설레고 기대되는 마음이 들었어요.',
+      ];
+    }
     return const [
       '저는 서운하고 슬픈 마음이 가장 컸어요.',
       '저는 불안하고 걱정되는 마음이 컸어요.',

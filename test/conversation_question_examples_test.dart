@@ -3,6 +3,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onaria/features/conversation_question_examples.dart';
 
 void main() {
+  test('joy screenshot thought examples follow the shared happy experience', () {
+    final examples = conversationQuestionExamples('그때 어떤 생각이 들었나요?',
+        emotion: EmotionType.joy,
+        userMessage: '함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요.',
+        answerExamples: ['저는 앞으로도 계속 힘들까 봐 걱정했어요.']);
+    expect(examples, hasLength(3));
+    expect(examples.first, '저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.');
+    expect(examples.join(), isNot(matches(r'걱정|잘못|힘들')));
+  });
+  test('positive emotions do not default to sadness or tension', () {
+    for (final emotion in [EmotionType.joy, EmotionType.happiness,
+      EmotionType.gratitude, EmotionType.anticipation,
+      EmotionType.admiration, EmotionType.overwhelmed]) {
+      for (final question in ['어떤 생각이 들었나요?', '지금 기분은 어떤가요?',
+        '몸에서 어떤 느낌이 느껴지나요?', '가장 마음에 남는 것은 무엇인가요?']) {
+        final examples = conversationQuestionExamples(question, emotion: emotion);
+        expect(examples, hasLength(3));
+        expect(examples.join(), isNot(matches(r'걱정|잘못|힘들|슬픈|불안|무겁|표현하지 못')));
+      }
+    }
+  });
+  test('latest difficult feelings and explicit worry question override joy', () {
+    expect(conversationQuestionExamples('그때 어떤 생각이 들었나요?',
+        emotion: EmotionType.joy, userMessage: '하지만 내일이 걱정되고 힘들어요.').join(), contains('걱정'));
+    expect(conversationQuestionExamples('무엇이 가장 걱정되나요?',
+        emotion: EmotionType.joy).join(), contains('걱정'));
+    expect(conversationQuestionExamples('어떤 생각이 들었나요?',
+        emotion: EmotionType.sadness, userMessage: '친구와 함께 웃으니 행복해요.').first,
+        contains('함께 웃을'));
+  });
+
   test('response decoding tolerates absent or malformed optional examples', () {
     const original = LlmConversationResponse(
         message: '마음을 살펴볼게요.',

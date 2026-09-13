@@ -99,6 +99,36 @@ void main() {
       expect(find.text('오늘의 말씀'), findsWidgets);
     });
   }
+  testWidgets('joy follow-up examples match context and send on tap', (tester) async {
+    rootBundle.clear();
+    await tester.runAsync(() => rootBundle.loadString('assets/data/bible_verses_ko.json'));
+    for (final channel in ['flutter_tts', 'plugin.csdcorp.com/speech_to_text']) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(MethodChannel(channel), (_) async => 1);
+    }
+    final client = _ExampleClient(questions: ['그때 어떤 생각이 들었나요?', '지금 기분은 어떤가요?']);
+    await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
+      home: ConversationPage(emotion: EmotionType.joy, intensity: 9, apiClient: client)));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요.');
+    await tester.tap(find.byTooltip('보내기'));
+    await tester.pump();
+    expect(find.byType(OutlinedButton), findsNothing);
+    for (var i = 0; i < 50 && client.requests.isEmpty; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    const example = '저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.';
+    expect(find.text('저는 앞으로도 계속 힘들까 봐 걱정했어요.'), findsNothing);
+    await tester.tap(find.widgetWithText(OutlinedButton, example));
+    for (var i = 0; i < 50 && client.requests.length < 2; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+    expect(client.requests.last.userMessage, example);
+    expect(find.widgetWithText(OutlinedButton, '저는 기쁘고 즐거운 마음이 가장 컸어요.'), findsOneWidget);
+  });
   testWidgets('server-authored examples handle unfamiliar questions and send on tap', (tester) async {
     rootBundle.clear();
     await tester.runAsync(() => rootBundle.loadString('assets/data/bible_verses_ko.json'));
@@ -150,7 +180,7 @@ void main() {
     final answers = [
       sceneQuestion ? '아름다운 노을을 보며 자연의 신비로움에 감탄했어요.' : '오늘 마음이 복잡했어요.',
       sceneQuestion ? '저는 하늘이 붉게 물들던 장면이 가장 기억에 남아요.' : '저는 어제 혼자 집에 돌아왔을 때 그 마음이 가장 크게 느껴졌어요.',
-      '저는 상대방이 제게 했던 말이 가장 마음에 남아요.',
+      sceneQuestion ? '저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요.' : '저는 상대방이 제게 했던 말이 가장 마음에 남아요.',
     ];
     for (var turn = 0; turn < answers.length; turn++) {
       if (turn == 0) {
@@ -394,7 +424,8 @@ void main() {
       expect(find.ancestor(of: find.text(prompt), matching: find.byType(OutlinedButton)), findsNothing);
       expect(find.text('그때 어떤 생각이 들었나요?'), findsOneWidget);
       expect(find.text('이렇게 이어가도 좋아요'), findsOneWidget);
-      expect(find.text('저는 내가 또 잘못한 건 아닐까 생각했어요.'), findsOneWidget);
+      expect(find.text('저는 이런 순간을 오래 기억하고 싶다고 생각했어요.'), findsOneWidget);
+      expect(find.text('저는 내가 또 잘못한 건 아닐까 생각했어요.'), findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
     });

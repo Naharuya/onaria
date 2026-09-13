@@ -191,6 +191,7 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   List<String> get _currentExamplePrompts {
+    if (_busy || _session.isEnded) return const [];
     final assistant = _items.where((item) => !item.fromUser).lastOrNull;
     final question = assistant?.question;
     if (question == null) return const [];
@@ -198,6 +199,7 @@ class _ConversationPageState extends State<ConversationPage> {
       _questionText(question),
       answerExamples: assistant!.answerExamples,
       userMessage: _session.lastUserMessage ?? '',
+      emotion: widget.emotion,
       situationExamples: _emotionSpecificPrompts[widget.emotion] ?? const [],
     );
   }
