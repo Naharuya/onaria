@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import { QuietWindowDebouncer } from './debounce.js';
 
 const execFileAsync = promisify(execFile);
-export const DEFAULT_VERIFICATION_QUIET_MS = 5 * 60 * 1000;
+export const DEFAULT_VERIFICATION_QUIET_MS = 10 * 60 * 1000;
 
 export async function projectFingerprint(cwd, metadataOnly = false) {
   const [{ stdout: head }, { stdout: branch }] = await Promise.all([
