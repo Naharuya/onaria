@@ -1,0 +1,71 @@
+project: rami
+protected_branches:
+  - main
+  - master
+debounce_seconds: 1200
+max_auto_repair_attempts: 2
+checks:
+  - id: git-diff-check
+    command: git
+    args:
+      - diff
+      - --check
+    repairable: false
+    stage: unit
+  - id: flutter-test
+    command: flutter
+    args:
+      - test
+    repairable: false
+    stage: unit
+  - id: flutter-analyze
+    command: flutter
+    args:
+      - analyze
+    repairable: false
+    stage: analyze
+  - id: ndef-parser-invalid-uri
+    command: flutter
+    args:
+      - test
+      - test/rami_card_link_test.dart
+    stage: risk
+    repairable: false
+release_policy:
+  server_pass_required: true
+  github_ci_pass_required: true
+  device_pass_required: true
+  release_approved_required: true
+  auto_merge: false
+  auto_publish: false
+build:
+  command: flutter
+  args:
+    - build
+    - apk
+    - --debug
+  artifact: build/app/outputs/flutter-apk/app-debug.apk
+  automatic: false
+coverage:
+  required:
+    - flutter_test
+    - flutter_analyze
+    - nfc_ndef
+    - initial_deep_link
+    - warm_deep_link
+    - duplicate_protection
+    - invalid_uri_fallback
+    - audio_regression
+  checksByCapability:
+    flutter_test:
+      - flutter-test
+    flutter_analyze:
+      - flutter-analyze
+    nfc_ndef:
+      - ndef-parser-invalid-uri
+    invalid_uri_fallback:
+      - ndef-parser-invalid-uri
+    initial_deep_link: []
+    warm_deep_link: []
+    duplicate_protection: []
+    audio_regression: []

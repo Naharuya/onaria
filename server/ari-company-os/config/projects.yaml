@@ -1,10 +1,13 @@
 projects:
   - id: onaria
-    dir: /Users/server/ari-server/projects/onaria
+    dir: /Users/server/ari-company-os-worktree
+    sourceDir: /Users/server/ari-server/projects/onaria/source
     branchPolicy: automation_only
   - id: rami
-    dir: /Users/server/ari-server/projects/rami
+    dir: /Users/server/ari-company-os-projects/rami
+    sourceDir: /Users/server/ari-server/projects/rami/source
     branchPolicy: automation_only
   - id: k-stock-ai
-    dir: /Users/server/ari-server/projects/k-stock-ai
+    dir: /Users/server/ari-company-os-projects/k-stock-ai
+    sourceDir: /Users/server/ari-server/projects/k-stock-ai/source
     branchPolicy: automation_only

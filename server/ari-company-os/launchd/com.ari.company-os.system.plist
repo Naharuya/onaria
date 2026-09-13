@@ -29,6 +29,8 @@
 	</dict>
 	<key>ExitTimeOut</key>
 	<integer>30</integer>
+	<key>GroupName</key>
+	<string>staff</string>
 	<key>KeepAlive</key>
 	<true/>
 	<key>Label</key>
@@ -49,6 +51,8 @@
 	<string>/Users/server/ari-server/logs/ari-company-os/launchd.stdout.log</string>
 	<key>ThrottleInterval</key>
 	<integer>10</integer>
+	<key>UserName</key>
+	<string>server</string>
 	<key>WorkingDirectory</key>
 	<string>/Users/server/ari-company-os-worktree/server/ari-company-os</string>
 </dict>

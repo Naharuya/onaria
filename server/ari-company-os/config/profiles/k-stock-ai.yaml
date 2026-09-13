@@ -1,0 +1,61 @@
+project: k-stock-ai
+protected_branches:
+  - main
+  - master
+debounce_seconds: 1200
+max_auto_repair_attempts: 2
+checks:
+  - id: git-diff-check
+    command: git
+    args:
+      - diff
+      - --check
+    repairable: false
+    stage: unit
+  - id: mock-tests
+    command: npm
+    args:
+      - test
+    repairable: false
+    env:
+      KSTOCK_LIVE_TRADING_ENABLED: "false"
+      KSTOCK_AI_MODE: mock
+    humanReviewOnFail: true
+    stage: unit
+  - id: mock-smoke
+    command: npm
+    args:
+      - run
+      - smoke
+    repairable: false
+    env:
+      KSTOCK_LIVE_TRADING_ENABLED: "false"
+      KSTOCK_AI_MODE: mock
+    humanReviewOnFail: true
+    stage: smoke
+release_policy:
+  server_pass_required: true
+  github_ci_pass_required: true
+  device_pass_required: true
+  release_approved_required: true
+  auto_merge: false
+  auto_publish: false
+coverage:
+  required:
+    - npm_test
+    - smoke
+    - kis_mock_stub
+    - opendart_mock_stub
+    - risk_hard_stop
+    - external_request_block
+  checksByCapability:
+    npm_test:
+      - mock-tests
+    smoke:
+      - mock-smoke
+    kis_mock_stub: []
+    opendart_mock_stub: []
+    risk_hard_stop:
+      - mock-tests
+    external_request_block:
+      - mock-tests

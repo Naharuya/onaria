@@ -1,8 +1,11 @@
-version: 2
+version: 3
 registryPolicy:
   registry: ../AGENT_REGISTRY.md
   beforeCreatingAgent: required
-  decision: [REUSE_EXISTING, EXTEND_EXISTING, NEW_AGENT_REQUIRED]
+  decision:
+    - REUSE_EXISTING
+    - EXTEND_EXISTING
+    - NEW_AGENT_REQUIRED
   duplicateCandidateWhenAnyTwoMatch:
     - same_inputs
     - same_outputs
@@ -37,7 +40,8 @@ registryPolicy:
     - rami-audio-manager
 mainManager:
   id: ari-main-manager
-  mission: "Convert goals, incidents and metrics into bounded tasks; reuse existing agents first; delegate; verify; escalate only material decisions."
+  mission: Own the queue, dependencies, registry-first assignment, verification
+    and human decisions; never edit product code.
   maxParallelTasks: 4
   approvalRequiredFor:
     - production_deploy
@@ -50,38 +54,804 @@ mainManager:
     - live_trading_enablement
     - irreversible_data_deletion
     - large_paid_marketing_spend
+  trigger:
+    - MANAGER_CYCLE
+    - DAILY_REPORT
+    - HIGH_RISK
+  schedule:
+    - intervalMs: 900000
+    - timezone: Asia/Seoul
+      at: 05:00
+      days:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      taskType: DAILY_REPORT
+  inputs:
+    - task_queue
+    - registry
+    - evidence
+  outputs: &a1
+    - task_assignments
+    - daily_report
+    - human_decisions
+  procedure:
+    - check_queue
+    - resolve_dependencies
+    - find_ready
+    - query_registry
+    - reuse_existing
+    - assign
+    - inspect_progress
+    - retry_transient_failures
+    - handoff_verification
+    - save_results
+    - create_followups
+    - separate_human_review
+  preconditions:
+    - registry_owner_resolved
+    - dependencies_completed
+    - concurrency_available
+  completionCriteria: &a2
+    - result_persisted
+    - next_tasks_persisted_atomically
+  nextTasks: *a1
+  retryPolicy:
+    maxAttempts: 2
+    retryOn:
+      - transient_io
+    onExhausted: HUMAN_REVIEW
+  escalationPolicy:
+    - safety
+    - privacy
+    - legal
+    - license
+    - payment
+    - price
+    - production
+    - app_store
+    - live_trading
+    - secrets
+    - unknown_scope
+  approvalRequired: []
+  dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+  concurrencyGroup: project:<project>
+  enabled: true
+  ownershipDecision: EXTEND_EXISTING
+  domain: company_operations
+  authority: evidence_and_task_only
+  successKpi: *a2
 agents:
   - id: product-manager
-    inputs: [user_feedback, analytics, competitor_findings]
-    outputs: [prioritized_tasks, acceptance_criteria]
+    inputs:
+      - evidence
+      - user_impact
+      - business_impact
+      - risk
+      - owner_goal
+    outputs: &a3
+      - prioritized_development_tasks
+      - acceptance_criteria
+    mission: Turn evidence or owner goals into deduplicated development acceptance
+      criteria.
+    trigger:
+      - PRODUCT_SIGNAL
+      - PRODUCT_GOAL
+      - CUSTOMER_RESEARCH_RESULT
+      - GROWTH_RESULT
+      - COMPETITOR_BUILD
+      - REPEATED_VERIFICATION_FAILURE
+    procedure:
+      - dedupe_requirements
+      - assess_user_impact
+      - assess_business_impact
+      - assess_risk
+      - rank_P0_P1_P2
+      - write_acceptance_criteria
+      - create_unapproved_development_task
+    schedule: []
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+    completionCriteria: &a4
+      - result_persisted
+      - next_tasks_persisted_atomically
+    nextTasks: *a3
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    ownershipDecision: EXTEND_EXISTING
+    domain: product_planning
+    authority: evidence_and_task_only
+    successKpi: *a4
   - id: coding-agent
-    inputs: [task, acceptance_criteria]
-    outputs: [branch_changes, tests]
-    constraints: [no_protected_branch_write, no_test_deletion_to_pass]
+    inputs: &a23
+      - approved_task
+      - acceptance_criteria
+      - resource_scope
+    outputs: &a5
+      - branch_changes
+      - focused_tests
+      - verification_task
+    constraints: &a24
+      - no_protected_branch_write
+      - no_test_deletion_to_pass
+    mission: Implement one approved development task in an isolated automation worktree.
+    trigger:
+      - DEVELOPMENT
+    procedure: &a25
+      - validate_approval_and_criteria
+      - inspect_registry
+      - check_branch
+      - create_task_worktree
+      - read_allowed_code_and_tests
+      - minimal_implementation
+      - focused_test
+      - save_diff_and_result
+      - enqueue_verification
+    schedule: []
+    preconditions: &a26
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - owner_approved
+      - acceptance_criteria_present
+    completionCriteria: &a6
+      - result_persisted
+      - next_tasks_persisted_atomically
+    nextTasks: *a5
+    retryPolicy: &a27
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy: &a28
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: &a29
+      - development
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    ownershipDecision: EXTEND_EXISTING
+    domain: engineering
+    authority: scoped_code_write
+    successKpi: *a6
   - id: repair-agent
-    inputs: [failed_check, diff, logs]
-    outputs: [minimal_fix]
+    inputs:
+      - failed_check
+      - diff
+      - sanitized_failure
+      - repair_count
+    outputs: &a7
+      - minimal_fix
+      - verification_task
     maxAttempts: 2
+    mission: Apply a bounded minimal correction after an eligible verification
+      failure, then request independent verification.
+    trigger:
+      - REPAIR
+    procedure:
+      - reject_sensitive_failure
+      - check_two_attempt_limit
+      - claim_project
+      - create_task_worktree
+      - minimal_fix
+      - save_diff
+      - request_same_verification
+    retryPolicy:
+      maxAttempts: 2
+      scope: verification_lineage
+      onExhausted: HUMAN_REVIEW
+    schedule: []
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+    completionCriteria: &a8
+      - result_persisted
+      - next_tasks_persisted_atomically
+    nextTasks: *a7
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    ownershipDecision: EXTEND_EXISTING
+    domain: engineering
+    authority: scoped_code_write
+    successKpi: *a8
   - id: verification-core
-    inputs: [project_profile, diff]
-    outputs: [SERVER_PASS, FAIL, HUMAN_REVIEW]
-    independentFrom: [coding-agent, repair-agent]
+    inputs:
+      - project_profile
+      - revision
+      - diff
+    outputs: &a9
+      - SERVER_PASS
+      - FAIL
+      - HUMAN_REVIEW
+    independentFrom:
+      - coding-agent
+      - repair-agent
+    mission: Independently verify project profiles without editing code or invoking
+      repair.
+    trigger:
+      - VERIFY_PROJECT
+      - CODE_QUIET_WINDOW
+    procedure:
+      - load_profile
+      - git_diff_check
+      - secret_scan
+      - lint_analyze
+      - unit_tests
+      - integration_smoke
+      - project_risk_tests
+      - test_build
+      - save_revision_bound_result
+    schedule: []
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+    completionCriteria: &a10
+      - result_persisted
+      - next_tasks_persisted_atomically
+    nextTasks: *a9
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    ownershipDecision: EXTEND_EXISTING
+    domain: engineering
+    authority: evidence_and_task_only
+    successKpi: *a10
   - id: growth-agent
-    inputs: [acquisition, activation, retention, sharing]
-    outputs: [single_highest_growth_bottleneck, experiment_task]
+    inputs:
+      - acquisition
+      - activation
+      - core_action
+      - share
+      - D1
+      - D7
+      - D30
+      - CAC
+    outputs: &a11
+      - single_bottleneck
+      - hypothesis
+      - KPI
+      - single_experiment_task
+    mission: Find one seven-day funnel bottleneck and propose at most one measurable
+      experiment.
+    trigger:
+      - GROWTH
+    schedule:
+      - timezone: Asia/Seoul
+        at: 06:00
+        days:
+          - 1
+    procedure:
+      - collect_7_days
+      - compare_previous_period
+      - funnel_drop
+      - select_one_bottleneck
+      - hypothesis
+      - measurement
+      - one_experiment
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - data_source_connected
+    completionCriteria: &a12
+      - evidence_backed_output_or_DATA_INSUFFICIENT
+      - never_fabricate_sources
+    nextTasks: *a11
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    dataSource:
+      connected: false
+      state: DATA_SOURCE_NOT_CONNECTED
+    ownershipDecision: EXTEND_EXISTING
+    domain: growth
+    authority: evidence_and_task_only
+    successKpi: *a12
   - id: customer-research-agent
-    inputs: [reviews, beta_feedback, support, churn_signals]
-    outputs: [clustered_problems, top3_tasks]
+    inputs:
+      - beta_feedback
+      - support_feedback
+      - reviews
+      - churn_analytics
+    outputs: &a13
+      - top3_problems
+      - product_manager_task
+    mission: Cluster connected feedback and pass at most three evidence-backed
+      problems to Product Manager.
+    trigger:
+      - CUSTOMER_RESEARCH
+      - BETA_FEEDBACK
+      - SUPPORT_FEEDBACK
+      - USER_REVIEW
+      - CHURN_EVENT
+    schedule:
+      - timezone: Asia/Seoul
+        at: 05:30
+        days:
+          - 1
+    procedure:
+      - collect
+      - cluster
+      - frequency
+      - severity
+      - business_impact
+      - top3
+      - product_handoff
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - data_source_connected
+    completionCriteria: &a14
+      - evidence_backed_output_or_DATA_INSUFFICIENT
+      - never_fabricate_sources
+    nextTasks: *a13
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    dataSource:
+      connected: false
+      state: DATA_SOURCE_NOT_CONNECTED
+    ownershipDecision: EXTEND_EXISTING
+    domain: customer_research
+    authority: evidence_and_task_only
+    successKpi: *a14
   - id: competitor-agent
-    inputs: [public_competitor_data]
-    outputs: [BUILD, IGNORE, WATCH]
+    inputs:
+      - registered_competitors
+      - public_prices
+      - features
+      - store_updates
+      - major_reviews
+      - positioning
+    outputs: &a15
+      - meaningful_changes
+      - BUILD_WATCH_IGNORE
+      - product_manager_task
+    mission: Compare registered competitor snapshots and route meaningful BUILD
+      proposals to Product Manager.
+    trigger:
+      - COMPETITOR
+    schedule:
+      - timezone: Asia/Seoul
+        at: 05:30
+        days:
+          - 3
+    procedure:
+      - collect_registered_competitors
+      - compare_snapshot
+      - filter_meaningful_changes
+      - classify
+      - route_BUILD_to_product
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - data_source_connected
+    completionCriteria: &a16
+      - evidence_backed_output_or_DATA_INSUFFICIENT
+      - never_fabricate_sources
+    nextTasks: *a15
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    dataSource:
+      connected: false
+      state: DATA_SOURCE_NOT_CONNECTED
+    ownershipDecision: EXTEND_EXISTING
+    domain: market_research
+    authority: evidence_and_task_only
+    successKpi: *a16
   - id: government-grant-agent
-    inputs: [grant_notices, eligibility]
-    outputs: [fit_score, deadline_tasks]
+    inputs:
+      - public_notices
+      - pre_founder_status
+      - ONARIA_RAMI_AI_fit
+    outputs: &a17
+      - qualified_opportunities
+      - D-30_D-14_D-7_D-3_tasks
+      - HUMAN_REVIEW
+    mission: Find relevant grants for a pre-founder without making
+      business-registration eligibility decisions.
+    trigger:
+      - GOVERNMENT_GRANT
+      - GRANT_DEADLINE
+    schedule:
+      - timezone: Asia/Seoul
+        at: 06:00
+        days:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+    procedure:
+      - search_pre_startup_AI_content_regional_programs
+      - eligibility
+      - business_registration_impact
+      - project_fit
+      - funding_and_self_contribution
+      - deadline
+      - documents
+      - qualified_tasks
+      - deadline_offsets
+    businessStatus: PRE_FOUNDER
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - data_source_connected
+    completionCriteria: &a18
+      - evidence_backed_output_or_DATA_INSUFFICIENT
+      - never_fabricate_sources
+    nextTasks: *a17
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    dataSource:
+      connected: false
+      state: DATA_SOURCE_NOT_CONNECTED
+    ownershipDecision: EXTEND_EXISTING
+    domain: funding
+    authority: evidence_and_task_only
+    successKpi: *a18
   - id: finance-agent
-    inputs: [ai_cost, infra_cost, marketing_cost, revenue]
-    outputs: [unit_economics, anomaly_alerts]
+    inputs:
+      - OpenAI_API_cost
+      - server_cost
+      - AI_cost
+      - marketing_cost
+      - store_cost
+      - license_cost
+      - revenue
+    outputs: &a19
+      - project_costs
+      - period_comparisons
+      - session_cost
+      - contribution_margin_when_possible
+      - anomaly_tasks
+    mission: Aggregate connected project costs and revenue; report anomalies without
+      changing prices or payment policy.
+    trigger:
+      - FINANCE
+    schedule:
+      - timezone: Asia/Seoul
+        at: 05:20
+        days:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+    procedure:
+      - collect_connected_costs
+      - project_aggregation
+      - compare_day_7d_30d
+      - detect_anomaly
+      - session_cost
+      - contribution_margin
+      - anomaly_task
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+      - data_source_connected
+    completionCriteria: &a20
+      - evidence_backed_output_or_DATA_INSUFFICIENT
+      - never_fabricate_sources
+    nextTasks: *a19
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    dataSource:
+      connected: false
+      state: DATA_SOURCE_NOT_CONNECTED
+    ownershipDecision: EXTEND_EXISTING
+    domain: finance
+    authority: evidence_and_task_only
+    successKpi: *a20
   - id: release-manager
-    inputs: [SERVER_PASS, github_ci, DEVICE_PASS, RELEASE_APPROVED]
-    outputs: [release_candidate_state]
-    hardRule: "Never publish with SERVER_PASS alone."
+    inputs:
+      - SERVER_PASS
+      - github_ci
+      - test_build
+      - DEVICE_PASS
+      - RELEASE_APPROVED
+    outputs: &a21
+      - release_candidate_state
+    hardRule: Never publish with SERVER_PASS alone.
+    mission: Check evidence gates only; never merge, deploy or publish.
+    trigger:
+      - RELEASE_GATE
+      - SERVER_PASS
+    procedure:
+      - server_pass
+      - matching_commit_github_ci
+      - matching_test_build
+      - matching_device_pass
+      - owner_release_approval
+      - record_gate_only
+    schedule: []
+    preconditions:
+      - registry_owner_resolved
+      - dependencies_completed
+      - concurrency_available
+    completionCriteria: &a22
+      - result_persisted
+      - next_tasks_persisted_atomically
+    nextTasks: *a21
+    retryPolicy:
+      maxAttempts: 0
+      retryOn:
+        - transient_io
+      onExhausted: HUMAN_REVIEW
+    escalationPolicy:
+      - safety
+      - privacy
+      - legal
+      - license
+      - payment
+      - price
+      - production
+      - app_store
+      - live_trading
+      - secrets
+      - unknown_scope
+    approvalRequired: []
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    ownershipDecision: EXTEND_EXISTING
+    domain: release_gates
+    authority: evidence_and_task_only
+    successKpi: *a22
+existingAgents:
+  - id: safety_agent
+    layer: product-runtime
+    path: backend/src/agents/safety_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: psychology_agent
+    layer: product-runtime
+    path: backend/src/agents/psychology_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: conversation_orchestrator
+    layer: product-runtime
+    path: backend/src/agents/conversation_orchestrator.js
+    ownershipDecision: REUSE_EXISTING
+  - id: religion_router
+    layer: product-runtime
+    path: backend/src/agents/religion_router.js
+    ownershipDecision: REUSE_EXISTING
+  - id: religious_integrity_agent
+    layer: product-runtime
+    path: backend/src/agents/religious_integrity_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: response_integrator
+    layer: product-runtime
+    path: backend/src/agents/response_integrator.js
+    ownershipDecision: REUSE_EXISTING
+  - id: citation_validator
+    layer: product-runtime
+    path: backend/src/agents/citation_validator.js
+    ownershipDecision: REUSE_EXISTING
+  - id: citation_grounding
+    layer: product-runtime
+    path: backend/src/agents/citation_grounding.js
+    ownershipDecision: REUSE_EXISTING
+  - id: protestant_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/protestant_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: catholic_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/catholic_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: buddhist_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/buddhist_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: jewish_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/jewish_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: islamic_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/islamic_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: hindu_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/hindu_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: confucian_agent
+    layer: product-runtime
+    path: backend/src/agents/religions/confucian_agent.js
+    ownershipDecision: REUSE_EXISTING
+  - id: rami-audio-manager
+    layer: development-specialist
+    path: .github/agents/rami-audio-manager.agent.md
+    capabilities:
+      - rami_audio
+      - record
+      - playback
+      - card_sound
+    ownershipDecision: REUSE_EXISTING
+    executionProvider: coding-agent
+    inputs: *a23
+    outputs: *a5
+    constraints: *a24
+    mission: Reuse the canonical RAMI Audio Manager specialist for approved audio work.
+    trigger:
+      - RAMI_AUDIO_DEVELOPMENT
+    procedure: *a25
+    schedule: []
+    preconditions: *a26
+    completionCriteria: *a6
+    nextTasks: *a5
+    retryPolicy: *a27
+    escalationPolicy: *a28
+    approvalRequired: *a29
+    dedupeKey: <project>:<task_type>:<resource_scope>:<goal_hash>
+    concurrencyGroup: project:<project>
+    enabled: true
+    domain: rami_audio
+    authority: scoped_code_write
+    successKpi: *a6
