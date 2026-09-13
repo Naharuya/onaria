@@ -1,7 +1,43 @@
-version: 1
+version: 2
+registryPolicy:
+  registry: ../AGENT_REGISTRY.md
+  beforeCreatingAgent: required
+  decision: [REUSE_EXISTING, EXTEND_EXISTING, NEW_AGENT_REQUIRED]
+  duplicateCandidateWhenAnyTwoMatch:
+    - same_inputs
+    - same_outputs
+    - same_domain
+    - same_authority
+    - same_success_kpi
+  preferProjectProfileOverAgentClone: true
+  canonicalAliases:
+    qa-agent: verification-core
+    test-agent: verification-core
+    verification-agent: verification-core
+    code-fix-agent: repair-agent
+    debug-agent: repair-agent
+    developer-agent: coding-agent
+  doNotRecreateExistingRuntimeAgents:
+    - safety_agent
+    - psychology_agent
+    - conversation_orchestrator
+    - religion_router
+    - religious_integrity_agent
+    - response_integrator
+    - citation_validator
+    - citation_grounding
+    - protestant_agent
+    - catholic_agent
+    - buddhist_agent
+    - jewish_agent
+    - islamic_agent
+    - hindu_agent
+    - confucian_agent
+  doNotRecreateExistingDevelopmentAgents:
+    - rami-audio-manager
 mainManager:
   id: ari-main-manager
-  mission: "Convert goals, incidents and metrics into bounded tasks; delegate; verify; escalate only material decisions."
+  mission: "Convert goals, incidents and metrics into bounded tasks; reuse existing agents first; delegate; verify; escalate only material decisions."
   maxParallelTasks: 4
   approvalRequiredFor:
     - production_deploy
