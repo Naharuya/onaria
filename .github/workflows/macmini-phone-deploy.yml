@@ -1,8 +1,7 @@
-name: Mac mini phone auto-deploy
+name: Mac mini phone manual deploy
 
+# Device installation requires an explicit manual dispatch.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
