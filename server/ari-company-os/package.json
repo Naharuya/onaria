@@ -1,0 +1,16 @@
+{
+  "name": "ari-autonomous-company-os",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node bin/ari-manager.js daemon",
+    "status": "node bin/ari-manager.js status",
+    "run": "node bin/ari-manager.js run",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}
