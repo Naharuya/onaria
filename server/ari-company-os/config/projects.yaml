@@ -1,0 +1,10 @@
+projects:
+  - id: onaria
+    dir: /Users/server/ari-server/projects/onaria
+    branchPolicy: automation_only
+  - id: rami
+    dir: /Users/server/ari-server/projects/rami
+    branchPolicy: automation_only
+  - id: k-stock-ai
+    dir: /Users/server/ari-server/projects/k-stock-ai
+    branchPolicy: automation_only
