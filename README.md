@@ -1,10 +1,10 @@
-# onaria MVP v0.4.1 테스트 버전
+# ONARIA MVP v0.4.1 테스트 버전
 
 개발 문서는 [문서 안내](docs/README.md)에서 찾을 수 있습니다. [현재 상태](ONARIA_STATUS.md), [작업 순서](ONARIA_ROADMAP.md), [완료 기준](ONARIA_GATES.md)을 기준으로 확인하고, 과거 보고서는 개발 이력으로 참고합니다.
 
-앱의 공식 표기는 소문자 `onaria`입니다. Flutter 패키지는 `onaria`, 앱 진입 위젯은 `OnariaApp`이며, 공용 라이브러리는 `lib/onaria.dart`입니다.
+앱의 공식 사용자 표시명은 `ONARIA`, 영문 기술명과 폴더명은 `onaria`입니다. Flutter 패키지는 `onaria`, 앱 진입 위젯은 `OnariaApp`이며, 공용 라이브러리는 `lib/onaria.dart`입니다.
 
-빌드 설정은 `ONARIA_API_BASE_URL`, `ONARIA_APP_TOKEN`, `ONARIA_PREMIUM_MEMBER`를 사용합니다. 기존 `SOUL_BIBLE_*` 설정도 호환되며, 두 설정이 있으면 `ONARIA_*`가 우선합니다. 기존 설치 앱과 저장 데이터를 이어 쓰도록 Android/iOS 앱 식별자, 로컬 저장 키, 관리자 세션 키는 유지합니다. 실제 저장소 주소·작업 폴더·서버 경로·SSH 별칭·서비스 및 Docker 볼륨 이름 역시 기존 운영 연결과 데이터를 보존하기 위해 유지합니다.
+빌드 설정은 `ONARIA_API_BASE_URL`, `ONARIA_APP_TOKEN`, `ONARIA_PREMIUM_MEMBER`를 사용합니다. 기존 `SOUL_BIBLE_*` 설정도 호환되며, 두 설정이 있으면 `ONARIA_*`가 우선합니다. 기존 설치 앱과 저장 데이터를 이어 쓰도록 Android/iOS 앱 식별자, 로컬 저장 키, 관리자 세션 키는 유지합니다. 실제 원격 저장소 주소·서버 경로·SSH 별칭·서비스 및 Docker 볼륨 이름 역시 기존 운영 연결과 데이터를 보존하기 위해 유지합니다.
 
 감정적으로 공감하고 질문을 건네며, 사용자의 동의를 받은 뒤 마음에 맞는
 말씀과 작은 실천을 제안하는 Flutter 앱입니다. AI Router가 한국어 성경,
@@ -166,3 +166,5 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 - os : Rocky 9
 - SSH 접속: `ssh soul-bible-server` (로컬 `~/.ssh/config`와 전용 키 필요)
 - 비밀번호와 API 키는 문서나 Git에 저장하지 말고 서버의 비밀 환경변수로 관리
+
+명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `/Users/server/ari-server/projects/onaria/source`입니다.

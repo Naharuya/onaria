@@ -8,7 +8,7 @@
 
 ## 변경한 라우팅
 
-기본 활성화이며 `SOUL_COST_ROUTER_V1_ENABLED=false`로 기존 경로를 복구할 수 있다. 기존 단계별 테스트는 이 롤백 경로를 명시적으로 검증하며, `ai_cost_router_v1.test.js`는 기본 활성 경로를 검증한다.
+기본 활성화이며 `ONARIA_COST_ROUTER_V1_ENABLED=false`로 기존 경로를 복구할 수 있다. 기존 단계별 테스트는 이 롤백 경로를 명시적으로 검증하며, `ai_cost_router_v1.test.js`는 기본 활성 경로를 검증한다.
 
 | 처리 | 기본 모델 | 출력 상한 | 호출 정책 |
 |---|---|---:|---|
@@ -26,11 +26,11 @@ reason은 local_template, simple_emotion, simple_followup, summary, rag_answer, 
 
 ## 비용과 품질 조건
 
-`SOUL_TARGET_SESSION_COST_USD=0.007`은 세션 목표이며 청구 상한이 아니다. 세션 지출과 다음 등급의 계획 비용으로 목표 초과 가능성을 확인한다. 일반적인 짧은 비교는 품질 하한인 Terra로 처리할 수 있지만, 신정론·복잡한 논증은 Sol 하한을 유지한다. 비용 게이트가 필요한 등급을 허용하지 않으면 약한 모델로 대체하지 않고 Local fallback을 사용한다.
+`ONARIA_TARGET_SESSION_COST_USD=0.007`은 세션 목표이며 청구 상한이 아니다. 세션 지출과 다음 등급의 계획 비용으로 목표 초과 가능성을 확인한다. 일반적인 짧은 비교는 품질 하한인 Terra로 처리할 수 있지만, 신정론·복잡한 논증은 Sol 하한을 유지한다. 비용 게이트가 필요한 등급을 허용하지 않으면 약한 모델로 대체하지 않고 Local fallback을 사용한다.
 
 Free/Premium의 기존 하루·월 요청량, 예산, 검증된 회원 신원 및 전역 premium 호출 비중 5% 정책을 보존한다. Free는 기본 Luna이고 Terra는 예산 내에서만 가능하다. Free의 Sol은 기본적으로 허용되지 않는다. Premium도 전역 5% 제한 때문에 초기 요청에서는 Sol이 거부될 수 있다.
 
-명시적 `SOUL_AI_REQUEST_RESERVATION_USD`는 기존 hard limit로 존중한다. 비어 있으면 Luna $0.004, Terra $0.028, Sol $0.08을 보수적으로 예약하고 확인된 사용량으로 정산한다. 종교 비교는 전통 수만큼 예약한다. 이는 실제 청구액이나 세션 목표와 다르다. 각 실제 호출 전에는 UTF-8 바이트 길이와 schema/framing 여유, 최대 출력 및 캐시 쓰기 가격으로 비용 상한을 확인한다. 알 수 없는 가격/사용량은 null로 남기고 예약을 유지한다.
+명시적 `ONARIA_AI_REQUEST_RESERVATION_USD`는 기존 hard limit로 존중한다. 비어 있으면 Luna $0.004, Terra $0.028, Sol $0.08을 보수적으로 예약하고 확인된 사용량으로 정산한다. 종교 비교는 전통 수만큼 예약한다. 이는 실제 청구액이나 세션 목표와 다르다. 각 실제 호출 전에는 UTF-8 바이트 길이와 schema/framing 여유, 최대 출력 및 캐시 쓰기 가격으로 비용 상한을 확인한다. 알 수 없는 가격/사용량은 null로 남기고 예약을 유지한다.
 
 ## Prompt cache와 Memory
 
@@ -52,7 +52,7 @@ sourceContext는 최대 3개, 본문 각 1,200자로 제한한다. 모델이 만
 
 근거: [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna), [Terra](https://developers.openai.com/api/docs/models/gpt-5.6-terra), [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol), [Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching). Sol 가격은 적어도 2026-11-21까지의 프로모션 가격이므로 이후 재검토해야 한다. 캐시는 최소 1,024토큰 조건을 만족해야 하며 적중을 보장하지 않는다. 짧은 프롬프트를 캐시만을 위해 불필요하게 늘리지 않는다.
 
-`SOUL_MODEL_PRICING_JSON`이 비어 있으면 이 기본표를 사용한다. 명시적 `{}` 또는 미등록 모델은 비용 미상으로 남긴다. 기존 배포의 가격표를 쓰면 새로운 모델 및 cacheWrite 가격도 포함해야 한다.
+`ONARIA_MODEL_PRICING_JSON`이 비어 있으면 이 기본표를 사용한다. 명시적 `{}` 또는 미등록 모델은 비용 미상으로 남긴다. 기존 배포의 가격표를 쓰면 새로운 모델 및 cacheWrite 가격도 포함해야 한다.
 
 요청 로그는 provider/model/tier/modelCalls/inputTokens/cachedInputTokens/cacheWriteTokens/outputTokens/estimatedCostUsd/latencyMs/fallback/fallbackReason을 기록한다. 사용자 원문과 키는 넣지 않는다. 기존 메모리 원장과 SQLite 원장에 sessionSummary를 추가하여 세션 호출·입력·캐시·출력·비용·미상 호출 수를 합산한다. SQLite에는 캐시 쓰기 토큰 컬럼을 호환 방식으로 추가하고 재시작 이후 합산을 테스트한다.
 

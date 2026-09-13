@@ -7,8 +7,8 @@
 기본 실행값은 기존 .env.example과 동일하다. 실제 .env는 읽거나 수정하지 않았다.
 
 ```env
-SOUL_AI_MODE=local
-SOUL_MULTI_AGENT_ENABLED=false
+ONARIA_AI_MODE=local
+ONARIA_MULTI_AGENT_ENABLED=false
 OPENAI_API_KEY=
 ```
 

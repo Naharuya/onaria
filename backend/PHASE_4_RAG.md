@@ -5,7 +5,7 @@
 3단계의 7개 Religion Agent, 역할 명세, `generateResult()` 및 기존 출력 어댑터를 재사용했다.
 공개 `/v1/mind/chat` 요청·응답 스키마와 종교 ID는 변경하지 않았다.
 `createLocalConversationService()`, local fallback, 인증, 기존 deadline과 feature gate를 유지했다.
-`SOUL_MULTI_AGENT_ENABLED=false`에서는 KB 검색도 모델 생성도 실행하지 않는다.
+`ONARIA_MULTI_AGENT_ENABLED=false`에서는 KB 검색도 모델 생성도 실행하지 않는다.
 실제 `.env` 및 `.env.example`은 이번 작업에서 수정하지 않았다. API key나 비밀정보를 추가하지 않았다.
 기존 작업 트리의 다른 변경은 유지했다.
 

@@ -7,7 +7,7 @@
 설정 우선순위는 `ONARIA_API_BASE_URL` → `SOUL_BIBLE_API_BASE_URL` → 공식 기본값입니다. 빈 값을 명시하면 연결을 비활성화합니다. Debug도 기본은 공식 API이며 개발 주소를 자동 선택하지 않습니다.
 
 ```bash
-flutter run --dart-define=SOUL_BIBLE_API_BASE_URL=http://127.0.0.1:8787
+flutter run --dart-define=ONARIA_API_BASE_URL=http://127.0.0.1:8787
 flutter build apk --debug
 flutter build appbundle --release
 flutter build ios --release
@@ -21,4 +21,4 @@ CI의 override 테스트는 테스트 프로세스에만 define을 전달합니�
 
 2026-09-13 공식 `/health` 실요청: HTTP 200, `{"status":"ok"}`, TLS 인증서 검증 성공, redirect 0. 실제 OpenAI 유료 호출이나 개인정보 전송은 하지 않았습니다.
 
-구도메인은 보안 차단 규칙·부정 테스트·archive 이력에만 유지할 수 있습니다. 이번 범위 밖의 `backend/ADMIN_PWA.md`, `script/setup-admin-https.sh`, `script/soul-bible-http.conf`는 수정하지 않았으며 기존 서버 설정 이력으로 취급합니다. 앱 빌드나 API 주소 결정에 사용하지 않습니다.
+구도메인은 보안 차단 규칙·부정 테스트·archive 이력에만 유지할 수 있습니다. 이번 범위 밖의 `backend/ADMIN_PWA.md`, `script/setup-admin-https.sh`, `script/onaria-http.conf`는 수정하지 않았으며 기존 서버 설정 이력으로 취급합니다. 앱 빌드나 API 주소 결정에 사용하지 않습니다.

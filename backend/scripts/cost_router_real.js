@@ -1,3 +1,4 @@
+import { brandEnv } from '../src/brand_env.js';
 import OpenAI from 'openai';
 import { getEncoding } from 'js-tiktoken';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -33,7 +34,7 @@ export function nearestRank(values, p) { const sorted = values.filter(Number.isF
 
 export async function runRealBenchmark() {
   await safetyPreflight();
-  const env = { ...process.env, SOUL_COST_ROUTER_V1_ENABLED: 'true' };
+  const env = { ...process.env, ONARIA_COST_ROUTER_V1_ENABLED: 'true' };
   if (!env.OPENAI_API_KEY) throw Error('REAL requires a configured API key (value suppressed).');
   // Added after the recorded REAL failure: do not pay for another benchmark
   // while this known safety regression remains unresolved.
@@ -127,8 +128,8 @@ export async function runRealBenchmark() {
   const totalInput = main.reduce((s, r) => s + r.sessionInputTokens, 0); const cached = main.reduce((s, r) => s + r.sessionCachedTokens, 0);
   const costs = main.map(s => s.sessionEstimatedCostUsd);
   const report = { stage: 'REAL', generatedAt: new Date().toISOString(), sessionDefinition: '3 scripted messages; not observed completed production journeys',
-    productionPolicyChanged: false, corpusMode: env.NODE_ENV === 'production' || env.SOUL_CORPUS_MODE === 'production' ? 'production' : 'development',
-    externalEmbeddingConfigured: env.SOUL_EMBEDDING_PROVIDER === 'openai', pricing, requests, sessions,
+    productionPolicyChanged: false, corpusMode: env.NODE_ENV === 'production' || brandEnv(env).ONARIA_CORPUS_MODE === 'production' ? 'production' : 'development',
+    externalEmbeddingConfigured: brandEnv(env).ONARIA_EMBEDDING_PROVIDER === 'openai', pricing, requests, sessions,
     summary: { averageCostUsd: known ? costs.reduce((s, n) => s + n, 0) / main.length : null,
       p50SessionCostUsd: known ? nearestRank(costs, 0.5) : null, p90SessionCostUsd: known ? nearestRank(costs, 0.9) : null,
       p50RequestLatencyMs: nearestRank(mainRequests.map(r => r.latencyMs), 0.5), p90RequestLatencyMs: nearestRank(mainRequests.map(r => r.latencyMs), 0.9),

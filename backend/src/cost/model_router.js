@@ -1,3 +1,4 @@
+import { brandEnv } from '../brand_env.js';
 export const taskTiers = Object.freeze({
   crisis: 'local', self_harm: 'local', immediate_safety: 'local', rule: 'local', greeting: 'local',
   bible_search: 'rag', religion_search: 'rag', emotion: 'cheap', intent: 'cheap',
@@ -35,7 +36,7 @@ export function classifyTask(body, { v1 = false } = {}) {
   return 'conversation';
 }
 
-export const costRouterEnabled = env => env.SOUL_COST_ROUTER_V1_ENABLED !== 'false';
+export const costRouterEnabled = env => brandEnv(env).ONARIA_COST_ROUTER_V1_ENABLED !== 'false';
 export const costTierNames = Object.freeze({ cheap: 'luna', standard: 'terra', premium: 'sol', local: 'local', rag: 'rag' });
 export const outputLimits = Object.freeze({ luna: 220, terra: 360, sol: 600, local: 0, rag: 0 });
 export function modelForCostTier(ledgerTier, env = {}) {
@@ -64,7 +65,7 @@ export function routeCostRequest(body, env = {}) {
 }
 
 export function applySessionTarget(route, session, env = {}) {
-  const value = Number(env.SOUL_TARGET_SESSION_COST_USD ?? 0.007);
+  const value = Number(brandEnv(env).ONARIA_TARGET_SESSION_COST_USD ?? 0.007);
   const target = Number.isFinite(value) && value > 0 ? value : 0.007;
   const spent = session?.sessionEstimatedCostUsd;
   const projected = { luna: 0.0008, terra: 0.008, sol: 0.02 }[route.tier] ?? 0;

@@ -58,10 +58,13 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
   }
 
   @override
-  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+  Future<bool> didPushRouteInformation(
+      RouteInformation routeInformation) async {
     final uri = routeInformation.uri;
     // An invitation opens the app without replacing an ongoing conversation.
-    return (uri.scheme == 'https' && uri.host == 'api.onaria.ai.kr' && uri.path == '/app/open') ||
+    return (uri.scheme == 'https' &&
+            uri.host == 'api.onaria.ai.kr' &&
+            uri.path == '/app/open') ||
         (uri.scheme == 'onaria' && uri.host == 'app' && uri.path == '/open') ||
         (uri.scheme.isEmpty && uri.path == '/app/open');
   }
@@ -82,7 +85,7 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
         child: ValueListenableBuilder<ThemeColor>(
             valueListenable: _theme,
             builder: (context, color, child) => MaterialApp(
-                  title: 'onaria',
+                  title: 'ONARIA',
                   navigatorKey: _navigator,
                   debugShowCheckedModeBanner: false,
                   theme: AppTheme.forColor(color),

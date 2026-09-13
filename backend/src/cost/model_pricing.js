@@ -1,3 +1,4 @@
+import { brandEnv } from '../brand_env.js';
 // Reviewed 2026-09-12 against developers.openai.com/api/docs/models/gpt-5.6-{luna,terra,sol}.
 // USD / 1M tokens; Sol promotional price needs review after 2026-11-21.
 export const reviewedPricing = Object.freeze({
@@ -7,7 +8,7 @@ export const reviewedPricing = Object.freeze({
 });
 export function readPricing(env = process.env) {
   try {
-    const parsed = JSON.parse(env.SOUL_MODEL_PRICING_JSON || JSON.stringify(reviewedPricing));
+    const parsed = JSON.parse(brandEnv(env).ONARIA_MODEL_PRICING_JSON || JSON.stringify(reviewedPricing));
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
   } catch { return {}; }
 }

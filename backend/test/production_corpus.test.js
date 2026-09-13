@@ -36,7 +36,7 @@ function approved(source = candidate()) {
   return reviewCorpusSource(reviewCorpusSource(source, { status: 'reviewed', reviewer: 'test-reviewer', at: stamp }), { status: 'approved', reviewer: 'test-reviewer', at: stamp });
 }
 const search = { tradition: 'protestant', query: '위로', language: 'ko-KR', limit: 3 };
-const env = { NODE_ENV: 'production', SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
+const env = { NODE_ENV: 'production', ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
 const quiet = { info() {}, warn() {} };
 const body = message => ({ session: { sessionId: 'phase6', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 }, userMessage: message,
   systemPromptVersion: 'ko-v1', allowedVerseIds: [] });
@@ -239,7 +239,7 @@ test('production service: injected unapproved sources fall back and disabled fla
     knowledgeProvider: { search: async request => ({ tradition: request.tradition, query: request.query, results: [candidate()] }) } });
   responseSchema.parse(await generate(body('기독교 위로')));
   assert.equal(logs[0].fallbackReason, 'knowledge_retrieval');
-  const off = createConversationService({ env: { ...env, SOUL_MULTI_AGENT_ENABLED: 'false' }, logger: quiet,
+  const off = createConversationService({ env: { ...env, ONARIA_MULTI_AGENT_ENABLED: 'false' }, logger: quiet,
     openAiFactory: () => assert.fail('disabled'), knowledgeProvider: { search: () => assert.fail('disabled') } });
   const local = createConversationService({ env: {}, logger: quiet });
   assert.deepEqual(await off(body('위로')), await local(body('위로')));

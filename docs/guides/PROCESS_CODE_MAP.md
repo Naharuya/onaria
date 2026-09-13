@@ -1,6 +1,6 @@
 # onaria 앱 프로세스별 코드 안내
 
-작성일: 2026-09-09. 프로젝트: `C:\Users\SJ\AndroidStudioProjects\soul-bible`, 브랜치: `main`.
+작성일: 2026-09-09. 프로젝트: `C:\Users\SJ\AndroidStudioProjects\onaria`, 브랜치: `main`.
 
 현재 파일 배치와 실행 흐름을 기준으로 정리했다. 이번 작업은 문서화이며 코드 이동·파일명 변경·기능 수정은 하지 않았다. 환경변수 이름은 코드상 설정 인터페이스를 설명하기 위한 것이며 실제 .env·인증 값·운영 서버 설정은 확인하지 않았다.
 
@@ -70,7 +70,7 @@ flowchart TD
 
 - 기본 주소: `https://api.onaria.ai.kr`.
 - 채팅 경로: `/v1/mind/chat`. 루트 기준으로 resolve하므로 base URL의 하위 경로를 덧붙이는 방식이 아니다.
-- `SOUL_BIBLE_API_BASE_URL`은 `String.fromEnvironment`로 읽는 빌드 시점 설정이다. 변경하려면 `--dart-define`을 적용해 앱을 다시 실행·빌드해야 한다.
+- `ONARIA_API_BASE_URL`은 `String.fromEnvironment`로 읽는 빌드 시점 설정이다. 변경하려면 `--dart-define`을 적용해 앱을 다시 실행·빌드해야 한다.
 - 운영에서는 HTTPS만 허용한다. debug에서는 localhost, 127.0.0.1, ::1, 10.0.2.2의 HTTP를 허용한다.
 - 채팅 요청 제한 시간은 기본 25초이며 자동 redirect를 따르지 않는다.
 - 설정 오류는 설정 안내, 통신 실패는 연결 실패 안내로 표시한다.
@@ -96,7 +96,7 @@ flowchart TD
 | 서버 대체 응답 | [local_conversation_service.js](../../backend/src/local_conversation_service.js) | 외부 생성 비활성·실패 시 로컬 응답 |
 | 세션 요약 | [memory_store.js](../../backend/src/memory_store.js) | 서버 세션별 요약 관리 |
 
-외부 멀티에이전트는 `SOUL_AI_MODE`, `SOUL_MULTI_AGENT_ENABLED`, 외부 API 제한 및 유효한 인증 설정 등 코드상 조건을 만족해야 한다. RAG의 운영 인덱스와 검색 방식도 설정에 따른다. 코드·테스트의 존재만으로 운영 활성화 상태를 확정하지 않는다. 서버 대체 응답은 유지하며 정상 생성·위기 응답·대체 응답을 모두 구분해 검증해야 한다.
+외부 멀티에이전트는 `ONARIA_AI_MODE`, `ONARIA_MULTI_AGENT_ENABLED`, 외부 API 제한 및 유효한 인증 설정 등 코드상 조건을 만족해야 한다. RAG의 운영 인덱스와 검색 방식도 설정에 따른다. 코드·테스트의 존재만으로 운영 활성화 상태를 확정하지 않는다. 서버 대체 응답은 유지하며 정상 생성·위기 응답·대체 응답을 모두 구분해 검증해야 한다.
 
 자료 준비 및 평가 코드는 [knowledge/ingestion](../../backend/src/knowledge/ingestion), `production_*`, `expert_*`, `*_pilot.js`, [evaluation](../../backend/src/evaluation)에 있다. 일반 앱 요청 경로와 자료 검수·인덱스 생성·평가 작업은 별개다. 운영 인덱스 생성·교체 명령을 일반 회귀 테스트처럼 실행하지 않는다.
 
@@ -150,7 +150,7 @@ flowchart TD
 flutter pub get
 flutter analyze
 flutter test
-flutter test test/conversation_lifecycle_test.dart --dart-define=SOUL_BIBLE_API_BASE_URL=http://invalid.example
+flutter test test/conversation_lifecycle_test.dart --dart-define=ONARIA_API_BASE_URL=http://invalid.example
 npm.cmd --prefix backend test
 flutter build apk --release
 flutter build appbundle --release

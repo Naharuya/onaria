@@ -1,8 +1,8 @@
 import { psychologyOutput, religionOutput } from './agent_outputs.js';
 
-export const costEnv = { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-cost-key',
+export const costEnv = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-cost-key',
   OPENAI_MODEL: 'mock', OPENAI_CHEAP_MODEL: 'mock-cheap', OPENAI_STANDARD_MODEL: 'mock-standard', OPENAI_PREMIUM_MODEL: 'mock-premium',
-  SOUL_MODEL_PRICING_JSON: JSON.stringify(Object.fromEntries(['mock', 'mock-cheap', 'mock-standard', 'mock-premium']
+  ONARIA_MODEL_PRICING_JSON: JSON.stringify(Object.fromEntries(['mock', 'mock-cheap', 'mock-standard', 'mock-premium']
     .map(model => [model, { input: 0.01, cachedInput: 0.002, output: 0.02 }]))) };
 // Synthetic rates above are arithmetic fixtures, not actual API prices.
 export const costBody = (userMessage = '내일 발표가 걱정돼요') => ({

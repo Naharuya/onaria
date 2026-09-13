@@ -35,7 +35,7 @@ class _Gateway implements CardShareGateway {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('soul_bible/image_export');
+  const channel = MethodChannel('onaria/image_export');
   tearDown(() => TestDefaultBinaryMessengerBinding
       .instance.defaultBinaryMessenger
       .setMockMethodCallHandler(channel, null));

@@ -1,8 +1,8 @@
 {
   "id": "/admin/",
-  "name": "onaria 관리자",
-  "short_name": "onaria 관리자",
-  "description": "onaria 회원과 서비스 현황 관리",
+  "name": "ONARIA 관리자",
+  "short_name": "ONARIA 관리자",
+  "description": "ONARIA 회원과 서비스 현황 관리",
   "lang": "ko",
   "start_url": "/admin/",
   "scope": "/admin/",

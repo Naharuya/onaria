@@ -73,7 +73,7 @@ sourceHints는 서버 제공 자료 ID 배열이다. 기존 `generate()`와 모�
 어댑터 뒤에 보존했다. Psychology의 기존 관찰 계약도 유지한다.
 `/v1/mind/chat` 요청·응답 필드 및 religion ID는 변경하지 않았다.
 `createLocalConversationService()`와 feature gate, timeout, 오류 fallback은 유지한다.
-`SOUL_MULTI_AGENT_ENABLED=false`에서는 새 질문 라우팅을 실행하지 않는다.
+`ONARIA_MULTI_AGENT_ENABLED=false`에서는 새 질문 라우팅을 실행하지 않는다.
 실제 `.env`, API key, 대규모 경전 원문은 추가하거나 수정하지 않았다.
 
 ## Religious Integrity Validator

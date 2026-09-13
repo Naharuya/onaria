@@ -5,7 +5,7 @@
 4단계의 ReligionKnowledgeProvider, sourceContext, 7개 Religion Agent와 내부 결과 어댑터를 유지했다.
 기존 145개 테스트를 수정하지 않고 신규 25개를 추가하여 **170/170 통과**했다.
 `/v1/mind/chat` 요청·응답, 기존 religion ID, `createLocalConversationService()`와 local fallback을 유지한다.
-`SOUL_MULTI_AGENT_ENABLED=false`는 KB/임베딩/모델을 호출하지 않는다.
+`ONARIA_MULTI_AGENT_ENABLED=false`는 KB/임베딩/모델을 호출하지 않는다.
 실제 `.env`와 `.env.example`, 비밀정보, 원문 corpus는 이번 단계에서 수정·추가하지 않았다.
 작업 시작 시 존재한 다른 파일 변경은 보존했다.
 
@@ -60,8 +60,8 @@ OpenAI adapter는 설치된 SDK의 `embeddings.create` 타입 정의를 확인�
 다음 설정이 **모두** 있어야 호출 가능하며 클라이언트 생성도 지연된다:
 
 ```text
-SOUL_EMBEDDING_PROVIDER=openai
-SOUL_EMBEDDING_ENABLED=true
+ONARIA_EMBEDDING_PROVIDER=openai
+ONARIA_EMBEDDING_ENABLED=true
 OPENAI_EMBEDDING_MODEL=<운영자가 선택한 모델 ID>
 OPENAI_API_KEY=<런타임 비밀정보>
 ```

@@ -12,7 +12,7 @@ import { createApp } from '../src/app.js';
 import { responseSchema } from '../src/schema.js';
 import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 
-const env = { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
+const env = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
 const body = (userMessage = '기도', religion) => ({ session: { sessionId: 'rag', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 }, userMessage, religion, systemPromptVersion: 'ko-v1', allowedVerseIds: [] });
 const search = (tradition = 'protestant', query = '기도') => ({ tradition, query, language: 'ko-KR', limit: 3 });
 const quiet = { info() {}, warn() {} };
@@ -136,7 +136,7 @@ test('RAG: retrieval failure uses local fallback with safe telemetry and disable
   assert.equal(logs[0].knowledgeSearchCount, 1);
   assert.equal(logs[0].routedTradition, 'buddhist');
   assert.ok(!JSON.stringify(logs).includes(input.userMessage));
-  const off = createConversationService({ env: { ...env, SOUL_MULTI_AGENT_ENABLED: 'false' }, logger: quiet, knowledgeProvider: { search: () => assert.fail('disabled') }, openAiFactory: () => assert.fail('disabled') });
+  const off = createConversationService({ env: { ...env, ONARIA_MULTI_AGENT_ENABLED: 'false' }, logger: quiet, knowledgeProvider: { search: () => assert.fail('disabled') }, openAiFactory: () => assert.fail('disabled') });
   const baseline = createConversationService({ env: {}, logger: quiet });
   assert.deepEqual(await off(input), await baseline(input));
 });

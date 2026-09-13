@@ -263,15 +263,15 @@ test('A-track disabled flag and provider failure preserve local fallback without
   const body = { session: { sessionId: 'phase9-local', selectedEmotion: '불안', emotionIntensity: 5, turnCount: 1 },
     userMessage: '오늘 불안해요', systemPromptVersion: 'ko-v1', allowedVerseIds: [], religion: 'protestant' };
   const local = await createConversationService({ env: {}, logger: quiet })(body);
-  const disabled = createConversationService({ env: { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'false', OPENAI_API_KEY: 'test-only' },
+  const disabled = createConversationService({ env: { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'false', OPENAI_API_KEY: 'test-only' },
     logger: quiet, openAiFactory: () => assert.fail('Disabled model'), knowledgeProvider: { search: () => assert.fail('Disabled retrieval') } });
   assert.deepEqual(await disabled(body), local);
-  const broken = createConversationService({ env: { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' },
+  const broken = createConversationService({ env: { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' },
     logger: quiet, openAiFactory: () => { throw new Error('Simulated outage'); } });
   assert.deepEqual(await broken(body), local); assert.equal(typeof createLocalConversationService(), 'function');
 });
 test('A-track HTTP regression preserves the public chat schema', async () => {
-  const generate = createConversationService({ env: { SOUL_MULTI_AGENT_ENABLED: 'false' }, logger: quiet });
+  const generate = createConversationService({ env: { ONARIA_MULTI_AGENT_ENABLED: 'false' }, logger: quiet });
   const app = createApp({ generate, memberStore: {}, logger: quiet });
   const server = await new Promise(resolve => { const listener = app.listen(0, '127.0.0.1', () => resolve(listener)); });
   try {

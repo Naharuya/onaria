@@ -43,7 +43,7 @@ source 행이 0개라 blocked source 수는 0이지만, corpus 부재로 전체 
 - 생성: 이 완료 보고서.
 
 7단계 검토/승인 코드, 대화 API, `createLocalConversationService()`, local fallback,
-`SOUL_MULTI_AGENT_ENABLED=false`, Safety 우선순위는 변경하지 않았다.
+`ONARIA_MULTI_AGENT_ENABLED=false`, Safety 우선순위는 변경하지 않았다.
 실제 `.env`를 수정하거나 로드하지 않았고 비밀정보를 추가하지 않았다.
 
 ## 1. 운영자 제공 자료 Intake

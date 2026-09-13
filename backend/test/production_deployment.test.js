@@ -193,18 +193,18 @@ test('deployment: active index resolution, namespace isolation and hybrid keywor
 });
 
 test('deployment: production config defaults keyword and hybrid requires explicit experimental flag', () => {
-  const baseline = productionConfiguration({ NODE_ENV: 'production', SOUL_CORPUS_MODE: 'development', SOUL_EXTERNAL_API_DISABLED: 'true' });
+  const baseline = productionConfiguration({ NODE_ENV: 'production', ONARIA_CORPUS_MODE: 'development', ONARIA_EXTERNAL_API_DISABLED: 'true' });
   assert.equal(baseline.corpusMode, 'production'); assert.equal(baseline.externalApiDisabled, true);
   assert.equal(baseline.retrievalMode, 'keyword');
-  const experiment = productionConfiguration({ NODE_ENV: 'production', SOUL_HYBRID_EXPERIMENTAL: 'true' });
+  const experiment = productionConfiguration({ NODE_ENV: 'production', ONARIA_HYBRID_EXPERIMENTAL: 'true' });
   assert.equal(experiment.retrievalMode, 'hybrid'); assert.equal(experiment.productionDefault, 'keyword');
 });
 
 test('deployment: external API disabled and multi-agent false serve local HTTP contract', async t => {
   const { root } = await workspace(t);
-  for (const flags of [{ SOUL_EXTERNAL_API_DISABLED: 'true', SOUL_MULTI_AGENT_ENABLED: 'true' }, { SOUL_MULTI_AGENT_ENABLED: 'false' }]) {
+  for (const flags of [{ ONARIA_EXTERNAL_API_DISABLED: 'true', ONARIA_MULTI_AGENT_ENABLED: 'true' }, { ONARIA_MULTI_AGENT_ENABLED: 'false' }]) {
     const generate = createConversationService({ logger: quiet,
-      env: { NODE_ENV: 'production', SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', OPENAI_API_KEY: 'mock-only', SOUL_PRODUCTION_INDEX_DIR: root, ...flags },
+      env: { NODE_ENV: 'production', ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', OPENAI_API_KEY: 'mock-only', ONARIA_PRODUCTION_INDEX_DIR: root, ...flags },
       openAiFactory: () => assert.fail('External client must not be created') });
     const app = createApp({ generate, memberStore: {}, logger: quiet });
     const server = await new Promise(resolve => { const listener = app.listen(0, '127.0.0.1', () => resolve(listener)); });
@@ -219,7 +219,7 @@ test('deployment: service uses active index; safety preempts model and retrieval
   const { root, index } = await workspace(t);
   await build(index, 'v1'); await index.activate('v1');
   const logs = [], calls = [];
-  const generate = createConversationService({ env: { NODE_ENV: 'production', SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'mock-only', SOUL_PRODUCTION_INDEX_DIR: root },
+  const generate = createConversationService({ env: { NODE_ENV: 'production', ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'mock-only', ONARIA_PRODUCTION_INDEX_DIR: root },
     logger: { ...quiet, info: (_, row) => logs.push(row) }, openAiFactory: () => ({ runStructured: async task => { calls.push(task.name); return task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput(); } }) });
   responseSchema.parse(await generate(body));
   assert.equal(logs[0].retrievalMode, 'keyword');

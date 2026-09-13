@@ -12,7 +12,7 @@ import { applyRetrievalConfidence, noAnswerReligion } from '../src/knowledge/ret
 test('REAL preflight: shared corpus, zero V1 clients, models and specialist calls', async () => {
   assert.equal((await safetyPreflight()).modelCalls, 0);
 });
-const env = { SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'fixture-only' };
+const env = { ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'fixture-only' };
 for (const [error, expected] of [
   [new OpenAI.APIConnectionTimeoutError(), 'timeout'],
   [new OpenAI.APIUserAbortError(), 'timeout'],

@@ -23,8 +23,8 @@ if (real) {
   process.exit(process.exitCode ?? 0);
 }
 if (real && !process.env.OPENAI_API_KEY) throw new Error('REAL requires OPENAI_API_KEY in the server environment.');
-const env = real ? { ...process.env, SOUL_COST_ROUTER_V1_ENABLED: 'true' } : {
-  SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'offline-stub',
+const env = real ? { ...process.env, ONARIA_COST_ROUTER_V1_ENABLED: 'true' } : {
+  ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'offline-stub',
 };
 const records = [];
 const support = { emotion: '불안', empathy: '마음이 복잡하고 불안하게 느껴지셨군요.',

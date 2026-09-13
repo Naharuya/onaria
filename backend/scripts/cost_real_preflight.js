@@ -1,3 +1,4 @@
+import { brandEnv } from '../src/brand_env.js';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -9,8 +10,8 @@ import { readPricing, estimateCost } from '../src/cost/model_pricing.js';
 const backend = fileURLToPath(new URL('../', import.meta.url));
 const root = resolve(backend, '..');
 export function checkProviderConfiguration(env) {
-  if (env.SOUL_AI_MODE !== 'openai' || env.SOUL_MULTI_AGENT_ENABLED !== 'true'
-    || env.SOUL_EXTERNAL_API_DISABLED === 'true' || !/^sk-[A-Za-z0-9_-]{20,}$/.test(env.OPENAI_API_KEY ?? '')) {
+  if (brandEnv(env).ONARIA_AI_MODE !== 'openai' || brandEnv(env).ONARIA_MULTI_AGENT_ENABLED !== 'true'
+    || brandEnv(env).ONARIA_EXTERNAL_API_DISABLED === 'true' || !/^sk-[A-Za-z0-9_-]{20,}$/.test(env.OPENAI_API_KEY ?? '')) {
     throw Error('PROVIDER_CONFIGURATION_FAILED');
   }
   for (const tier of ['cheap', 'standard', 'premium']) {
@@ -22,16 +23,16 @@ export function checkProviderConfiguration(env) {
 }
 function runCommand(stage, env) {
   const testEnv = { ...env, NODE_ENV: 'test' };
-  for (const key of Object.keys(testEnv)) if (/^(OPENAI_|SOUL_|ADMIN_|APP_BEARER_TOKEN)/.test(key)) delete testEnv[key];
+  for (const key of Object.keys(testEnv)) if (/^(OPENAI_|ONARIA_|ADMIN_|APP_BEARER_TOKEN)/.test(key)) delete testEnv[key];
   let command = process.execPath, args = ['--test'], cwd = backend;
   if (stage === 'flutter_safety_parity') {
     cwd = root;
     if (process.platform === 'win32') {
-      testEnv.ONARIA_PREFLIGHT_FLUTTER = env.ONARIA_FLUTTER_BIN
+      testEnv.ONARIA_PREFLIGHT_FLUTTER = brandEnv(env).ONARIA_FLUTTER_BIN
         || (existsSync('C:/src/flutter/bin/flutter.bat') ? 'C:/src/flutter/bin/flutter.bat' : 'flutter.bat');
       command = 'powershell.exe';
       args = ['-NoProfile', '-Command', '& $env:ONARIA_PREFLIGHT_FLUTTER test test/safety_parity_test.dart test/crisis_detector_test.dart; exit $LASTEXITCODE'];
-    } else { command = env.ONARIA_FLUTTER_BIN || 'flutter'; args = ['test', 'test/safety_parity_test.dart', 'test/crisis_detector_test.dart']; }
+    } else { command = brandEnv(env).ONARIA_FLUTTER_BIN || 'flutter'; args = ['test', 'test/safety_parity_test.dart', 'test/crisis_detector_test.dart']; }
   }
   const result = spawnSync(command, args, { cwd, env: testEnv, encoding: 'utf8', timeout: 180000, maxBuffer: 16 * 1024 * 1024, windowsHide: true });
   let output = (result.stdout ?? '') + (result.stderr ?? '');

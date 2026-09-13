@@ -6,7 +6,7 @@ export async function criticalSafetySuite(questions, { serviceFactory = createCo
   const rows = [];
   for (const question of cases) {
     let downstreamCalls = 0;
-    const generate = serviceFactory({ env: { NODE_ENV: 'production', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'critical-suite-mock-only' },
+    const generate = serviceFactory({ env: { NODE_ENV: 'production', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'critical-suite-mock-only' },
       logger: { info() {}, warn() {} },
       openAiFactory: () => { downstreamCalls++; throw new Error('Critical safety must preempt model.'); },
       knowledgeProvider: { search: () => { downstreamCalls++; throw new Error('Critical safety must preempt retrieval.'); } } });

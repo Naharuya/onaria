@@ -9,7 +9,7 @@ import { costEnv, costBody, costFactory, costKnowledge } from './fixtures/cost_f
 
 test('cost HTTP path preserves schema, auth and admin fields; quota ignores client plan and session rotation', async t => {
   const calls = []; const logs = [];
-  const generate = createConversationService({ env: { ...costEnv, SOUL_FREE_DAILY_AI_CALLS: '1' },
+  const generate = createConversationService({ env: { ...costEnv, ONARIA_FREE_DAILY_AI_CALLS: '1' },
     openAiFactory: costFactory(calls), logger: { info: (...args) => logs.push(args) } });
   const app = createApp({ generate, appToken: 'test-app', adminToken: 'test-admin', memberStore: { getAdminOverview: () => ({ total: 0, recent: [] }) } });
   const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
@@ -42,7 +42,7 @@ test('near quota uses one cheap call; trusted Premium gets higher quota', async 
   assert.equal(calls.length, before + 2);
 });
 test('sufficient RAG uses checked source text without any LLM even with no key or quota', async () => {
-  const service = createConversationService({ env: { SOUL_FREE_DAILY_AI_CALLS: '0' },
+  const service = createConversationService({ env: { ONARIA_FREE_DAILY_AI_CALLS: '0' },
     costKnowledgeProvider: costKnowledge, openAiFactory: () => assert.fail('no LLM'), logger: {} });
   const result = await service(costBody('위로하는 성경 구절 찾아주세요'));
   responseSchema.parse(result); assert.match(result.message, /합성 테스트 자료 1/);
@@ -67,7 +67,7 @@ test('cost storage errors and capacity fail to local while safety remains first'
   responseSchema.parse(await limited(costBody()));
 });
 test('priced calls exceeding reservation are blocked before provider construction', async () => {
-  const service = createConversationService({ env: { ...costEnv, SOUL_MODEL_PRICING_JSON: JSON.stringify({ 'mock-cheap': { input: 100, cachedInput: 10, output: 100 } }) },
+  const service = createConversationService({ env: { ...costEnv, ONARIA_MODEL_PRICING_JSON: JSON.stringify({ 'mock-cheap': { input: 100, cachedInput: 10, output: 100 } }) },
     logger: {}, openAiFactory: () => assert.fail('budget must block') });
   responseSchema.parse(await service(costBody()));
   assert.equal(service.usageLedger.overview().today.modelCalls, 0);
@@ -92,7 +92,7 @@ test('premium model is used only for a complex trusted request after enough non-
 });
 
 test('unknown model prices do not fail service and remain visibly unknown', async () => {
-  const service = createConversationService({ env: { ...costEnv, SOUL_MODEL_PRICING_JSON: '{}' }, openAiFactory: costFactory(), logger: {} });
+  const service = createConversationService({ env: { ...costEnv, ONARIA_MODEL_PRICING_JSON: '{}' }, openAiFactory: costFactory(), logger: {} });
   responseSchema.parse(await service(costBody()));
   assert.equal(service.usageLedger.overview().today.estimatedCostUsd, null);
   assert.equal(service.usageLedger.overview().today.modelCalls, 2);

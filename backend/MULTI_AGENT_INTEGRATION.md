@@ -66,12 +66,12 @@
 기본값:
 
 ```env
-SOUL_AI_MODE=local
-SOUL_MULTI_AGENT_ENABLED=false
+ONARIA_AI_MODE=local
+ONARIA_MULTI_AGENT_ENABLED=false
 OPENAI_API_KEY=
 ```
 
-OpenAI 경로는 `SOUL_AI_MODE=openai`, `SOUL_MULTI_AGENT_ENABLED=true`, 비어 있지 않은 서버 API 키가 모두 있을 때만 사용한다. 모델은 기존 `OPENAI_MODEL` 설정을 사용하고, 미설정 시 저장소의 기존 기본값 `gpt-5.6`을 유지한다. 실제 계정의 모델 접근 가능 여부는 배포 전에 확인해야 한다. 설정 변경은 서버 재시작 후 반영된다.
+OpenAI 경로는 `ONARIA_AI_MODE=openai`, `ONARIA_MULTI_AGENT_ENABLED=true`, 비어 있지 않은 서버 API 키가 모두 있을 때만 사용한다. 모델은 기존 `OPENAI_MODEL` 설정을 사용하고, 미설정 시 저장소의 기존 기본값 `gpt-5.6`을 유지한다. 실제 계정의 모델 접근 가능 여부는 배포 전에 확인해야 한다. 설정 변경은 서버 재시작 후 반영된다.
 
 활성 경로에서는 심리 성찰과 선택된 종교 전문 역할에 순서대로 최대 두 번의 논리적 모델 호출을 한다. 각 SDK 요청의 timeout은 6초, 재시도 한도는 1회다. 전체 흐름에는 18초 제한과 AbortSignal 취소를 적용해 Flutter의 기존 25초 HTTP timeout 안에서 로컬 응답으로 전환할 여유를 둔다. 안전 검사·종교 검증·응답 통합은 서버 코드로 처리한다.
 

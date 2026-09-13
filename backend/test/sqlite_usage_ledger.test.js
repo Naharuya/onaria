@@ -97,7 +97,7 @@ test('late usage is idempotent and settles expired budget using the call-time pr
 
 test('month/day boundaries and record pruning do not delete current-month quota', async t => {
   const store = await workspace(t); let clock = new Date('2026-09-01T00:00:00Z');
-  const ledger = store.open({ now: () => clock, retentionDays: 32, env: { SOUL_FREE_MONTHLY_AI_CALLS: '1' } });
+  const ledger = store.open({ now: () => clock, retentionDays: 32, env: { ONARIA_FREE_MONTHLY_AI_CALLS: '1' } });
   paidCall(ledger);
   clock = new Date('2026-09-30T23:59:00Z');
   assert.equal(ledger.reserve().decision.tier, 'local');
@@ -132,7 +132,7 @@ test('foreign databases and corruption do not turn into a fresh permissive ledge
   assert.equal(inspect.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE name = 'cost_requests'").get().n, 0); inspect.close();
   const corrupted = path.join(store.directory, 'corrupt.sqlite'); await writeFile(corrupted, 'private broken file');
   const logs = [];
-  const ledger = createRuntimeUsageLedger({ env: { SOUL_USAGE_DB_PATH: corrupted }, logger: { error: value => logs.push(value) } });
+  const ledger = createRuntimeUsageLedger({ env: { ONARIA_USAGE_DB_PATH: corrupted }, logger: { error: value => logs.push(value) } });
   assert.equal(ledger.overview().available, false); assert.throws(() => ledger.reserve());
   assert.deepEqual(logs, ['cost_ledger_unavailable']);
   const service = createConversationService({ env: costEnv, usageLedger: ledger, logger: {}, openAiFactory: () => assert.fail('no provider') });
@@ -164,7 +164,7 @@ test('only allowlisted metadata reaches SQLite, including its WAL file', async t
 
 test('runtime persistent ledger works across real conversation service restarts', async t => {
   const store = await workspace(t); const calls = [];
-  const env = { ...costEnv, SOUL_USAGE_DB_PATH: store.filename, SOUL_FREE_DAILY_AI_CALLS: '1' };
+  const env = { ...costEnv, ONARIA_USAGE_DB_PATH: store.filename, ONARIA_FREE_DAILY_AI_CALLS: '1' };
   for (let i = 0; i < 2; i++) {
     const ledger = createRuntimeUsageLedger({ env, logger: {} });
     try {

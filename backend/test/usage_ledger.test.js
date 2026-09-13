@@ -32,7 +32,7 @@ test('unknown usage keeps reservation and unknown costs are not reported as zero
 });
 test('UTC daily reset retains monthly quota, bounded event retention does not erase quota', () => {
   let date = new Date('2026-09-09T23:59:00Z');
-  const ledger = createUsageLedger({ now: () => date, maxEntries: 1, env: { SOUL_FREE_MONTHLY_AI_CALLS: '1' } });
+  const ledger = createUsageLedger({ now: () => date, maxEntries: 1, env: { ONARIA_FREE_MONTHLY_AI_CALLS: '1' } });
   const lease = ledger.reserve(); lease.recordCall({ model: 'unknown', modelTier: 'standard' }); lease.finish();
   date = new Date('2026-09-10T00:00:00Z');
   assert.equal(ledger.reserve().decision.tier, 'local');

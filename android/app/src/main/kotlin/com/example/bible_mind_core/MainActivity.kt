@@ -12,7 +12,7 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "soul_bible/image_export")
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "onaria/image_export")
             .setMethodCallHandler { call, result ->
                 if (call.method != "saveImage") {
                     result.notImplemented()

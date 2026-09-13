@@ -20,8 +20,8 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64, onaria-deploy]
     timeout-minutes: 45
     env:
-      SOUL_AI_MODE: local
-      SOUL_EXTERNAL_API_DISABLED: 'true'
+      ONARIA_AI_MODE: local
+      ONARIA_EXTERNAL_API_DISABLED: 'true'
       OPENAI_API_KEY: ''
       ANDROID_HOME: /Users/server/Library/Android/sdk
       ANDROID_SDK_ROOT: /Users/server/Library/Android/sdk

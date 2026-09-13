@@ -1,3 +1,4 @@
+import { brandEnv } from '../brand_env.js';
 import { createLocalJWKSet, createRemoteJWKSet, customFetch, decodeProtectedHeader, jwtVerify } from 'jose';
 
 export class IdentityError extends Error {
@@ -101,16 +102,16 @@ export function createEntitlementResolver(entries = [], { now = () => new Date()
 }
 
 export function createRuntimeIdentity({ env = process.env, logger = console } = {}) {
-  const required = env.SOUL_AUTH_REQUIRED === 'true';
-  if (env.SOUL_AUTH_ENABLED !== 'true' && !required) return { required: false, verify: null };
+  const required = brandEnv(env).ONARIA_AUTH_REQUIRED === 'true';
+  if (brandEnv(env).ONARIA_AUTH_ENABLED !== 'true' && !required) return { required: false, verify: null };
   try {
-    if (env.SOUL_AUTH_ENABLED !== 'true') throw new IdentityError(503);
-    const verify = createIdentityVerifier({ issuer: env.SOUL_AUTH_ISSUER, audience: env.SOUL_AUTH_AUDIENCE,
-      jwksUrl: env.SOUL_AUTH_JWKS_URL || undefined, jwks: env.SOUL_AUTH_JWKS_JSON ? JSON.parse(env.SOUL_AUTH_JWKS_JSON) : undefined,
-      algorithms: (env.SOUL_AUTH_ALGORITHMS || 'RS256').split(',').map(value => value.trim()),
-      typ: env.SOUL_AUTH_JWT_TYP || 'JWT', maxTokenAgeSeconds: Number(env.SOUL_AUTH_MAX_TOKEN_AGE_SECONDS || 3600),
-      requiredClaims: JSON.parse(env.SOUL_AUTH_REQUIRED_CLAIMS_JSON || '{}') });
-    const planFor = createEntitlementResolver(JSON.parse(env.SOUL_AUTH_ENTITLEMENTS_JSON || '[]'));
+    if (brandEnv(env).ONARIA_AUTH_ENABLED !== 'true') throw new IdentityError(503);
+    const verify = createIdentityVerifier({ issuer: brandEnv(env).ONARIA_AUTH_ISSUER, audience: brandEnv(env).ONARIA_AUTH_AUDIENCE,
+      jwksUrl: brandEnv(env).ONARIA_AUTH_JWKS_URL || undefined, jwks: brandEnv(env).ONARIA_AUTH_JWKS_JSON ? JSON.parse(brandEnv(env).ONARIA_AUTH_JWKS_JSON) : undefined,
+      algorithms: (brandEnv(env).ONARIA_AUTH_ALGORITHMS || 'RS256').split(',').map(value => value.trim()),
+      typ: brandEnv(env).ONARIA_AUTH_JWT_TYP || 'JWT', maxTokenAgeSeconds: Number(brandEnv(env).ONARIA_AUTH_MAX_TOKEN_AGE_SECONDS || 3600),
+      requiredClaims: JSON.parse(brandEnv(env).ONARIA_AUTH_REQUIRED_CLAIMS_JSON || '{}') });
+    const planFor = createEntitlementResolver(JSON.parse(brandEnv(env).ONARIA_AUTH_ENTITLEMENTS_JSON || '[]'));
     return { required, async verify(token) { const identity = await verify(token); return { userId: identity.userId, plan: planFor(identity) }; } };
   } catch {
     try { logger.error?.('identity_configuration_invalid'); } catch { /* No keys, tokens, subjects or error text in logs. */ }

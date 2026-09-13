@@ -67,7 +67,7 @@ Repository root의 `script/prepare-a-track-source.ps1`도 생성했다. 공식 Z
 - `src/evaluation/pilot_evaluation.js`: Precision@3 및 감정·개념 query별 top-3 태그 정합성 보고 추가.
 
 `/v1/mind/chat`, 외부 response schema, `createLocalConversationService()`, local fallback,
-`SOUL_MULTI_AGENT_ENABLED=false` 및 Safety → Psychology → Religion → Citation → Integrity → Integration
+`ONARIA_MULTI_AGENT_ENABLED=false` 및 Safety → Psychology → Religion → Citation → Integrity → Integration
 순서는 유지했다. `config/expert-reviewers.json`은 비어 있으며 변경하지 않았다.
 
 ## Source policy와 provenance

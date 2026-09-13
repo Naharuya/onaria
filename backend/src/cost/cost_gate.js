@@ -1,7 +1,8 @@
+import { brandEnv } from '../brand_env.js';
 import { taskTiers } from './model_router.js';
 
 export function configuredNumber(env, key, fallback) {
-  const value = env[key];
+  const value = brandEnv(env)[key];
   if (value === undefined || value === '') return fallback;
   const number = Number(value);
   // Invalid explicit policy fails closed, rather than silently raising a quota.
@@ -10,7 +11,7 @@ export function configuredNumber(env, key, fallback) {
 
 export function costPolicy(plan = 'free', env = process.env) {
   const premium = plan === 'premium';
-  const prefix = premium ? 'SOUL_PREMIUM' : 'SOUL_FREE';
+  const prefix = premium ? 'ONARIA_PREMIUM' : 'ONARIA_FREE';
   const dailyCalls = Math.floor(configuredNumber(env, `${prefix}_DAILY_AI_CALLS`, premium ? 50 : 5));
   const dailyBudget = configuredNumber(env, `${prefix}_DAILY_AI_BUDGET_USD`, premium ? 0.30 : 0.03);
   return {
@@ -18,13 +19,13 @@ export function costPolicy(plan = 'free', env = process.env) {
     monthlyCalls: Math.floor(configuredNumber(env, `${prefix}_MONTHLY_AI_CALLS`, dailyCalls * 31)),
     monthlyBudget: configuredNumber(env, `${prefix}_MONTHLY_AI_BUDGET_USD`, dailyBudget * 31),
     premiumCalls: Math.floor(configuredNumber(env, `${prefix}_PREMIUM_CALLS`, premium ? 50 : 0)),
-    reservationUsd: configuredNumber(env, 'SOUL_AI_REQUEST_RESERVATION_USD', 0.006),
+    reservationUsd: configuredNumber(env, 'ONARIA_AI_REQUEST_RESERVATION_USD', 0.006),
   };
 }
 
 export function evaluateCostGate({ plan = 'free', taskType = 'conversation', dailyUsage = {}, monthlyUsage = {}, globalUsage = {}, reservationUsd } = {}, env = process.env) {
   const policy = costPolicy(plan, env);
-  if (Number.isFinite(reservationUsd) && reservationUsd > 0 && !env.SOUL_AI_REQUEST_RESERVATION_USD) policy.reservationUsd = reservationUsd;
+  if (Number.isFinite(reservationUsd) && reservationUsd > 0 && !brandEnv(env).ONARIA_AI_REQUEST_RESERVATION_USD) policy.reservationUsd = reservationUsd;
   const remainingDailyBudget = Math.max(0, policy.dailyBudget - (dailyUsage.budgetUsedUsd ?? 0));
   const desired = taskTiers[taskType] ?? 'standard';
   const result = (tier, reason) => ({ allowed: tier !== 'blocked', tier, reason, remainingDailyBudget, policy });

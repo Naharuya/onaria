@@ -1,3 +1,4 @@
+import { brandEnv } from '../brand_env.js';
 import { assertProductionSource, corpusPolicy, validateCandidate } from './production_guard.js';
 import { validateCitations } from '../agents/citation_validator.js';
 import { reviewReligiousIntegrity } from '../agents/religious_integrity_agent.js';
@@ -6,11 +7,11 @@ import { assessSafety } from '../agents/safety_agent.js';
 export const productionValidators = Object.freeze({ citation: validateCitations, integrity: reviewReligiousIntegrity, safety: assessSafety });
 export function productionConfiguration(env = {}) {
   return Object.freeze({
-    corpusMode: env.NODE_ENV === 'production' || env.SOUL_CORPUS_MODE === 'production' ? 'production' : 'development',
-    externalApiDisabled: env.SOUL_EXTERNAL_API_DISABLED === 'true',
-    multiAgentEnabled: env.SOUL_MULTI_AGENT_ENABLED === 'true',
-    retrievalMode: env.SOUL_HYBRID_EXPERIMENTAL === 'true' ? 'hybrid' : 'keyword',
-    productionDefault: 'keyword', hybridExperimental: env.SOUL_HYBRID_EXPERIMENTAL === 'true',
+    corpusMode: env.NODE_ENV === 'production' || brandEnv(env).ONARIA_CORPUS_MODE === 'production' ? 'production' : 'development',
+    externalApiDisabled: brandEnv(env).ONARIA_EXTERNAL_API_DISABLED === 'true',
+    multiAgentEnabled: brandEnv(env).ONARIA_MULTI_AGENT_ENABLED === 'true',
+    retrievalMode: brandEnv(env).ONARIA_HYBRID_EXPERIMENTAL === 'true' ? 'hybrid' : 'keyword',
+    productionDefault: 'keyword', hybridExperimental: brandEnv(env).ONARIA_HYBRID_EXPERIMENTAL === 'true',
   });
 }
 

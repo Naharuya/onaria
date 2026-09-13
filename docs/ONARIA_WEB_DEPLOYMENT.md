@@ -98,7 +98,7 @@ ADMIN_ALLOW_BEARER=false
 
 `ADMIN_TOKEN`은 기존 서버의 비밀 값을 사용하되 노출된 값은 교체합니다. 값이 비어 있으면 관리자 로그인은 차단됩니다. API 키는 기존 환경변수 또는 기존 암호화 설정 화면을 사용합니다. 홈페이지 기능만을 위해 외부 AI를 켤 필요는 없습니다.
 
-`MEMBER_DB_PATH`를 설정하지 않으면 기존 실행 디렉터리의 `data/members.sqlite`를 사용합니다. systemd의 `WorkingDirectory=/opt/soul-bible/backend`를 유지해야 합니다. 기존 DB 위치를 확인하지 않고 새로운 빈 경로로 바꾸지 않습니다. `SOUL_USAGE_DB_PATH`와 운영 RAG 인덱스 경로도 유지합니다.
+`MEMBER_DB_PATH`를 설정하지 않으면 기존 실행 디렉터리의 `data/members.sqlite`를 사용합니다. systemd의 `WorkingDirectory=/opt/soul-bible/backend`를 유지해야 합니다. 기존 DB 위치를 확인하지 않고 새로운 빈 경로로 바꾸지 않습니다. `ONARIA_USAGE_DB_PATH`와 운영 RAG 인덱스 경로도 유지합니다.
 
 `TRUST_PROXY=loopback`은 **같은 호스트의 Apache에서 Node로 연결할 때**만 사용합니다. `true`, 임의 전체 네트워크 또는 인터넷 주소를 신뢰하도록 설정하지 않습니다. Docker의 경우 아래 별도 안내를 따릅니다.
 

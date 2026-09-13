@@ -30,7 +30,7 @@ const record = (overrides = {}) => ({ sourceId: 'protestant:test:1', tradition: 
 const input = (records = [record()], overrides = {}) => ({ records, query: '위로', tradition: 'protestant', language: 'ko-KR', limit: 3, ...overrides });
 const body = (userMessage = '위로', religion) => ({ session: { sessionId: 'vector-rag', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 },
   userMessage, religion, systemPromptVersion: 'ko-v1', allowedVerseIds: [] });
-const env = { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
+const env = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
 const quiet = { info() {}, warn() {} };
 const mockModel = async task => task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput();
 
@@ -163,7 +163,7 @@ test('ingestion: pre-indexed hybrid path reuses vectors without online corpus em
 
 test('external embedding: missing explicit flags or model performs zero client creation', async () => {
   let clients = 0;
-  for (const config of [{}, { OPENAI_API_KEY: 'test-only' }, { SOUL_EMBEDDING_ENABLED: 'true', OPENAI_API_KEY: 'test-only' }]) {
+  for (const config of [{}, { OPENAI_API_KEY: 'test-only' }, { ONARIA_EMBEDDING_ENABLED: 'true', OPENAI_API_KEY: 'test-only' }]) {
     const provider = createOpenAiEmbeddingAdapter({ env: config, clientFactory: () => { clients++; } });
     await assert.rejects(provider.embed('text'));
   }
@@ -172,7 +172,7 @@ test('external embedding: missing explicit flags or model performs zero client c
 
 test('external embedding: injected fake adapter validates index order, batch budget and disables retry', async () => {
   let calls = 0;
-  const provider = createOpenAiEmbeddingAdapter({ env: { SOUL_EMBEDDING_ENABLED: 'true', SOUL_EMBEDDING_PROVIDER: 'openai', OPENAI_API_KEY: 'test-only', OPENAI_EMBEDDING_MODEL: 'test-embedding' },
+  const provider = createOpenAiEmbeddingAdapter({ env: { ONARIA_EMBEDDING_ENABLED: 'true', ONARIA_EMBEDDING_PROVIDER: 'openai', OPENAI_API_KEY: 'test-only', OPENAI_EMBEDDING_MODEL: 'test-embedding' },
     clientFactory: options => {
       assert.equal(options.maxRetries, 0);
       return { embeddings: { create: async (body, options) => {
@@ -187,7 +187,7 @@ test('external embedding: injected fake adapter validates index order, batch bud
 });
 
 test('external embedding: malformed vectors fail and online corpus budget prevents any paid calls', async () => {
-  const provider = createOpenAiEmbeddingAdapter({ env: { SOUL_EMBEDDING_ENABLED: 'true', SOUL_EMBEDDING_PROVIDER: 'openai', OPENAI_API_KEY: 'test-only', OPENAI_EMBEDDING_MODEL: 'test-embedding' },
+  const provider = createOpenAiEmbeddingAdapter({ env: { ONARIA_EMBEDDING_ENABLED: 'true', ONARIA_EMBEDDING_PROVIDER: 'openai', OPENAI_API_KEY: 'test-only', OPENAI_EMBEDDING_MODEL: 'test-embedding' },
     clientFactory: () => ({ embeddings: { create: async () => ({ data: [{ index: 0, embedding: [NaN] }] }) } }),
   });
   await assert.rejects(provider.embed('text'));
@@ -286,7 +286,7 @@ test('service: hybrid HTTP fields remain private and disabled flag makes no know
     assert.ok(logs[0].vectorScore > 0);
     assert.ok(!JSON.stringify(logs).includes('기독교 위로'));
   } finally { await new Promise(resolve => server.close(resolve)); }
-  const off = createConversationService({ env: { ...env, SOUL_MULTI_AGENT_ENABLED: 'false' }, logger: quiet, knowledgeProvider: { search: () => assert.fail('disabled') }, openAiFactory: () => assert.fail('disabled') });
+  const off = createConversationService({ env: { ...env, ONARIA_MULTI_AGENT_ENABLED: 'false' }, logger: quiet, knowledgeProvider: { search: () => assert.fail('disabled') }, openAiFactory: () => assert.fail('disabled') });
   const baseline = createConversationService({ env: {}, logger: quiet });
   assert.deepEqual(await off(body()), await baseline(body()));
 });

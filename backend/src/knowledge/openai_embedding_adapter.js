@@ -1,8 +1,9 @@
+import { brandEnv } from '../brand_env.js';
 import { validateTexts, validateVector, withEmbeddingDeadline } from './embedding_provider.js';
 
 // Client construction is lazy; supplying only the normal chat API key cannot enable this adapter.
 export function createOpenAiEmbeddingAdapter({ env = {}, clientFactory, timeoutMs = 1500 } = {}) {
-  const enabled = env.SOUL_EMBEDDING_ENABLED === 'true' && env.SOUL_EMBEDDING_PROVIDER === 'openai'
+  const enabled = brandEnv(env).ONARIA_EMBEDDING_ENABLED === 'true' && brandEnv(env).ONARIA_EMBEDDING_PROVIDER === 'openai'
     && typeof env.OPENAI_API_KEY === 'string' && Boolean(env.OPENAI_API_KEY.trim())
     && !/\s/.test(env.OPENAI_API_KEY) && typeof env.OPENAI_EMBEDDING_MODEL === 'string'
     && /^[a-zA-Z0-9_.-]{1,80}$/.test(env.OPENAI_EMBEDDING_MODEL);

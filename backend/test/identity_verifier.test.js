@@ -7,7 +7,7 @@ import { createConversationService } from '../src/conversation_service.js';
 import { costEnv, costBody, costFactory } from './fixtures/cost_fixtures.js';
 
 const issuer = 'https://identity.example.test';
-const audience = 'soul-bible';
+const audience = 'onaria';
 const { privateKey, publicKey } = await generateKeyPair('RS256');
 const jwks = { keys: [{ ...await exportJWK(publicKey), kid: 'test-key' }] };
 const timestamp = Math.floor(Date.now() / 1000);
@@ -40,7 +40,7 @@ test('premium entitlement comes from server grants and expires', async () => {
 test('runtime disabled and invalid required configuration fail predictably without secrets', async () => {
   assert.deepEqual(createRuntimeIdentity({ env: {} }), { required: false, verify: null });
   const logs = [];
-  const identity = createRuntimeIdentity({ env: { SOUL_AUTH_REQUIRED: 'true' }, logger: { error: value => logs.push(value) } });
+  const identity = createRuntimeIdentity({ env: { ONARIA_AUTH_REQUIRED: 'true' }, logger: { error: value => logs.push(value) } });
   assert.equal(identity.required, true);
   await assert.rejects(identity.verify('secret'), error => error.status === 503);
   assert.deepEqual(logs, ['identity_configuration_invalid']);
@@ -48,7 +48,7 @@ test('runtime disabled and invalid required configuration fail predictably witho
 
 test('HTTP verified members have separate quota; forged plan and invalid credentials cannot grant access', async t => {
   const calls = [];
-  const generate = createConversationService({ env: { ...costEnv, SOUL_FREE_DAILY_AI_CALLS: '1' }, openAiFactory: costFactory(calls), logger: {} });
+  const generate = createConversationService({ env: { ...costEnv, ONARIA_FREE_DAILY_AI_CALLS: '1' }, openAiFactory: costFactory(calls), logger: {} });
   const verify = createIdentityVerifier({ issuer, audience, jwks });
   const app = createApp({ generate, memberStore: {}, identity: { required: true,
     verify: async token => ({ ...await verify(token), plan: 'free' }) } });

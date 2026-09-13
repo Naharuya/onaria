@@ -4,8 +4,8 @@ import { writeFileSync } from 'node:fs';
 import { createConversationService } from '../src/conversation_service.js';
 import { assessRequestCrisis } from '../src/crisis.js';
 let calls = 0; const events = [];
-const service = createConversationService({ env: { SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true',
-  OPENAI_API_KEY: 'offline-fixture', SOUL_EXTERNAL_API_DISABLED: 'false' },
+const service = createConversationService({ env: { ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true',
+  OPENAI_API_KEY: 'offline-fixture', ONARIA_EXTERNAL_API_DISABLED: 'false' },
   logger: { info: (_event, data) => events.push(data), warn() {} },
   openAiFactory: () => ({ runStructured: async () => { calls++; throw new OpenAI.APIConnectionTimeoutError(); } }),
 });

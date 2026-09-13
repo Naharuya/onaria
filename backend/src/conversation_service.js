@@ -1,3 +1,4 @@
+import { brandEnv } from './brand_env.js';
 import { ZodError } from 'zod';
 import OpenAI from 'openai';
 import { createLocalConversationService } from './local_conversation_service.js';
@@ -77,14 +78,14 @@ export function createConversationService({ env = process.env, logger = console,
   const v1 = costRouterEnabled(env);
   const apiKey = (env.OPENAI_API_KEY || '').trim();
   const configuration = productionConfiguration(env);
-  const requestedOpenAi = env.SOUL_AI_MODE === 'openai' && env.SOUL_MULTI_AGENT_ENABLED === 'true';
+  const requestedOpenAi = brandEnv(env).ONARIA_AI_MODE === 'openai' && brandEnv(env).ONARIA_MULTI_AGENT_ENABLED === 'true';
   const enabled = requestedOpenAi && !configuration.externalApiDisabled && Boolean(apiKey) && !/\s/.test(apiKey);
-  const corpusMode = env.NODE_ENV === 'production' || env.SOUL_CORPUS_MODE === 'production' ? 'production' : 'development';
+  const corpusMode = env.NODE_ENV === 'production' || brandEnv(env).ONARIA_CORPUS_MODE === 'production' ? 'production' : 'development';
   const selectedKnowledgeProvider = knowledgeProvider ?? createReligionKnowledgeProvider({
     mode: corpusMode,
-    ...(corpusMode === 'production' && env.SOUL_PRODUCTION_INDEX_DIR
-      ? { store: activeIndexStore(createProductionIndex(env.SOUL_PRODUCTION_INDEX_DIR)) } : {}),
-    retriever: corpusMode === 'production' ? createRetrievalStrategy({ strategy: configuration.retrievalMode }) : createHybridRetriever(!configuration.externalApiDisabled && env.SOUL_EMBEDDING_PROVIDER === 'openai'
+    ...(corpusMode === 'production' && brandEnv(env).ONARIA_PRODUCTION_INDEX_DIR
+      ? { store: activeIndexStore(createProductionIndex(brandEnv(env).ONARIA_PRODUCTION_INDEX_DIR)) } : {}),
+    retriever: corpusMode === 'production' ? createRetrievalStrategy({ strategy: configuration.retrievalMode }) : createHybridRetriever(!configuration.externalApiDisabled && brandEnv(env).ONARIA_EMBEDDING_PROVIDER === 'openai'
       ? { embeddingProvider: createOpenAiEmbeddingAdapter({ env }) } : {}),
   });
   // Keep the repository's existing model setting; deployment must verify account access.
@@ -93,8 +94,8 @@ export function createConversationService({ env = process.env, logger = console,
   const providers = new Map();
   // The no-LLM path never activates an external embedding adapter.
   const cheapKnowledge = costKnowledgeProvider ?? createReligionKnowledgeProvider({ mode: corpusMode, retriever: keywordRetriever,
-    ...(corpusMode === 'production' && env.SOUL_PRODUCTION_INDEX_DIR
-      ? { store: activeIndexStore(createProductionIndex(env.SOUL_PRODUCTION_INDEX_DIR)) } : {}) });
+    ...(corpusMode === 'production' && brandEnv(env).ONARIA_PRODUCTION_INDEX_DIR
+      ? { store: activeIndexStore(createProductionIndex(brandEnv(env).ONARIA_PRODUCTION_INDEX_DIR)) } : {}) });
 
   function getProvider(selectedModel, tier) {
     // REAL Sol responses approached 6s (5.69s) and intermittently hit the SDK

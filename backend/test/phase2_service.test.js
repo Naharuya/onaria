@@ -8,7 +8,7 @@ import { responseSchema } from '../src/schema.js';
 import { createApp } from '../src/app.js';
 import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 
-const enabled = { SOUL_COST_ROUTER_V1_ENABLED: 'false', SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-key', OPENAI_MODEL: 'test-model' };
+const enabled = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-key', OPENAI_MODEL: 'test-model' };
 const request = (extra = {}) => ({ session: { sessionId: 'phase2', selectedEmotion: '불안', emotionIntensity: 7, turnCount: 1 },
   userMessage: 'private-user-message', systemPromptVersion: 'ko-v1', allowedVerseIds: ['PHP_4_6_7'], ...extra });
 const agent = { id: 'integrated' };
@@ -26,8 +26,8 @@ function mockService(calls = []) {
 }
 
 for (const [name, env, reason] of [
-  ['default', {}, null], ['local', { ...enabled, SOUL_AI_MODE: 'local' }, null],
-  ['flag off', { ...enabled, SOUL_MULTI_AGENT_ENABLED: 'false' }, null],
+  ['default', {}, null], ['local', { ...enabled, ONARIA_AI_MODE: 'local' }, null],
+  ['flag off', { ...enabled, ONARIA_MULTI_AGENT_ENABLED: 'false' }, null],
   ['missing key', { ...enabled, OPENAI_API_KEY: '' }, 'missing_api_key'],
 ]) test(`phase 2: ${name} makes zero provider calls and logs only safe metadata`, async () => {
   const log = capture();

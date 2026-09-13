@@ -11,7 +11,7 @@ import { costEnv, costBody, costFactory } from '../test/fixtures/cost_fixtures.j
 
 const directory = await mkdtemp(path.join(tmpdir(), 'soul-cost-smoke-'));
 const calls = [];
-const env = { ...costEnv, SOUL_USAGE_DB_PATH: path.join(directory, 'usage.sqlite'), SOUL_FREE_DAILY_AI_CALLS: '1' };
+const env = { ...costEnv, ONARIA_USAGE_DB_PATH: path.join(directory, 'usage.sqlite'), ONARIA_FREE_DAILY_AI_CALLS: '1' };
 async function start() {
   const ledger = createRuntimeUsageLedger({ env, logger: {} });
   assert.equal(ledger.overview().persistent, true);

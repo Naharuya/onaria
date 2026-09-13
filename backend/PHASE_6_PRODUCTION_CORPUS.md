@@ -148,10 +148,10 @@ npm.cmd run eval:gold
 CLI, 운영 설정과 HTTP 계약을 검증했다.
 
 NODE_ENV=production에서는 development 설정으로 운영 필터를 우회할 수 없다.
-SOUL_PRODUCTION_INDEX_DIR로 active snapshot 저장소를 연결한다.
-SOUL_EXTERNAL_API_DISABLED=true는 API 키/멀티에이전트 설정이 있어도 외부 LLM 및
+ONARIA_PRODUCTION_INDEX_DIR로 active snapshot 저장소를 연결한다.
+ONARIA_EXTERNAL_API_DISABLED=true는 API 키/멀티에이전트 설정이 있어도 외부 LLM 및
 embedding 클라이언트를 생성하지 않고 local 경로를 사용한다.
-SOUL_MULTI_AGENT_ENABLED=false도 기존 local 경로와 /v1/mind/chat 계약을 유지한다.
+ONARIA_MULTI_AGENT_ENABLED=false도 기존 local 경로와 /v1/mind/chat 계약을 유지한다.
 활성 snapshot의 서비스 연결은 injected mock으로 검증했다. embedding 실패 시 keyword
 fallback 및 safety의 retrieval/model 선행 차단도 검증했다.
 
@@ -201,7 +201,7 @@ rate는 전체 검색 문항 기준, wrong-tradition은 반환 출처 기준이�
 production default는 **keyword**, hybrid는 **experimental**이다.
 MRR >= keyword, Recall@3 >= keyword, wrong-tradition <= keyword를 모두 충족했지만
 기존의 실제 개선 및 전문가 검토 조건도 유지하므로 promoted=false다.
-SOUL_HYBRID_EXPERIMENTAL=true는 명시적 로컬 hybrid 실험 override이며 benchmark가
+ONARIA_HYBRID_EXPERIMENTAL=true는 명시적 로컬 hybrid 실험 override이며 benchmark가
 운영 설정을 자동 변경하지 않는다. 이 수치는 로컬 결정적 embedding과 합성 자료 결과로,
 실제 자료/학습된 embedding의 품질 또는 사용권 검증 결과가 아니다.
 

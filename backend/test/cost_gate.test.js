@@ -20,7 +20,7 @@ test('safety and RAG do not require an AI quota; explicit invalid policy fails c
     assert.equal(evaluateCostGate({ taskType, dailyUsage: { aiRequests: 9999 } }).reason, 'safety_bypass');
   }
   assert.equal(evaluateCostGate({ taskType: 'bible_search', dailyUsage: { aiRequests: 9999 } }).tier, 'rag');
-  assert.equal(evaluateCostGate({}, { SOUL_FREE_DAILY_AI_CALLS: 'bad' }).tier, 'local');
-  assert.equal(evaluateCostGate({}, { SOUL_FREE_DAILY_AI_BUDGET_USD: '0' }).tier, 'local');
-  assert.equal(evaluateCostGate({ dailyUsage: { aiRequests: 5 } }, { SOUL_FREE_DAILY_AI_CALLS: '10' }).tier, 'standard');
+  assert.equal(evaluateCostGate({}, { ONARIA_FREE_DAILY_AI_CALLS: 'bad' }).tier, 'local');
+  assert.equal(evaluateCostGate({}, { ONARIA_FREE_DAILY_AI_BUDGET_USD: '0' }).tier, 'local');
+  assert.equal(evaluateCostGate({ dailyUsage: { aiRequests: 5 } }, { ONARIA_FREE_DAILY_AI_CALLS: '10' }).tier, 'standard');
 });

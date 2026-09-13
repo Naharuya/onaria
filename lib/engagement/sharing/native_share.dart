@@ -14,12 +14,18 @@ class NativeCardShare implements CardShareGateway {
   static const _appLink = String.fromEnvironment('ONARIA_SHARE_APP_URL');
   static String? get invitationText {
     final uri = Uri.tryParse(_appLink);
-    if (uri == null || uri.scheme != 'https' || uri.host != 'api.onaria.ai.kr' ||
-        uri.path != '/app/open' || uri.userInfo.isNotEmpty || uri.hasQuery || uri.hasFragment) {
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host != 'api.onaria.ai.kr' ||
+        uri.path != '/app/open' ||
+        uri.userInfo.isNotEmpty ||
+        uri.hasQuery ||
+        uri.hasFragment) {
       return null;
     }
     return 'onaria에서 마음에 작은 쉼을 만나보세요.\n앱 열기 · 설치 안내: $uri';
   }
+
   static bool get supportsSave =>
       !kIsWeb &&
       [TargetPlatform.android, TargetPlatform.iOS]
@@ -41,7 +47,7 @@ class NativeCardShare implements CardShareGateway {
 
   @override
   Future<bool> save(Uint8List png) async =>
-      await const MethodChannel('soul_bible/image_export')
+      await const MethodChannel('onaria/image_export')
           .invokeMethod<bool>('saveImage', png) ??
       false;
 }

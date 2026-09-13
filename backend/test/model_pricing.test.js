@@ -9,6 +9,6 @@ test('synthetic prices subtract cached tokens exactly once', () => {
   assert.ok(Math.abs(estimateCacheSavings(usage, pricing) - 0.0006) < 1e-12);
   assert.equal(estimateCost({ ...usage, model: 'unknown' }, pricing), null);
   assert.equal(estimateCost({ ...usage, cachedInputTokens: 1001 }, pricing), null);
-  assert.deepEqual(readPricing({ SOUL_MODEL_PRICING_JSON: 'invalid' }), {});
+  assert.deepEqual(readPricing({ ONARIA_MODEL_PRICING_JSON: 'invalid' }), {});
   assert.equal(estimateCost({ model: 'toString' }), null);
 });

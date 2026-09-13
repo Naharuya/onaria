@@ -15,7 +15,7 @@ import { createApp } from '../src/app.js';
 import { costBody, costKnowledge } from './fixtures/cost_fixtures.js';
 import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 
-const env = { SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-cost-v1' };
+const env = { ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-cost-v1' };
 const counts = { inputTokens: 800, cachedInputTokens: 400, cacheWriteTokens: 200, outputTokens: 120 };
 const support = () => ({ emotion: '불안', empathy: '불안한 마음이 드셨군요. 천천히 이야기해 주세요.',
   nextQuestion: '지금 가장 마음에 남는 것은 무엇인가요?', summary: '불안한 감정과 안정에 대한 필요', answerExamples: ['저는 친구가 해 준 말이 마음에 남아요.', '저는 혼자 기다렸던 순간이 기억에 남아요.'] });
@@ -104,7 +104,7 @@ test('quality floor prevents budget-forced weak answers; feedback escalates next
   const general = routeCostRequest(costBody('두 가지 선택의 장단점을 비교하고 싶어요'));
   assert.equal(applySessionTarget(general, { sessionBudgetUsedUsd: 1 }).tier, 'terra');
   assert.equal(routeCostRequest(costBody('답변이 너무 일반적이고 부족해요')).reason, 'escalation_quality');
-  const { service, calls, logs } = setup({ env: { ...env, SOUL_FREE_DAILY_AI_BUDGET_USD: '0.0001' } });
+  const { service, calls, logs } = setup({ env: { ...env, ONARIA_FREE_DAILY_AI_BUDGET_USD: '0.0001' } });
   responseSchema.parse(await service(costBody('복합적인 갈등을 상담하고 싶어요')));
   assert.equal(calls.length, 0);
   assert.equal(logs.at(-1).provider, 'local');

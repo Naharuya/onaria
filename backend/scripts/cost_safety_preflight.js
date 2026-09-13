@@ -8,8 +8,8 @@ export async function safetyPreflight() {
   const cases = JSON.parse(readFileSync(new URL('../../backend_contract/safety_cases.json', import.meta.url), 'utf8'));
   let clients = 0, agents = 0;
   const logs = [];
-  const service = createConversationService({ env: { SOUL_AI_MODE: 'openai', SOUL_MULTI_AGENT_ENABLED: 'true',
-    SOUL_COST_ROUTER_V1_ENABLED: 'true', OPENAI_API_KEY: 'synthetic-preflight' },
+  const service = createConversationService({ env: { ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true',
+    ONARIA_COST_ROUTER_V1_ENABLED: 'true', OPENAI_API_KEY: 'synthetic-preflight' },
     logger: { info: (_, data) => logs.push(data), warn() {} },
     openAiFactory() { clients++; throw Error('Safety client creation forbidden'); },
     selectReligion() { agents++; throw Error('Safety religion selection forbidden'); },

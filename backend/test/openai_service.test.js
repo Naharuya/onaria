@@ -66,7 +66,7 @@ test('stage 8: legacy callable OpenAI service retains its request and response c
   } } } });
   const body = { session: { sessionId: 'legacy' }, userMessage: 'test', allowedVerseIds: ['verse-1'] };
   assert.deepEqual(await service(body, { id: 'integrated' }, 'prior memory'), fixture);
-  assert.equal(sent.text.format.name, 'soul_bible_turn');
+  assert.equal(sent.text.format.name, 'onaria_turn');
   assert.equal(JSON.parse(sent.input).memorySummary, 'prior memory');
   assert.deepEqual(JSON.parse(sent.input).allowedVerseIds, ['verse-1']);
 });

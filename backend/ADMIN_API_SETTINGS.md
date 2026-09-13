@@ -5,7 +5,7 @@
 - 키 저장/교체: 새 요청부터 적용한다. 실제 OpenAI 연결 확인이나 유료 호출은 수행하지 않는다.
 - 키 삭제: 저장된 빈 값으로 환경변수 키도 덮어써 새 요청의 AI 사용을 중단한다. 이미 진행 중인 요청은 완료될 수 있다.
 - 처음 저장하기 전에는 기존 `OPENAI_API_KEY` 환경변수를 사용한다.
-- AI 활성화에는 기존 `SOUL_AI_MODE=openai`, `SOUL_MULTI_AGENT_ENABLED=true` 및 외부 API 허용·비용·콘텐츠 정책이 여전히 필요하다. 키 입력만으로 이를 변경하지 않는다.
+- AI 활성화에는 기존 `ONARIA_AI_MODE=openai`, `ONARIA_MULTI_AGENT_ENABLED=true` 및 외부 API 허용·비용·콘텐츠 정책이 여전히 필요하다. 키 입력만으로 이를 변경하지 않는다.
 
 `GET/PUT/DELETE /v1/admin/settings`는 관리자 Bearer 인증을 요구하며 응답은 `no-store`다. 조회 결과에는 등록 여부·설정 출처·응답 모드·변경 시각만 포함한다. PUT 본문은 `{ "apiKey": "새 키" }`다. 키는 브라우저 저장소에 보관하지 않으며 전송 시 입력란을 비운다. 관리자 인증 토큰은 기존처럼 sessionStorage에 유지된다.
 

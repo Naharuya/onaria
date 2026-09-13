@@ -1,4 +1,4 @@
-# ONARIA / MindBible
+# ONARIA
 
 PROJECT=ONARIA
 TYPE=Flutter + Node.js + AI + Web/Admin

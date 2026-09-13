@@ -54,7 +54,7 @@ export function createOpenAiService({ apiKey, model, client, timeout = 6_000, ma
     const safety = assessRequestCrisis(body);
     if (safety.level > 0) return crisisResponse(body.session.selectedEmotion, safety);
     return runStructured({
-      name: 'soul_bible_turn', instructions: SYSTEM_PROMPT,
+      name: 'onaria_turn', instructions: SYSTEM_PROMPT,
       input: buildInput(body, agent, memorySummary),
       jsonSchema: responseJsonSchema, schema: responseSchema, maxOutputTokens: 900,
     }, options);

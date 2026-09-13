@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      SOUL_AI_MODE: local
-      SOUL_EXTERNAL_API_DISABLED: 'true'
+      ONARIA_AI_MODE: local
+      ONARIA_EXTERNAL_API_DISABLED: 'true'
       OPENAI_API_KEY: ''
     defaults:
       run:
