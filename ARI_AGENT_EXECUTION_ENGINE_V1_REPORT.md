@@ -2,7 +2,7 @@
 
 최종 상태: **PARTIAL**
 
-기록 시각: 2026-09-14T06:47:57.108178+09:00
+기록 시각: 2026-09-14T06:50:21.767056+09:00
 
 실행 엔진·로컬 Trigger·단위/통합 검증은 PASS다. 외부 데이터 연결은 요청한 1차 범위대로 미연결 처리했다. 실제 앱 profile은 아래 사유로 HUMAN_REVIEW이고, 로그인 전 system LaunchDaemon 설치는 Mac 관리자 인증이 없어 미완료다. 이 상태를 회사 전체 자동 운영 또는 release 승인으로 해석하지 않는다.
 
@@ -94,7 +94,7 @@
 - 세 fixture: 변경 → debounce → Verification Task → SERVER_PASS 확인. 실제 제품 성공으로 해석하지 않는다.
 - 세 실제 automation 작업 트리: 임시 probe로 변경 → 600ms debounce → 각 Task 생성 확인, probe 정리. 테스트 override는 상시 launchd에 적용하지 않는다.
 - Dry-run: 11 계약 로드, 세 profile VALID, 15분/15초/20분 설정 확인.
-- GitHub CI: **PENDING_PUSH**. 검증 code commit: `push 후 기록`. 실행 링크: push 후 기록.
+- GitHub CI: **BLOCKED_BILLING — job did not start; tests NOT RUN**. 검증 code commit: `19d70b848212929e0c8038172527a6afc5750e75`. 실행 링크: https://github.com/Naharuya/soul-bible/actions/runs/34784920803.
 
 ## 실제 프로젝트 profile 결과
 
@@ -130,8 +130,8 @@ ARI_WATCH_POLL_INTERVAL_MS => 15000
 ARI_POLL_INTERVAL_MS => 900000
 KSTOCK_LIVE_TRADING_ENABLED => false
 ARI_QUIET_WINDOW_MS => 1200000
-runs = 2
-pid = 49489
+runs = 3
+pid = 62027
 last exit code = 0
 state = active
 state = active
@@ -158,9 +158,11 @@ sudo /bin/bash /Users/server/ari-company-os-worktree/server/ari-company-os/scrip
 
 ## Commit / Push 및 보존
 
-기존 main/master 작업 트리와 미커밋 사용자 파일은 보존했다. 작업 브랜치의 이전 설치 결과까지 포함하여 실행 엔진과 이 보고서를 commit/push한다. 보고서 전용 후속 commit은 검증한 code commit과 구분한다. 이번 작업에서 실제 앱/repair workflow 자체가 사용자 코드 commit/merge/push를 자동 수행하도록 만들지는 않았다.
+기존 main/master 작업 트리와 미커밋 사용자 파일은 보존했다. 작업 브랜치의 이전 설치 결과까지 포함한 실행 엔진 code commit `19d70b848212929e0c8038172527a6afc5750e75`를 지정 브랜치로 push 완료했다. 이 보고서의 CI/운영 결과 갱신은 별도 문서 commit으로 push한다. 보고서 전용 후속 commit은 검증한 code commit과 구분한다. 이번 작업에서 실제 앱/repair workflow 자체가 사용자 코드 commit/merge/push를 자동 수행하도록 만들지는 않았다.
 
 ## 남은 Risk / 다음 단계
+
+GitHub Actions는 계정 billing 잠금 때문에 job 자체가 시작하지 못했다. 원격 테스트는 NOT RUN이며 로컬 테스트 통과와 구분한다. 계정 상태 복구 후 같은 code commit의 CI 재실행이 필요하다.
 
 1. 로컬 관리자 인증으로 system LaunchDaemon 설치 후 로그인 전 부팅을 실제 검증해야 한다. 현재 충족 범위는 로그인 시 자동 시작이다.
 2. ONARIA의 기존 credential 형태 test marker를 사람이 확인해야 한다. 자동 allowlist나 Safety/테스트 기준 완화는 하지 않았다. 이후 기존 analyze 4건과 profile/APK 전체 재검증이 필요하다.
