@@ -6,6 +6,8 @@ import '../app/mind_card_store.dart';
 import '../app/space_scaffold.dart';
 import '../app/verse_history.dart';
 import '../engagement/engagement_controller.dart';
+import '../app/privacy_consent.dart';
+import 'account_deletion_page.dart';
 
 class PrivacyPage extends StatefulWidget {
   const PrivacyPage({super.key});
@@ -109,8 +111,17 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const SizedBox(height: 20),
           const Text('회원 정보와 계정',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const Text(
-              '현재 회원가입은 서버에 정보를 등록하는 기능이에요. 이 앱에는 본인 인증을 통한 계정 삭제 기능이 아직 없어요. 기기 기록 삭제나 앱 삭제로 탈퇴가 처리되지는 않아요. 서버 회원 정보의 삭제 요청 절차와 문의처는 정식 공개 전에 확정해야 해요.'),
+          const Text('신규 회원정보 등록은 중단되어 있어요. 이전에 등록한 회원정보는 본인 확인 후 삭제 요청할 수 있어요. 기기 기록 삭제와 서버 회원정보 삭제는 별도예요.'),
+          OutlinedButton(onPressed: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const AccountDeletionPage())),
+            child: const Text('기존 회원정보 삭제 요청')),
+          OutlinedButton(onPressed: () async {
+            try {
+              await PrivacyConsent.revoke();
+              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('대화 전송 동의를 철회했어요. 이미 전송된 정보의 삭제는 별도 요청이 필요해요.')));
+            } catch (_) {
+              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('동의 철회를 저장하지 못했어요. 다시 시도해 주세요.')));
+            }
+          }, child: const Text('서버·외부 AI 전송 동의 철회')),
           TextButton(
               onPressed: () async {
                 try {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './browser-fixtures.js';
 
 test('anonymous category feedback appears only in the authenticated analytics screen', async ({ page, request }) => {
   const response = await request.post('/v1/feedback', { data: {

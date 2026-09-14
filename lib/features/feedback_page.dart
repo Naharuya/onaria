@@ -6,9 +6,11 @@ import '../app/api_config.dart';
 import '../app/space_scaffold.dart';
 import '../engagement/engagement_controller.dart';
 import '../engagement/safety_notice.dart';
+import 'content_report_page.dart';
 
 class FeedbackPage extends StatefulWidget {
-  const FeedbackPage({super.key, this.client});
+  const FeedbackPage({super.key, this.client, this.responseText});
+  final String? responseText;
   final http.Client? client;
   @override
   State<FeedbackPage> createState() => _FeedbackPageState();
@@ -99,6 +101,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       onPressed: () => Navigator.pop(context),
                       child: const Text('돌아가기')),
                 ] else ...[
+                  OutlinedButton.icon(
+                    onPressed: _busy ? null : () => Navigator.push(context, MaterialPageRoute<void>(
+                      builder: (_) => ContentReportPage(responseText: widget.responseText))),
+                    icon: const Icon(Icons.flag_outlined), label: const Text('부적절한 AI 응답 신고')),
                   const Text('어떤 경험이었나요?',
                       style:
                           TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),

@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../app/verse_narration.dart';
 import 'feedback_page.dart';
+import '../app/privacy_consent.dart';
 
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
@@ -419,6 +420,7 @@ class _ConversationPageState extends State<ConversationPage>
             : ProxyLlmApiClient(
                 endpoint: ApiConfig.chatUrl!,
                 appTokenProvider: () async => ApiConfig.appToken,
+                privacyVersionProvider: PrivacyConsent.acceptedVersion,
               ));
     _session = ConversationSession(
       sessionId: DateTime.now().microsecondsSinceEpoch.toString(),
@@ -558,6 +560,11 @@ class _ConversationPageState extends State<ConversationPage>
       if (client == null) {
         await _continueWithoutServer(turnBeforeRequest);
         return;
+      }
+      if (widget.apiClient == null) {
+        final accepted = await PrivacyConsent.ensure(context);
+        if (!active()) return;
+        if (!accepted) throw StateError('Privacy consent not granted');
       }
       final allowedVerses = await _verseRepository.findForEmotion(
         widget.emotion,
@@ -1323,7 +1330,7 @@ class _ConversationPageState extends State<ConversationPage>
                             TextButton.icon(
                                 onPressed: () => Navigator.of(context).push(
                                     MaterialPageRoute(
-                                        builder: (_) => const FeedbackPage())),
+                                        builder: (_) => FeedbackPage(responseText: _items.where((item) => !item.fromUser).lastOrNull?.text))),
                                 icon: const Icon(Icons.feedback_outlined),
                                 label: const Text('답변에 대한 의견 보내기')),
                           if (_busy) _typing(),

@@ -3,7 +3,9 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { ZodError } from 'zod';
+import { ZodError, z } from 'zod';
+import { loadPrivacyPolicy, publicPrivacy } from './privacy_policy.js';
+import { contentReportSchema } from './content_reports.js';
 import { assessRequestCrisis, crisisResponse } from './crisis.js';
 import { logSafetyAssessment } from './safety_event.js';
 import { requestSchema, responseSchema } from './schema.js';
@@ -17,7 +19,7 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics(), privacy = loadPrivacyPolicy(), reports = null, registrationEnabled = !production }) {
   const app = express();
   const startedAt = new Date();
   const feedback = createFeedbackMetrics();
@@ -45,6 +47,20 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
 
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+  app.get('/v1/privacy', (_req, res) => res.json(publicPrivacy(privacy)));
+  app.post('/v1/reports', (req, res, next) => {
+    if (appToken && req.get('authorization') !== `Bearer ${appToken}`) return res.status(401).json({ message: '인증이 필요합니다.' });
+    try {
+      const report = contentReportSchema.parse(req.body);
+      if (!privacy.ready || !reports) return res.status(503).json({ message: '신고 접수 준비 중입니다. 잠시 후 다시 시도해 주세요.' });
+      reports.add(report);
+      return res.status(202).json({ accepted: true });
+    } catch (error) {
+      if (error.code === 'REPORT_ID_REUSED') return res.status(409).json({ message: '다시 신고 내용을 선택해 주세요.' });
+      if (error.code === 'REPORT_CAPACITY') return res.status(503).json({ message: '신고 접수가 지연되고 있습니다.' });
+      return next(error);
+    }
+  });
   app.post('/v1/feedback', (req, res, next) => {
     if (appToken && req.get('authorization') !== `Bearer ${appToken}`) {
       return res.status(401).json({ message: '인증이 필요합니다.' });
@@ -56,6 +72,26 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
   app.use('/v1/admin', adminAuth({ token: adminToken, production, allowBearer: allowAdminBearer }));
   app.get('/v1/admin/feedback', (_req, res) => res.json(feedback.overview()));
+  app.get('/v1/admin/reports', (_req, res) => res.json({ reports: reports?.list() ?? [], available: !!reports }));
+  app.post('/v1/admin/reports/:id/review', (req, res, next) => {
+    try {
+      z.string().regex(/^[a-f0-9]{32}$/).parse(req.params.id);
+      z.object({ confirmation: z.literal('REVIEWED') }).strict().parse(req.body);
+      if (!reports) return res.status(503).json({ message: '신고 저장소가 준비되지 않았습니다.' });
+      return res.status(reports.review(req.params.id) ? 200 : 404).json({});
+    } catch (error) { return next(error); }
+  });
+  app.delete('/v1/admin/members/:id', (req, res, next) => {
+    try {
+      const id = z.coerce.number().int().positive().max(Number.MAX_SAFE_INTEGER).parse(req.params.id);
+      z.object({ confirmation: z.literal(`DELETE_MEMBER:${id}`),
+        verificationReference: z.string().regex(/^[A-Za-z0-9-]{8,80}$/) }).strict().parse(req.body);
+      if (!memberStore.eraseVerifiedMember) return res.status(503).json({ message: '삭제 저장소가 준비되지 않았습니다.' });
+      memberStore.eraseVerifiedMember(id);
+      // Do not log identity, submitted proof or deleted member fields.
+      return res.status(204).end();
+    } catch (error) { return next(error); }
+  });
   app.use('/v1/admin/settings', (req, res, next) => {
     if (!adminSettings) return res.status(503).json({ message: '설정 저장소를 사용할 수 없습니다.' });
     next();
@@ -84,7 +120,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     res.sendFile(fileURLToPath(new URL('../public/admin.html', import.meta.url)));
   });
   app.use('/admin', express.static(fileURLToPath(new URL('../public', import.meta.url)), { index: false, maxAge: 0, dotfiles: 'deny' }));
-  app.use(websiteRouter({ publicOrigin }));
+  app.use(websiteRouter({ publicOrigin, privacy }));
   app.get('/v1/admin/overview', (req, res) => {
     res.set('Cache-Control', 'no-store');
     const members = memberStore.getAdminOverview?.() ?? { total: null, recent: [] };
@@ -111,6 +147,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
   app.post('/v1/auth/signup', (req, res, next) => {
     try {
+      if (!registrationEnabled) return res.status(503).json({ message: '회원정보 등록은 잠시 중단했어요. 가입 없이 이용할 수 있어요.' });
       const member = memberStore.create(memberSchema.parse(req.body));
       return res.status(201).json({ member: publicMember(member) });
     } catch (error) {
@@ -136,6 +173,9 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
 
       // Shared app authentication above is unchanged. Per-member identity uses
       // a separate credential and is never inferred from body/session fields.
+      if (production && (!privacy.ready || req.get('x-onaria-privacy-version') !== privacy.version)) {
+        return res.status(privacy.ready ? 428 : 503).json({ message: '개인정보 안내 확인 후 대화를 이용해 주세요.' });
+      }
       const identityToken = req.get('x-soul-identity-token');
       let trustedIdentity = {};
       if (identityToken !== undefined) {

@@ -62,6 +62,10 @@ class EngagementPage extends StatelessWidget {
                     const Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: Text('곁에 두고 싶은 말씀을 저장해 보세요.')),
+                  if (controller.savedVerseIds.any((id) => controller.verse(id) == null))
+                    const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text('일부 말씀은 자료 검토 중이라 표시하지 않아요. 저장 기록은 보존되어 있어요.')),
                   for (final verse in controller.catalog
                       .where((v) => controller.savedVerseIds.contains(v.id)))
                     _verseCard(context, controller, verse),

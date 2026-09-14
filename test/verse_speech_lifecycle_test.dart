@@ -19,7 +19,7 @@ class _OfflineClient implements LlmApiClient {
 
 void main() {
   for (final action in ['stop', 'leave', 'complete', 'error']) {
-    testWidgets('bilingual speech lifecycle: $action', (tester) async {
+    testWidgets('bundled Korean speech lifecycle: $action', (tester) async {
       SharedPreferencesAsyncPlatform.instance =
           InMemorySharedPreferencesAsync.empty();
       addTearDown(() => SharedPreferencesAsyncPlatform.instance = null);
@@ -80,7 +80,7 @@ void main() {
         pending.complete(1);
       }
       await tester.pumpAndSettle();
-      expect(spoken, action == 'complete' ? 2 : 1);
+      expect(spoken, 1); // Unlicensed English is intentionally absent.
       if (action != 'leave') {
         expect(find.text('말씀 낭독 멈추기'), findsNothing);
       }

@@ -92,9 +92,9 @@ class EngagementController extends ChangeNotifier {
           journey = SevenDayJourney.fromJson(
               Map<String, dynamic>.from(data['journey'] as Map));
         }
-        _saved.addAll((data['savedVerseIds'] as List? ?? [])
-            .whereType<String>()
-            .where((id) => verse(id) != null));
+        // A temporarily withheld catalog must not erase the user's saved IDs.
+        // Views resolve IDs against the currently approved catalog.
+        _saved.addAll((data['savedVerseIds'] as List? ?? []).whereType<String>());
         _gratitudeSaved.addAll(
             (data['gratitudeVerseIds'] as List? ?? []).whereType<String>());
         _achievements.addAll(Achievement.values.where(
