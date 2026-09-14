@@ -1,12 +1,13 @@
 {
   "name": "ari-autonomous-company-os",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node bin/ari-manager.js daemon",
     "status": "node bin/ari-manager.js status",
+    "dashboard": "node bin/ari-manager.js dashboard",
     "run": "node bin/ari-manager.js run",
     "test": "node --test"
   },
