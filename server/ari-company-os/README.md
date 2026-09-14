@@ -1,6 +1,6 @@
 # ARI Company OS execution engine
 
-This extends the eleven canonical operating agents in `AGENT_REGISTRY.md`; it does not create per-project QA/Safety/Psychology agents. `config/agents.yaml` is the executable registry, including complete execution contracts and references to existing runtime/specialist owners. `ENGINE_INVENTORY.md` records the registry-first decisions.
+This extends the canonical operating agents in `AGENT_REGISTRY.md`; it does not create per-project QA/Safety/Psychology agents. `config/agents.yaml` is the executable registry. Existing project/runtime agents are reused first.
 
 ## Local operation
 
@@ -11,36 +11,81 @@ export ARI_STATE_ROOT=/Users/server/ari-server/runtime/ari-company-os
 node bin/ari-manager.js daemon --dry-run
 node bin/ari-manager.js status
 node bin/ari-manager.js registry
-node bin/ari-manager.js enqueue /path/to/reviewed-task.json
-node bin/ari-manager.js event /path/to/reviewed-event.json
+node bin/ari-manager.js dashboard
 ```
 
-The task/event CLI is a trusted, local operator interface, not an authenticated public API. No network listener is exposed. Do not put credentials or personal data in task payloads. `approve-development <task-id>` records the local owner's explicit approval for a development task awaiting review. It never grants release approval.
+The task/event CLI is a trusted local operator interface. The dashboard is a read-only HTTP listener bound to `127.0.0.1` by default; it has no mutation API and must not be exposed to the public Internet. `approve-development <task-id>` records explicit development approval only and never grants release approval.
 
-Main Manager runs every 900000ms (15 minutes). Scheduler deadlines and queue-file events wake it immediately, independently of that periodic cycle. The queue watcher uses native events with a 250ms stat fallback. Project scanning defaults to 15000ms; verification starts after a fresh 600000ms (10 minute) quiet window. If source changes again during the quiet window, the timer resets from the latest change. Coding Agent completion hands off to Verification immediately without waiting for the quiet window. Poll/debounce overrides are only for controlled tests. The installed service explicitly restores production-independent local defaults.
+Main Manager runs every 900000ms (15 minutes). Scheduler deadlines and queue events wake it immediately. Project scanning defaults to 15000ms; verification starts after a fresh 600000ms (10 minute) quiet window. If source changes again during the quiet window, the timer resets. Coding Agent and Repair completion hand off to Verification immediately without waiting for the quiet window.
 
-Task lifecycle: `PENDING → READY → IN_PROGRESS → VERIFYING → COMPLETED`; exceptions `BLOCKED`, `FAILED`, `HUMAN_REVIEW`, `CANCELLED`. Dependencies require COMPLETED predecessors. Result and followup creation are one queue transaction. Active dedupe includes human-review tasks. Concurrency serializes each project's work even when supplied group names differ. Writer workflows additionally lock the shared Git directory and create task-specific automation worktrees. No cross-host distributed lease is implemented.
+Task lifecycle: `PENDING → READY → IN_PROGRESS → VERIFYING → COMPLETED`; exceptions `BLOCKED`, `FAILED`, `HUMAN_REVIEW`, `CANCELLED`. Dependencies require COMPLETED predecessors. Active dedupe includes human-review tasks. Concurrency serializes project work. Writer workflows lock the shared Git directory and use task-specific automation worktrees.
 
-## Approved development payload
+## Local-first AI Router
 
-```json
-{
-  "type": "DEVELOPMENT",
-  "project": "fixture",
-  "projectDir": "/path/to/isolated/repository",
-  "goal": "Return the expected value",
-  "resourceScope": ["src/value.cjs"],
-  "acceptanceCriteria": ["The exported value equals 2"],
-  "approval": {"approved": true, "by": "owner"},
-  "focusedChecks": [{"id":"value", "command":"node", "args":["--test","test/value.test.cjs"]}]
-}
-```
+`src/ai_router.js` is infrastructure, not a new business agent identity.
 
-V1's Codex adapter supports small existing files under explicit `src/`, `lib/`, `backend/src/` allowlists. Runtime agent/policy/security/test/config paths are not automatically writable. New files, broad refactors, dependency provisioning and uncertain scopes terminate in HUMAN_REVIEW. A coding worktree starts from a committed revision; uncommitted source edits are not silently imported. A repair worktree copies only the previous failing scope and preserves that lineage. Worktrees and diffs are retained for review. Automatic coding/repair commits, merges and pushes are not performed by the daemon.
+- Local lane: Ollama at `http://127.0.0.1:11434`, default model from `ARI_LOCAL_AI_MODEL` (fallback `qwen3.5:4b-mlx`).
+- Local-first examples: report summarization, classification, customer/competitor/growth/finance/grant analysis when evidence is already available.
+- External-first examples: DEVELOPMENT, REPAIR, architecture/security work.
+- High-risk safety/privacy/legal/payment/release/live-trading/security scopes never silently route to Local AI; they require external review and/or HUMAN_REVIEW.
+- If Local AI fails, optional external escalation is allowed only when an explicit external adapter is configured.
+- No API key is stored in telemetry or dashboard data.
 
-Verification Core owns profile loading, diff/secret checks, analyze/lint, unit, integration/smoke, risk checks, optional debug APK and immutable revision-bound reports. It cannot invoke a repair worker. The existing repair-agent workflow receives eligible FAIL results, has a maximum lineage count of two and requests a separate verification task. `VerificationWorkflow` is a compatibility/integration driver for that separation, not a new agent identity.
+Ollama returns `prompt_eval_count` and `eval_count`; those are stored as measured input/output tokens. Codex CLI currently does not expose reliable token counts through this adapter, so its exact call frequency is recorded while tokens are explicitly marked `UNAVAILABLE` rather than estimated.
 
-Profiles record required capability coverage. Empty mappings stop at HUMAN_REVIEW; successful generic tests do not substitute for missing audio, lifecycle/deep-link, KIS or OpenDART adapter tests. Secret-pattern findings are not automatically allowlisted, even in existing tests.
+## AI usage telemetry
+
+`state/ai-usage.jsonl` records one line per AI invocation:
+
+- timestamp
+- local/external lane
+- provider/model
+- agent/task type
+- success/failure
+- measured input/output/total tokens when available
+- token measurement state
+- duration
+- escalation flag
+- externally supplied cost estimate when available
+
+`AiUsageStore.summary()` calculates Local AI rate, external call frequency, measured token totals, token-measurement coverage, escalation count, and per-agent/provider totals. Unknown token usage is never treated as zero.
+
+## Operations dashboard
+
+The daemon starts the dashboard unless `ARI_DASHBOARD_ENABLED=false`.
+
+Default link on the Mac mini:
+
+`http://127.0.0.1:8787/`
+
+Environment options:
+
+- `ARI_DASHBOARD_HOST` default `127.0.0.1`
+- `ARI_DASHBOARD_PORT` default `8787`
+
+The UI shows:
+
+- active/completed/HUMAN_REVIEW task counts
+- Agent activity
+- Local vs External AI call frequency
+- Local processing rate
+- measured tokens and token coverage
+- recorded external cost estimates
+- recent tasks and AI calls
+
+It refreshes every 30 seconds. It is read-only. Do not bind it to a public interface without adding authentication and network controls first.
+
+## Coding / repair
+
+The Codex adapter supports small existing files under explicit `src/`, `lib/`, `backend/src/` allowlists. Runtime agent/policy/security/test/config paths are not automatically writable. New files, broad refactors, dependency provisioning and uncertain scopes terminate in HUMAN_REVIEW. Worktrees and diffs are retained for review. Automatic coding/repair commits, merges and pushes are not performed by the daemon.
+
+Codex coding/repair invocation frequency is written to the same AI telemetry store. Because the CLI adapter does not currently provide authoritative token counts, those events have `tokenState=UNAVAILABLE`.
+
+## Verification Core
+
+Verification Core owns profile loading, diff/secret checks, analyze/lint, unit, integration/smoke, risk checks, optional debug APK and revision-bound reports. It cannot invoke a repair worker. Repair has a maximum lineage count of two and requests a separate verification task.
+
+Profiles record required capability coverage. Missing required capability tests stop at HUMAN_REVIEW. Successful generic tests do not substitute for missing audio, lifecycle/deep-link, KIS or OpenDART adapter tests.
 
 ## Schedules (Asia/Seoul)
 
@@ -53,17 +98,28 @@ Profiles record required capability coverage. Empty mappings stop at HUMAN_REVIE
 | Growth | Monday 06:00 |
 | Competitor | Wednesday 05:30 |
 | Government Grant | Weekdays 06:00; pre-founder status |
-| Verification | Coding handoff immediately, or code quiet for 10 minutes |
+| Verification | Coding/Repair handoff immediately, or code quiet for 10 minutes |
 | Repair / Release gate / high risk | Immediately on their respective events |
 
-On startup the scheduler catches up only today's due slots. Persistent date/owner keys prevent repeat processing after restart. Older missed days are not fabricated. External data adapters are deliberately unconnected: Finance/Growth/Customer/Competitor/Grant tasks block with DATA_SOURCE_NOT_CONNECTED. Reports label external facts UNVERIFIED. Grant deadline helper supports D-30/14/7/3 and escalates registration eligibility.
+External business-data adapters remain deliberately disconnected until a real source is configured. Their tasks return `DATA_SOURCE_NOT_CONNECTED`; reports label unavailable facts `UNVERIFIED`.
 
 ## Release evidence
 
-SERVER_PASS → matching GitHub CI PASS → actual matching Test Build → DEVICE_PASS → owner's RELEASE_APPROVED. A local `CI_RESULT`, `TEST_BUILD`, `DEVICE_RESULT` or `RELEASE_APPROVAL` event identifies an existing blocked `releaseTaskId` and supplies `evidence` with matching commit/fingerprint. All evidence remains local and operator-supplied; no CI/device connector is implied. Actual build existence/hash is checked. Stale evidence is HUMAN_REVIEW. Even a fully satisfied gate never executes merge/deploy/publish.
+`SERVER_PASS → matching GitHub CI PASS → actual matching Test Build → DEVICE_PASS → owner's RELEASE_APPROVED`.
+
+Evidence is revision-bound. Stale evidence is rejected. Even a fully satisfied gate never executes merge/deploy/publish automatically.
 
 ## launchd and validation
 
-`scripts/install-launchd.py --replace-managed` backs up and updates only this managed user service. User LaunchAgent starts at login. A reviewed system plist and `scripts/install-system-launchd.sh` are supplied for an administrator to install login-independent startup; do not run a user and system copy together. No automatic login or system security settings are changed.
+`scripts/install-launchd.py --replace-managed` updates only the managed user service. A reviewed system plist and installer exist for login-independent startup; do not run duplicate user/system copies.
 
-Tests: `npm test`; `node scripts/validate-installation.js`; `node scripts/validate-project-watches.js`. The latter creates/removes only uniquely controlled probe files in automation worktrees. Real Codex fixture validation: `node scripts/validate-engine-daemon.js`, or `node scripts/validate-installation.js --codex`. These are isolated fixtures and are never evidence of connected business data. `scripts/verify-projects.js` executes actual registered profiles and may return HUMAN_REVIEW/FAIL.
+Validation:
+
+```sh
+npm test
+node scripts/validate-installation.js
+node scripts/validate-project-watches.js
+node scripts/verify-projects.js
+```
+
+After deployment verify `quietMs=600000` in daemon status/logs, check `http://127.0.0.1:8787/api/health`, and confirm the dashboard displays real queue data without exposing secrets.
