@@ -24,14 +24,16 @@ class _SignUpPageState extends State<SignUpPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(24, 42, 24, 24),
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
                 children: [
                   const Align(alignment: Alignment.centerLeft, child: BackButton()),
                   Icon(Icons.auto_awesome, color: AppTheme.of(context).green, size: 38),
                   const SizedBox(height: 18),
                   Text('onaria 시작하기', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
-                  Text('회원 정보를 등록할 수 있어요. 마음 기록은 현재 휴대폰에 저장되며 다른 기기로 자동 동기화되지 않아요.', style: TextStyle(color: AppTheme.of(context).muted)),
+                  Text('회원가입은 선택이에요. 가입하지 않아도 대화와 기록을 사용할 수 있어요. 현재 가입은 회원 정보 등록이며, 로그인이나 기기 간 기록 동기화를 제공하지 않아요.', style: TextStyle(color: AppTheme.of(context).muted)),
+                  TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('가입하지 않고 돌아가기')),
                   const SizedBox(height: 28),
                   Form(
                     key: _formKey,
@@ -57,18 +59,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _church,
+                        onFieldSubmitted: (_) => _submit(),
                         maxLength: 100,
                         textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(labelText: '교회명', prefixIcon: Icon(Icons.church_outlined)),
-                        validator: _required,
+                        decoration: const InputDecoration(labelText: '교회명 (선택)', prefixIcon: Icon(Icons.church_outlined)),
                       ),
                       const SizedBox(height: 20),
-                      _SocialButton(icon: const Text('N', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)), label: '네이버 로그인 (준비 중)', color: const Color(0xFF03C75A), onPressed: _showSocialLoginUnavailable),
-                      const SizedBox(height: 8),
-                      _SocialButton(icon: const Icon(Icons.chat_bubble, size: 20), label: '카카오 로그인 (준비 중)', color: const Color(0xFFFEE500), foreground: const Color(0xFF191919), onPressed: _showSocialLoginUnavailable),
-                      const SizedBox(height: 8),
-                      _SocialButton(icon: const Text('G', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)), label: 'Google 로그인 (준비 중)', color: AppTheme.of(context).panel, foreground: AppTheme.of(context).ink, onPressed: _showSocialLoginUnavailable, outlined: true),
-                      const SizedBox(height: 80),
                       FilledButton.icon(onPressed: _busy ? null : _submit, icon: const Icon(Icons.check), label: Text(_busy ? '가입 중...' : '회원가입')),
                     ]),
                   ),
@@ -80,14 +76,9 @@ class _SignUpPageState extends State<SignUpPage> {
       );
 
   String? _required(String? value) => value == null || value.trim().isEmpty ? '입력해 주세요.' : null;
-  void _showSocialLoginUnavailable() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('소셜 로그인은 아직 준비 중이에요. 아래 회원가입을 이용해 주세요.')),
-    );
-  }
-
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_busy || !_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
     final apiBaseUrl = ApiConfig.baseUrl;
     if (apiBaseUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,20 +107,4 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void dispose() { _name.dispose(); _phone.dispose(); _church.dispose(); super.dispose(); }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({required this.icon, required this.label, required this.color, required this.onPressed, this.foreground = Colors.white, this.outlined = false});
-  final Widget icon;
-  final String label;
-  final Color color;
-  final Color foreground;
-  final VoidCallback onPressed;
-  final bool outlined;
-  @override
-  Widget build(BuildContext context) => FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(backgroundColor: color, foregroundColor: foreground, side: outlined ? const BorderSide(color: Color(0xFFE0E0E0)) : null),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [icon, const SizedBox(width: 10), Text(label)]),
-      );
 }

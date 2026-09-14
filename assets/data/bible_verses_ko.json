@@ -4,6 +4,21 @@
   "copyrightNotice": "Korean: 개역한글 (Public Domain), English: NIV (For development reference).",
   "verses": [
     {
+      "id": "ROM_15_13",
+      "book": "로마서",
+      "chapter": 15,
+      "verseStart": 13,
+      "verseEnd": null,
+      "reference": "로마서 15:13",
+      "translation": "KRV",
+      "text": "소망의 하나님이 모든 기쁨과 평강을 믿음 안에서 너희에게 충만케 하사 성령의 능력으로 소망이 넘치게 하시기를 원하노라",
+      "englishText": "",
+      "emotions": ["기쁨", "행복", "기대", "벅찬", "감탄"],
+      "tags": ["소망", "기쁨", "평안"],
+      "reflectionQuestion": "지금 품고 있는 작은 소망은 무엇인가요?",
+      "sourceUrl": "https://www.bskorea.or.kr/bible/korbibReadpage.php?back=yes&book=rom&chap=15&sec=13&version=HAN"
+    },
+    {
       "id": "PHP_4_6_7",
       "book": "빌립보서",
       "chapter": 4,
@@ -181,7 +196,7 @@
       "translation": "KRV",
       "text": "범사에 감사하라 이것이 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라.",
       "englishText": "give thanks in all circumstances; for this is God’s will for you in Christ Jesus.",
-      "emotions": ["감사", "벅참"],
+      "emotions": ["감사", "벅찬"],
       "tags": ["감사", "일상", "기도"],
       "reflectionQuestion": ""
     },
@@ -195,7 +210,7 @@
       "translation": "KRV",
       "text": "감사함으로 그의 문에 들어가며 찬송함으로 그의 궁정에 들어가서 그에게 감사하며 그의 이름을 송축할지어다.",
       "englishText": "Enter his gates with thanksgiving and his courts with praise; give thanks to him and praise his name.",
-      "emotions": ["감사", "기쁨", "행복", "감탄", "벅참", "놀람"],
+      "emotions": ["감사", "기쁨", "행복", "감탄", "벅찬", "놀람"],
       "tags": ["감사", "찬양", "기쁨"],
       "reflectionQuestion": "오늘 기억하고 싶은 감사 한 가지는 무엇인가요?"
     }
