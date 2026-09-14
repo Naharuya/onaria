@@ -2,12 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import {spawn, execFileSync} from 'node:child_process';
+import {performance} from 'node:perf_hooks';
 import {sensitiveFailure} from './verification_runner.js';
 const denied = /backend\/src\/agents|psychology|test|spec|safety|security|privacy|legal|license|trad|deploy|publish|payment|secret|crisis|auth|religio|policy|config|\.env/i;
 // The CLI only proposes exact replacements in read-only mode. The adapter owns writes.
-export function createCodexRepairWorker({enabled=false, executable='/Users/server/.local/bin/codex', propose,mode='repair'}={}) {
-  return async ({cwd,branch,failedCheck,result,attempt,context}) => {
-    const review = reason => ({humanReview:true,reason});
+export function createCodexRepairWorker({enabled=false, executable='/Users/server/.local/bin/codex', propose,mode='repair',usageStore=null}={}) {
+  return async ({cwd,branch,failedCheck,result,attempt,context,taskId=null,agentId=null}) => {
+    const started=performance.now();
+    const record=(outcome,note=null)=>usageStore?.record({provider:'codex-cli',lane:'external',model:'codex',agentId:agentId??(mode==='repair'?'repair-agent':'coding-agent'),taskId,taskType:mode==='repair'?'REPAIR':'DEVELOPMENT',outcome,durationMs:Math.round(performance.now()-started),tokenState:'UNAVAILABLE',note});
+    const review = reason => {record('blocked',reason);return {humanReview:true,reason};};
     if (!enabled) return review('codex_worker_requires_opt_in');
     if (sensitiveFailure(failedCheck) || attempt > 2) return review('repair_policy_blocked');
     const actual=execFileSync('git',['branch','--show-current'],{cwd,encoding:'utf8'}).trim();
@@ -26,7 +29,7 @@ export function createCodexRepairWorker({enabled=false, executable='/Users/serve
     const prompt=JSON.stringify({instruction:'Return JSON exact source replacements to fix the deterministic failure. Do not run tools, write files, change tests or relax criteria. If uncertain or safety/security/legal/trading/deployment related, return humanReview:true. Only provided files may change.',failedCheck:{id:failedCheck.id,command:failedCheck.command,args:failedCheck.args,reason:result.reason,stdout:result.stdout,stderr:result.stderr},files:inputs,context:context??null,mode});
     let proposal;
     try { proposal=propose ? await propose(prompt) : await invoke(executable,cwd,prompt); }
-    catch { return review('codex_unavailable_timeout_or_invalid_output'); }
+    catch { record('failed','codex_unavailable_timeout_or_invalid_output'); return {humanReview:true,reason:'codex_unavailable_timeout_or_invalid_output'}; }
     if (proposal.humanReview || !Array.isArray(proposal.edits) || !proposal.edits.length) return review('codex_requested_review');
     const seen=new Set();
     for (const edit of proposal.edits) {
@@ -37,6 +40,7 @@ export function createCodexRepairWorker({enabled=false, executable='/Users/serve
     }
     if (execFileSync('git',['branch','--show-current'],{cwd,encoding:'utf8'}).trim() !== branch) return review('branch_changed');
     for (const edit of proposal.edits) fs.writeFileSync(path.join(cwd,edit.file),edit.content);
+    record('success');
     return {humanReview:false,files:proposal.edits.map(e=>e.file),adapter:'codex-read-only-proposal'};
   };
 }
