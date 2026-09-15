@@ -14,6 +14,7 @@
 
 ## 개발 지침
 
+- [프로젝트 폴더 구조·정리 기준](guides/PROJECT_STRUCTURE.md)
 - [기술 구성·배포](guides/TECH_STACK_AND_DEPLOYMENT.md)
 - [테스트 안내](guides/TESTING_GUIDE.md)
 - [사용 흐름과 코드 위치](guides/PROCESS_CODE_MAP.md)

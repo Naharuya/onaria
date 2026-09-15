@@ -1,4 +1,8 @@
 .dart_tool/
+# Local operating-system metadata and Python test caches.
+.DS_Store
+__pycache__/
+*.py[cod]
 .flutter-plugins
 .flutter-plugins-dependencies
 .idea/

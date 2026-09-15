@@ -10,16 +10,11 @@ import 'social_auth_config.dart';
 import 'theme_controller.dart';
 
 class OnariaApp extends StatefulWidget {
-  const OnariaApp({
-    super.key,
-    this.authConfig = const SocialAuthConfig(),
-    this.engagement,
-    this.homeOverride,
-  });
+  const OnariaApp(
+      {super.key, this.authConfig = const SocialAuthConfig(), this.engagement});
 
   final SocialAuthConfig authConfig;
   final EngagementController? engagement;
-  final Widget? homeOverride;
 
   @override
   State<OnariaApp> createState() => _OnariaAppState();
@@ -94,7 +89,7 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
                   navigatorKey: _navigator,
                   debugShowCheckedModeBanner: false,
                   theme: AppTheme.forColor(color),
-                  home: widget.homeOverride ?? const CheckInPage(),
+                  home: const CheckInPage(),
                   initialRoute: '/',
                 )));
   }
