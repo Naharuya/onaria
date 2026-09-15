@@ -7,9 +7,14 @@ import '../../domain_events.dart';
 import 'cross_light_game.dart';
 
 class CrossLightPage extends StatefulWidget {
-  const CrossLightPage({super.key, this.game, this.continueToMindCard = false});
+  const CrossLightPage(
+      {super.key,
+      this.game,
+      this.continueToMindCard = false,
+      this.fromMindCard = false});
   final CrossLightGame? game;
   final bool continueToMindCard;
+  final bool fromMindCard;
   @override
   State<CrossLightPage> createState() => _CrossLightPageState();
 }
@@ -36,8 +41,9 @@ class _CrossLightPageState extends State<CrossLightPage>
             resourceRef: 'cross_light',
             durationMs: duration < 0 ? 0 : duration,
             completed: _game.complete,
-            entryPoint:
-                widget.continueToMindCard ? 'mind_card' : 'engagement_menu') ??
+            entryPoint: widget.continueToMindCard || widget.fromMindCard
+                ? 'mind_card'
+                : 'engagement_menu') ??
         Future<void>.value());
   }
 
@@ -53,6 +59,15 @@ class _CrossLightPageState extends State<CrossLightPage>
     WidgetsBinding.instance.addObserver(this);
     _roundStarted = _game.clock();
     if (_game.started && !_game.complete && !_game.paused) _tick();
+    if (widget.fromMindCard && !_game.started) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted &&
+            ModalRoute.of(context)?.isCurrent == true &&
+            EngagementScope.maybeOf(context)?.safetyBlocked != true) {
+          _start();
+        }
+      });
+    }
   }
 
   @override
@@ -180,7 +195,7 @@ class _CrossLightPageState extends State<CrossLightPage>
                               fontSize: 28, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       const Text(
-                          '작은 빛을 손가락으로 천천히 끌어 중앙에 모아 주세요. 빛이 모여 십자가가 돼요.'),
+                          '움직이는 여섯 별 중 반짝이는 별 하나를 터치해 주세요. 모은 빛이 십자가가 돼요.'),
                       const SizedBox(height: 12),
                       CrossLightSky(
                           pieces: _game.pieces,
@@ -196,7 +211,7 @@ class _CrossLightPageState extends State<CrossLightPage>
                       const SizedBox(height: 16),
                       if (!_game.started) ...[
                         const Text(
-                            '움직이는 빛을 중앙의 테두리 안에 놓아 시작해 보세요.\n여섯 개의 별을 모으면 작은 쉼이 완성돼요.',
+                            '반짝이는 별을 터치해 시작해 보세요.\n여섯 개의 별을 모으면 작은 쉼이 완성돼요.',
                             textAlign: TextAlign.center),
                       ] else if (_game.complete) ...[
                         const Text('오늘 내려놓고 싶은 마음 하나를\n잠시 생각해 보세요.',
@@ -235,7 +250,9 @@ class _CrossLightPageState extends State<CrossLightPage>
                                 widget.continueToMindCard ? true : null),
                             child: Text(widget.continueToMindCard
                                 ? '오늘의 마음카드 보기'
-                                : '편안히 돌아가기')),
+                                : widget.fromMindCard
+                                    ? '돌아가기'
+                                    : '편안히 돌아가기')),
                         TextButton(
                             onPressed: _restart,
                             child: const Text('한 번 더 빛 모으기')),
@@ -244,8 +261,8 @@ class _CrossLightPageState extends State<CrossLightPage>
                             _game.paused
                                 ? '잠시 쉬는 중이에요. 모은 빛은 그대로 있어요.'
                                 : _game.ready
-                                    ? '마음에 머무는 빛을 중앙으로 천천히 옮겨 보세요.'
-                                    : '천천히 숨 쉬어 보세요. 곧 다음 빛을 고를 수 있어요.',
+                                    ? '반짝이는 별 하나를 터치해 보세요.'
+                                    : '천천히 숨 쉬어 보세요. 곧 다음 별이 반짝여요.',
                             textAlign: TextAlign.center),
                         const SizedBox(height: 12),
                         Wrap(
@@ -274,7 +291,9 @@ class _CrossLightPageState extends State<CrossLightPage>
                           },
                           child: Text(widget.continueToMindCard
                               ? '이번에는 건너뛰고 마음카드 보기'
-                              : '이번에는 여기까지'),
+                              : widget.fromMindCard
+                                  ? '돌아가기'
+                                  : '이번에는 여기까지'),
                         ),
                       ],
                     ]),

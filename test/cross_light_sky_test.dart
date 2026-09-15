@@ -4,6 +4,63 @@ import 'package:onaria/engagement/mini_games/cross_light/cross_light_sky.dart';
 import 'package:onaria/engagement/mini_games/cross_light/cross_light_game.dart';
 
 void main() {
+  testWidgets('six stars stay visible with only one tappable between rests',
+      (tester) async {
+    final pieces = <String>{};
+    var ready = true;
+    var paused = false;
+    late StateSetter refresh;
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: StatefulBuilder(
+      builder: (context, setState) {
+        refresh = setState;
+        return CrossLightSky(
+            pieces: Set.of(pieces),
+            ready: ready,
+            paused: paused,
+            onCollect: (word) => setState(() {
+                  pieces.add(word);
+                  ready = false;
+                }));
+      },
+    ))));
+    for (final word in crossLightWords.keys) {
+      final active = tester
+          .widgetList<InkResponse>(find.byType(InkResponse))
+          .where((light) => light.onTap != null);
+      expect(active.length, 1);
+      expect(active.single.key, ValueKey('cross-light-touch-$word'));
+      for (final other in crossLightWords.keys
+          .where((w) => w != word && !pieces.contains(w))) {
+        expect(find.byKey(ValueKey('cross-piece-$other')), findsOneWidget);
+        await tester.tap(find.byKey(ValueKey('cross-light-touch-$other')));
+        expect(pieces, isNot(contains(other)));
+      }
+      refresh(() => paused = true);
+      await tester.pump();
+      await tester.tap(find.byKey(ValueKey('cross-light-touch-$word')));
+      expect(pieces, isNot(contains(word)));
+      refresh(() => paused = false);
+      await tester.pump();
+      await tester.tap(find.byKey(ValueKey('cross-light-touch-$word')));
+      await tester.pump();
+      expect(pieces, contains(word));
+      expect(
+          tester
+              .widgetList<InkResponse>(find.byType(InkResponse))
+              .where((light) => light.onTap != null),
+          isEmpty);
+      refresh(() => ready = true);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    }
+    expect(pieces.length, 6);
+    expect(
+        tester
+            .widgetList<InkResponse>(find.byType(InkResponse))
+            .where((light) => light.onTap != null),
+        isEmpty);
+    await tester.pumpWidget(const SizedBox());
+  });
   testWidgets(
       'drag collects only inside the center and leaves page scrolling in place',
       (tester) async {

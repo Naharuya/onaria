@@ -28,11 +28,13 @@ class _CrossLightSkyState extends State<CrossLightSky> {
   Set<String> get pieces => widget.pieces;
   bool get ready => widget.ready;
   bool get paused => widget.paused;
-  bool _canMove(String word) => ready && !paused && !pieces.contains(word);
+  String? get _nextWord =>
+      crossLightWords.keys.where((word) => !pieces.contains(word)).firstOrNull;
+  bool _canMove(String word) => ready && !paused && word == _nextWord;
   void onCollect(String word) => widget.onCollect(word);
 
   void _move(String word, Offset global, double width, double height) {
-    if (!ready || paused || pieces.contains(word)) return;
+    if (!_canMove(word)) return;
     if (_dragging != null && _dragging != word) return;
     final box = _surface.currentContext!.findRenderObject() as RenderBox;
     final point = box.globalToLocal(global) - const Offset(24, 24);
@@ -183,6 +185,7 @@ class _CrossLightSkyState extends State<CrossLightSky> {
                       collected: pieces.contains(entry.$2.key) ||
                           _dragging == entry.$2.key,
                       paused: paused,
+                      highlighted: _canMove(entry.$2.key),
                       phase: entry.$1 * .8,
                       horizontalTravel: math.min(30, (width - 48) * .14),
                       child: RawGestureDetector(
@@ -206,11 +209,11 @@ class _CrossLightSkyState extends State<CrossLightSky> {
                         },
                         child: Semantics(
                           label: '${entry.$2.value}의 빛',
-                          hint: '중앙으로 끌어 모으세요. 두 번 탭해서 모을 수도 있어요.',
+                          hint: '반짝이는 별을 터치해 빛을 모으세요.',
                           button: !pieces.contains(entry.$2.key),
-                          enabled: ready && !pieces.contains(entry.$2.key),
+                          enabled: _canMove(entry.$2.key),
                           selected: pieces.contains(entry.$2.key),
-                          onTap: ready && !pieces.contains(entry.$2.key)
+                          onTap: _canMove(entry.$2.key)
                               ? () => onCollect(entry.$2.key)
                               : null,
                           child: Tooltip(
@@ -219,7 +222,7 @@ class _CrossLightSkyState extends State<CrossLightSky> {
                             child: InkResponse(
                               key:
                                   ValueKey('cross-light-touch-${entry.$2.key}'),
-                              onTap: ready && !pieces.contains(entry.$2.key)
+                              onTap: _canMove(entry.$2.key)
                                   ? () => onCollect(entry.$2.key)
                                   : null,
                               radius: 24,
@@ -232,19 +235,20 @@ class _CrossLightSkyState extends State<CrossLightSky> {
                                 style: TextStyle(
                                     fontSize:
                                         pieces.contains(entry.$2.key) ? 28 : 24,
-                                    color:
-                                        pieces.contains(entry.$2.key) || ready
-                                            ? lightColor
-                                            : const Color(0xFFB9C8E2),
+                                    color: pieces.contains(entry.$2.key) ||
+                                            _canMove(entry.$2.key)
+                                        ? lightColor
+                                        : const Color(0xFFB9C8E2),
                                     shadows: [
-                                      Shadow(
-                                          color:
-                                              lightColor.withValues(alpha: 0.4),
-                                          blurRadius: 12)
+                                      if (_canMove(entry.$2.key))
+                                        Shadow(
+                                            color: lightColor.withValues(
+                                                alpha: 0.4),
+                                            blurRadius: 12)
                                     ]),
                                 child: Text(
                                     pieces.contains(entry.$2.key) ||
-                                            entry.$1.isEven
+                                            _canMove(entry.$2.key)
                                         ? '✦'
                                         : '✧',
                                     textScaler: TextScaler.noScaling),
@@ -264,11 +268,13 @@ class _CrossLightSkyState extends State<CrossLightSky> {
 class _DriftingLight extends StatefulWidget {
   const _DriftingLight(
       {required this.collected,
+      required this.highlighted,
       required this.paused,
       required this.phase,
       required this.horizontalTravel,
       required this.child});
   final bool collected;
+  final bool highlighted;
   final bool paused;
   final double phase;
   final double horizontalTravel;
@@ -325,7 +331,14 @@ class _DriftingLightState extends State<_DriftingLight>
           return Transform.translate(
             offset: Offset(math.sin(angle) * widget.horizontalTravel * strength,
                 math.cos(angle) * 22 * strength),
-            child: child,
+            child: Opacity(
+              opacity: strength == 0
+                  ? 1
+                  : widget.highlighted && !widget.paused
+                      ? .8 + .2 * math.cos(angle * 4)
+                      : .65,
+              child: child,
+            ),
           );
         },
       );
