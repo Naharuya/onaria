@@ -267,4 +267,4 @@ GitHub workflow 실행, 실제 Cafe24 배포, Docker 실행, 실제 휴대폰 �
 
 2026-09-12 홈페이지/Admin 변경 30개 파일만 담은 커밋 후보에서 다시 검증했습니다. Backend 394개, 브라우저 10개, 별도 보안/PWA/관리자 테스트 16개, Flutter 84개가 통과했고 Flutter 1개는 건너뛰었습니다. 위 전체 작업 폴더 결과와 개수가 다른 것은 회원가입·Flutter UI 변경 및 관련 테스트를 이번 커밋에서 제외했기 때문입니다. 실제 `.env`, 운영 데이터와 빌드 결과는 포함하지 않습니다.
 
-기존 main의 Android CI는 루트 analyzer가 별도 `rami/` 프로젝트를 분석해 실패한 이력이 있습니다. 이번 홈페이지/Admin 커밋에는 앱 CI와 RAMI 분석 범위 변경을 섞지 않습니다. 새 커밋의 Backend/Web/Android/iOS CI가 모두 통과하기 전까지 배포 패키지 확정과 Cafe24 배포 준비를 진행하지 않습니다. 진단용 `actions-smoke`, `checkout-smoke`, `runner-smoke`, `backend-ci-smoke` workflow는 삭제하지 않고 후속 정리 후보로 유지합니다.
+과거에는 ONARIA 저장소 내부의 RAMI 프로젝트 때문에 루트 analyzer가 실패한 이력이 있습니다. 현재 RAMI는 독립 저장소 `Naharuya/RAMI`에서 관리합니다. 이번 홈페이지/Admin 커밋에는 앱 CI와 RAMI 분석 범위 변경을 섞지 않습니다. 새 커밋의 Backend/Web/Android/iOS CI가 모두 통과하기 전까지 배포 패키지 확정과 Cafe24 배포 준비를 진행하지 않습니다. 진단용 `actions-smoke`, `checkout-smoke`, `runner-smoke`, `backend-ci-smoke` workflow는 삭제하지 않고 후속 정리 후보로 유지합니다.

@@ -39,7 +39,7 @@
 - [멀티 에이전트 개요](../backend/MULTI_AGENT_INTEGRATION.md)
 - 단계별 고유 구현 이력: [1](../backend/PHASE_1_INTEGRATION.md) · [2](../backend/PHASE_2_INTEGRATION.md) · [3](../backend/PHASE_3_SPECIALIZATION.md) · [4](../backend/PHASE_4_RAG.md) · [5](../backend/PHASE_5_VECTOR_RAG.md) · [6](../backend/PHASE_6_PRODUCTION_CORPUS.md) · [7](../backend/PHASE_7_EXPERT_CORPUS.md) · [8](../backend/PHASE_8_PILOT_RELEASE.md) · [9](../backend/PHASE_9_CHRISTIANITY_A_TRACK.md)
 - 관리자: [API 설정](../backend/ADMIN_API_SETTINGS.md), [관리자 PWA](../backend/ADMIN_PWA.md)
-- [rami 프로젝트](../rami/README.md)는 별도 앱이므로 해당 문서와 소스를 유지합니다.
+- RAMI는 독립 GitHub 저장소 `Naharuya/RAMI`에서 관리하며 ONARIA 저장소에는 소스를 중복 보관하지 않습니다.
 
 ## 문서 갱신 원칙
 
