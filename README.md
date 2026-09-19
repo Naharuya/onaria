@@ -167,4 +167,4 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 - SSH 접속: `ssh soul-bible-server` (로컬 `~/.ssh/config`와 전용 키 필요)
 - 비밀번호와 API 키는 문서나 Git에 저장하지 말고 서버의 비밀 환경변수로 관리
 
-명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `/Users/server/ari-server/projects/onaria/source`입니다.
+명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `$ARI_ROOT/projects/onaria`입니다.

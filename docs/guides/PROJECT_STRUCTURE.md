@@ -17,7 +17,7 @@
 | `docs/guides/` | 반복해서 참고하는 개발 지침 |
 | `docs/releases/`, `docs/archive/` | 버전별 검증 기록과 과거 개발 이력 |
 | `.github/workflows/` | CI 정의 |
-| `rami/` | 별도 앱. ONARIA 정리 범위에서 제외 |
+| RAMI | 독립 저장소 `Naharuya/RAMI`에서 관리 |
 
 ## 생성 파일과 보존 파일
 
