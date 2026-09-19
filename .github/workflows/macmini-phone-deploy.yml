@@ -22,10 +22,10 @@ jobs:
       ONARIA_AI_MODE: local
       ONARIA_EXTERNAL_API_DISABLED: 'true'
       OPENAI_API_KEY: ''
-      ANDROID_HOME: /Users/server/Library/Android/sdk
-      ANDROID_SDK_ROOT: /Users/server/Library/Android/sdk
+      ANDROID_HOME: ${{ env.HOME }}/Library/Android/sdk
+      ANDROID_SDK_ROOT: ${{ env.HOME }}/Library/Android/sdk
       ONARIA_ANDROID_PACKAGE: com.example.bible_mind_core
-      PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/server/Library/Android/sdk/platform-tools
+      PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${{ env.HOME }}/Library/Android/sdk/platform-tools
 
     steps:
       - name: Checkout trusted main source

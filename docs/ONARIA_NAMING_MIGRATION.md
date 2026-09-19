@@ -1,7 +1,7 @@
 # ONARIA 명칭 및 로컬 경로 전환
 
 사용자 표시명은 **ONARIA**, 기술명·로컬 폴더명은 **onaria**다.
-Mac 작업 경로는 `/Users/server/ari-server/projects/onaria/source`다.
+Mac 작업 경로는 `$ARI_ROOT/projects/onaria`다.
 Git origin은 기존 `https://github.com/Naharuya/soul-bible.git`을 유지한다.
 원격 저장소 이름 변경과 Git 이력 재작성은 수행하지 않는다.
 
