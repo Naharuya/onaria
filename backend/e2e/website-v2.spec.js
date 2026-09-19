@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('brand structure, honest availability, SEO, links and 404', async ({ page, request }) => {
-  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms']) {
+  for (const path of ['/', '/about', '/services', '/privacy', '/terms']) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const canonical = await page.locator('link[rel=canonical]').getAttribute('href');
@@ -20,13 +20,15 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   }
   await page.goto('/');
   const ids = await page.locator('main > section').evaluateAll(sections => sections.map(s => s.id || s.className));
-  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'paths', 'apps', 'safety', 'privacy', 'ecosystem', 'cta']);
-  await expect(page.locator('.tradition-card')).toHaveCount(7);
-  await expect(page.locator('.tradition-card .status', { hasText: '준비 중' })).toHaveCount(7);
+  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'cta']);
+  await expect(page.locator('.tradition-card')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: '일곱 전통' })).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('불교');
+  await expect(page.locator('body')).not.toContainText('이슬람');
   await expect(page.getByRole('link', { name: /다운로드/ })).toHaveCount(0);
   expect((await request.get('/not-an-onaria-page')).status()).toBe(404);
   const sitemap = await (await request.get('/sitemap.xml')).text();
-  expect((sitemap.match(/<loc>/g) || []).length).toBe(6);
+  expect((sitemap.match(/<loc>/g) || []).length).toBe(5);
   expect(sitemap).not.toContain('/admin');
   expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /admin');
 });
@@ -54,13 +56,13 @@ test('keyboard, interactive journey and reduced motion', async ({ page }) => {
   expect(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length)).toBe(0);
 });
 
-for (const width of [390, 768, 1440]) {
+for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
   test(`visual checkpoints and bounds ${width}`, async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     await page.locator('.hero-art img').evaluate(img => img.decode());
-    for (const selector of ['.hero', '#how-it-works', '#paths', '#apps', '#safety']) {
+    for (const selector of ['.hero', '#how-it-works', '#apps', '#safety']) {
       const section = page.locator(selector);
       await section.scrollIntoViewIfNeeded();
       await section.screenshot({ path: testInfo.outputPath(`${width}-${selector.replace(/[.#]/g, '')}.png`) });
