@@ -20,9 +20,12 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   }
   await page.goto('/');
   const ids = await page.locator('main > section').evaluateAll(sections => sections.map(s => s.id || s.className));
-  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'ecosystem', 'cta']);
+  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'cta']);
   await expect(page.locator('.tradition-card')).toHaveCount(0);
   await expect(page.getByRole('link', { name: '일곱 전통' })).toHaveCount(0);
+  await expect(page.locator('#ecosystem')).toHaveCount(0);
+  await expect(page.getByText('불교', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('이슬람', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /다운로드/ })).toHaveCount(0);
   expect((await request.get('/not-an-onaria-page')).status()).toBe(404);
   const sitemap = await (await request.get('/sitemap.xml')).text();
