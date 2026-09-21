@@ -260,9 +260,31 @@ class _CheckInPageState extends State<CheckInPage> {
                   Expanded(child: Divider(color: AppTheme.of(context).gold)),
                 ]),
                 const SizedBox(height: 18),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('지금 가장 가까운 마음을 골라주세요', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.of(context).ink)),
-                  if (_emotion != null || _otherEmotion || _promotedKeyword != null) Text('선택됨', style: TextStyle(fontSize: 12, color: AppTheme.of(context).green, fontWeight: FontWeight.w700)),
+                Row(children: [
+                  Expanded(
+                    child: Text(
+                      '지금 가장 가까운 마음을 골라주세요',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.of(context).ink,
+                      ),
+                    ),
+                  ),
+                  if (_emotion != null || _otherEmotion || _promotedKeyword != null) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '선택됨',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.of(context).green,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ]),
                 const SizedBox(height: 12),
                 GridView.count(
@@ -308,7 +330,7 @@ class _CheckInPageState extends State<CheckInPage> {
                                     padding: const EdgeInsets.symmetric(horizontal: 4),
                                     child: Text(
                                       card.label,
-                                      maxLines: 2,
+                                      maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
