@@ -35,7 +35,10 @@ class _GrowthPageState extends State<GrowthPage> {
               ]));
             }
             final cards = snapshot.data ?? [];
-            return ListView(padding: const EdgeInsets.all(24), children: [
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 620),
+                child: ListView(padding: const EdgeInsets.all(24), children: [
               const Text('나를 돌본 시간이 남았어요.',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
@@ -84,7 +87,7 @@ class _GrowthPageState extends State<GrowthPage> {
                   onPressed: () =>
                       Navigator.of(context).popUntil((route) => route.isFirst),
                   child: const Text('오늘은 여기까지')),
-            ]);
+            ])));
           },
         ),
       );
