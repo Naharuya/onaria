@@ -5,6 +5,7 @@ import '../../../app/space_scaffold.dart';
 import '../../engagement_controller.dart';
 import '../../domain_events.dart';
 import 'cross_light_game.dart';
+import 'cross_light_reflections.dart';
 
 class CrossLightPage extends StatefulWidget {
   const CrossLightPage({super.key, this.game, this.continueToMindCard = false});
@@ -160,6 +161,7 @@ class _CrossLightPageState extends State<CrossLightPage>
   @override
   Widget build(BuildContext context) {
     final restVerse = EngagementScope.maybeOf(context)?.verse('MAT_11_28');
+    final reflection = crossLightReflectionForDate(_roundStarted);
     return PopScope(
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) _recordExit();
@@ -207,6 +209,24 @@ class _CrossLightPageState extends State<CrossLightPage>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        Card(
+                          key: const ValueKey('cross-daily-reflection'),
+                          child: Padding(
+                            padding: const EdgeInsets.all(18),
+                            child: Column(children: [
+                              const Text('오늘의 사유',
+                                  style: TextStyle(fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 10),
+                              Text(reflection,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(height: 1.65)),
+                              const SizedBox(height: 8),
+                              const Text('— onaria original reflection',
+                                  style: TextStyle(fontSize: 11)),
+                            ]),
+                          ),
+                        ),
                         const SizedBox(height: 12),
                         if (restVerse != null)
                           Card(
