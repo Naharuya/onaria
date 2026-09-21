@@ -124,5 +124,5 @@ class _SharePreviewPageState extends State<SharePreviewPage> {
                   label: const Text('이미지 파일 저장'))),
           const Text('저장할 위치를 직접 선택해 주세요.', textAlign: TextAlign.center),
         ],
-      ])));
+      ]))));
 }
