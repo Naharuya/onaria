@@ -10,7 +10,11 @@ Status: PRE-RELEASE / HUMAN APPROVAL REQUIRED FOR PLAY CONSOLE SUBMISSION
 - [ ] Verify HTTPS-only production API and third-party AI data disclosure.
 - [ ] Verify account deletion implementation if in-app account creation ships.
 
-## P0 Play Console / policy declarations
+## Deferred / excluded from current automatic work
+- Business/operator identity, contact details, retention periods and other final operating information.
+- Play Console form submission, store submission, rollout and public release.
+
+## P0 Play Console / policy declarations (prepare only; do not submit)
 - [ ] Complete Health apps declaration. ONARIA includes emotion/stress/mental-wellbeing features; declaration must match shipped behavior.
 - [ ] Complete Data safety form based on actual collection, sharing, retention, deletion, microphone, and AI-provider flows.
 - [ ] Confirm content rating questionnaire.
@@ -25,11 +29,14 @@ Status: PRE-RELEASE / HUMAN APPROVAL REQUIRED FOR PLAY CONSOLE SUBMISSION
 - Production backend/API uses HTTPS. Keep plaintext development exceptions out of release builds.
 
 ## Human approval gates
-1. Production Android applicationId.
-2. Legal/business identity, contact details, retention periods, international transfer/AI-provider disclosures in the final privacy policy.
-3. Play Console Health apps declaration and Data safety answers.
-4. Store listing claims/screenshots.
-5. Final production release / rollout.
+1. Final operating/legal information is deferred by user instruction.
+2. Play Console submission and public release are deferred by user instruction.
+
+## applicationId analysis
+- `applicationId` itself is REQUIRED; deleting the property without a replacement is not a valid cleanup strategy because Android/Google Play require a stable unique app identity.
+- `com.example.bible_mind_core` is a development placeholder and should NOT be the ONARIA production identity.
+- Repository search shows this identifier is referenced by Android/release/app-link assets and documentation, so migration must be atomic rather than a one-line deletion.
+- Candidate derived from the owned service domain is `kr.ai.onaria`, but changing the ID changes Android app identity and can affect already-installed test builds/data. Perform the migration as a dedicated tested change before first Play publication, not as an unreviewed deletion.
 
 ## Sources checked
 - Google Play Target API level requirements (2026-08-31: new apps and updates target Android 16 / API 36+).
