@@ -218,7 +218,7 @@ Safety는 앱, backend, Admin 집계가 같은 정책을 사용해야 한다.
 
 - PR #31: 법적 메뉴 + 버전정보 + Admin 개인정보 보호
 - PR #32: production app identifier `com.onaria.app`
-- PR #33: adaptive emotion cards + 365 Cross Light reflections + 밝은 아이콘 소스
+- PR #33: 최종 Launch Integration — 법적 메뉴/Admin + production ID + adaptive emotion cards + 365 Cross Light reflections + 밝은 아이콘 소스
 - PR #20: 현재 운영 인프라 문서 동기화
 - Issue #21: GitHub Actions backend-tests runner 문제
 - Issue #22: Launch Gate
