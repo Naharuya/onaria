@@ -24,7 +24,7 @@ jobs:
       OPENAI_API_KEY: ''
       ANDROID_HOME: ${{ env.HOME }}/Library/Android/sdk
       ANDROID_SDK_ROOT: ${{ env.HOME }}/Library/Android/sdk
-      ONARIA_ANDROID_PACKAGE: com.example.bible_mind_core
+      ONARIA_ANDROID_PACKAGE: com.onaria.app
       PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${{ env.HOME }}/Library/Android/sdk/platform-tools
 
     steps:
