@@ -167,7 +167,7 @@ class _CrossLightPageState extends State<CrossLightPage>
           if (didPop) _recordExit();
         },
         child: SpaceScaffold(
-          appBar: AppBar(title: const Text('빛 조각으로 십자가 완성하기')),
+          appBar: AppBar(title: const Text('십자가 빛 모으기')),
           body: SafeArea(
               top: false,
               child: Center(
