@@ -32,7 +32,7 @@ test('admin cookie authentication, desktop/mobile routes, empty/error states and
   // Subsequent page loads restore the server session without a stored credential.
   for (const width of [360, 390, 430, 768, 1280]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system']) {
+    for (const path of ['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system', 'privacy']) {
       await page.goto('/admin/' + path); await expect(page.locator('#dashboard')).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
