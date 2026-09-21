@@ -68,8 +68,8 @@ class EmotionCardStore {
   List<String> extractKeywords(String text) {
     final cleaned = text
         .toLowerCase()
-        .replaceAll(RegExp(r'[^0-9a-z가-힣\\s]'), ' ')
-        .replaceAll(RegExp(r'\\s+'), ' ')
+        .replaceAll(RegExp(r'[^0-9a-z가-힣\s]'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
     if (cleaned.isEmpty) return const [];
 
