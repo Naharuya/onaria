@@ -18,10 +18,10 @@ export function appLinksRouter(env = process.env) {
   const appleId = env.ONARIA_APPLE_APP_ID ?? '';
   router.get('/.well-known/assetlinks.json', (_req, res) => res.json(fingerprints.length ? [{
     relation: ['delegate_permission/common.handle_all_urls'],
-    target: { namespace: 'android_app', package_name: 'com.example.bible_mind_core', sha256_cert_fingerprints: fingerprints },
+    target: { namespace: 'android_app', package_name: 'com.onaria.app', sha256_cert_fingerprints: fingerprints },
   }] : []));
   router.get('/.well-known/apple-app-site-association', (_req, res) => res.json({
-    applinks: { apps: [], details: /^[A-Z0-9]{10}\.com\.example\.bibleMindCore$/.test(appleId)
+    applinks: { apps: [], details: /^[A-Z0-9]{10}\.com\.onaria\.app$/.test(appleId)
       ? [{ appID: appleId, paths: ['/app/open'] }] : [] },
   }));
   router.get(['/app', '/app/open'], (_req, res) => {
