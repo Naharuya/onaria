@@ -130,7 +130,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   const Padding(
                       padding: EdgeInsets.all(20),
                       child: Center(child: CircularProgressIndicator())),
-              ])));
+              ]))));
         });
   }
 }
