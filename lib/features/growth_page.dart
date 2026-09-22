@@ -16,7 +16,15 @@ class GrowthPage extends StatefulWidget {
 class _GrowthPageState extends State<GrowthPage> {
   late final _store = widget.store ?? MindCardStore();
   late Future<List<MindCardRecord>> _records = _store.getAll();
+  final ScrollController _scrollController = ScrollController();
+
   void _reload() => setState(() => _records = _store.getAll());
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => SpaceScaffold(
@@ -35,59 +43,80 @@ class _GrowthPageState extends State<GrowthPage> {
               ]));
             }
             final cards = snapshot.data ?? [];
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 620),
-                child: ListView(padding: const EdgeInsets.all(24), children: [
-              const Text('나를 돌본 시간이 남았어요.',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              const Text('하루를 건너뛰어도 괜찮아요. 저장한 마음카드 속 작은 행동을 천천히 돌아보세요.'),
-              const SizedBox(height: 20),
-              if (EngagementScope.maybeOf(context) != null) ...[
-                FilledButton.icon(
-                    icon: const Icon(Icons.notifications_none),
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                            builder: (_) => const NotificationSettingsPage(
-                                startTomorrow: true))),
-                    label: const Text('다음날 알림 설정하기')),
-                const SizedBox(height: 8),
-                const Text('원하는 시간을 골라 켜면 내일부터 조용히 알려드려요.'),
-              ],
-              TextButton(
-                  onPressed: () async {
-                    await Navigator.of(context).push(MaterialPageRoute<void>(
-                        builder: (_) => SavedCardsPage(store: _store)));
-                    if (mounted) _reload();
-                  },
-                  child: const Text('저장한 카드 보기 / 공유')),
-              const SizedBox(height: 16),
-              if (cards.isEmpty) const Text('마음카드를 저장하면 작은 성장 기록이 이곳에 남아요.'),
-              for (final card in cards)
-                Card(
-                    child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(card.dateLabel,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 8),
-                              const Text('내가 고른 작은 행동'),
-                              Text(card.action),
-                              if (card.verseReference.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Text(card.verseReference),
-                              ],
-                            ]))),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                  onPressed: () =>
-                      Navigator.of(context).popUntil((route) => route.isFirst),
-                  child: const Text('오늘은 여기까지')),
-            ])));
+            return SafeArea(
+              top: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 620),
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    child: ListView(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                      children: [
+                        const Text('나를 돌본 시간이 남았어요.',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 12),
+                        const Text(
+                            '하루를 건너뛰어도 괜찮아요. 저장한 마음카드 속 작은 행동을 천천히 돌아보세요.'),
+                        const SizedBox(height: 20),
+                        if (EngagementScope.maybeOf(context) != null) ...[
+                          FilledButton.icon(
+                              icon: const Icon(Icons.notifications_none),
+                              onPressed: () => Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                      builder: (_) =>
+                                          const NotificationSettingsPage(
+                                              startTomorrow: true))),
+                              label: const Text('다음날 알림 설정하기')),
+                          const SizedBox(height: 8),
+                          const Text('원하는 시간을 골라 켜면 내일부터 조용히 알려드려요.'),
+                        ],
+                        TextButton(
+                            onPressed: () async {
+                              await Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                      builder: (_) =>
+                                          SavedCardsPage(store: _store)));
+                              if (mounted) _reload();
+                            },
+                            child: const Text('저장한 카드 보기 / 공유')),
+                        const SizedBox(height: 16),
+                        if (cards.isEmpty)
+                          const Text('마음카드를 저장하면 작은 성장 기록이 이곳에 남아요.'),
+                        for (final card in cards)
+                          Card(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(card.dateLabel,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 8),
+                                        const Text('내가 고른 작은 행동'),
+                                        Text(card.action),
+                                        if (card.verseReference.isNotEmpty) ...[
+                                          const SizedBox(height: 8),
+                                          Text(card.verseReference),
+                                        ],
+                                      ]))),
+                        const SizedBox(height: 20),
+                        OutlinedButton(
+                            onPressed: () => Navigator.of(context)
+                                .popUntil((route) => route.isFirst),
+                            child: const Text('오늘은 여기까지')),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
         ),
       );
