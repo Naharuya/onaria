@@ -128,7 +128,7 @@ Safety Gate는 모든 AI 흐름보다 우선한다.
 - 변경 경계: /admin, /v1, 인증, CSRF, DB, AI Router, Flutter production API는 변경하지 않음
 - Preview: V3 제작
 - 운영배포: 미실행
-- 외부 이슈: www.onaria.ai.kr TLS hostname mismatch는 인프라 트랙에서 별도 처리
+- 외부 이슈: www.onaria.ai.kr TLS hostname mismatch는 2026-09-21 현재 새 운영 서버(1.201.113.102, Ubuntu, nginx)에서 Let’s Encrypt SAN 및 HTTPS 200을 확인해 해결 상태로 기록
 
 ## 9. QA / 완료 조건
 Website:
@@ -139,7 +139,7 @@ Website:
 - Admin/API 회귀 없음
 - Preview 승인 후 운영 배포
 - onaria.ai.kr 외부 200 및 자산 정상
-- www TLS 해결 후 canonical redirect 검증
+- www TLS: 인증서 SAN과 HTTPS 200 확인 완료. canonical 정책(200 유지 또는 root redirect)은 별도 제품/SEO 결정으로 관리
 
 ## 10. 개발 이력
 ### 2026-09-21

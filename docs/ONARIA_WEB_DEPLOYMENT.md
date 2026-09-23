@@ -1,5 +1,22 @@
 # ONARIA 홈페이지 + Admin PWA 배포 안내
 
+> **현재 운영 인프라 기준 — 2026-09-21**
+>
+> 아래 문서에는 2026-09-12 당시 Cafe24/Apache 절차가 남아 있습니다. 현재 운영 기준과 충돌하는 경우 이 블록을 우선합니다.
+>
+> - Production host: `ari-prod-01`
+> - Public IPv4: `1.201.113.102`
+> - OS: Ubuntu
+> - TLS/Web front: nginx 1.24.0
+> - DNS: `onaria.ai.kr`, `www.onaria.ai.kr`, `api.onaria.ai.kr` → `1.201.113.102`
+> - TLS: Let’s Encrypt certificate name `onaria.ai.kr`; SAN includes all three hostnames
+> - Certificate path: `/etc/letsencrypt/live/onaria.ai.kr/fullchain.pem`
+> - Private key path: `/etc/letsencrypt/live/onaria.ai.kr/privkey.pem`
+> - 2026-09-21 verification: root and `www` HTTPS both returned HTTP 200 through nginx
+> - Legacy Cafe24 `104.105.128.84` / Rocky / Apache instructions are historical and must not be applied to current production without an explicit migration/rollback decision.
+> - Production changes still require backup, config validation, and user approval.
+
+
 작성 기준: 2026-09-12. **아래는 배포 절차이며 실제 서버와 휴대폰 검증 완료 보고가 아닙니다.**
 
 ## 현재 구조와 재사용 범위
