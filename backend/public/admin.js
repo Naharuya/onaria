@@ -241,8 +241,9 @@ const views = {
   dashboard: ['overview', 'webOverview', 'aiUsage', 'conversations', 'modelUsage', 'analyticsPanel'],
   users: ['members'], 'ai-usage': ['aiUsage', 'modelUsage'], safety: ['safetyPanel'],
   content: ['contentPanel'], analytics: ['webOverview', 'analyticsPanel'], system: ['conversations', 'settings'],
+  privacy: ['privacyOps'],
 };
-const viewTitles = { dashboard: '대시보드', users: '사용자', 'ai-usage': 'AI 비용과 사용량', safety: 'Safety', content: '콘텐츠', analytics: '이용 분석', system: '시스템과 API 설정' };
+const viewTitles = { dashboard: '대시보드', users: '사용자', 'ai-usage': 'AI 비용과 사용량', safety: 'Safety', content: '콘텐츠', analytics: '이용 분석', system: '시스템과 API 설정', privacy: '개인정보 보호' };
 function applyAdminRoute() {
   const key = location.pathname.split('/')[2] || 'dashboard';
   const selected = views[key] ? key : 'dashboard';
