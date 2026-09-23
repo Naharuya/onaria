@@ -195,7 +195,7 @@ class _CheckInPageState extends State<CheckInPage> {
                         child: Row(children: [
                           Icon(Icons.public_outlined),
                           SizedBox(width: 12),
-                          Expanded(child: Text('개인정보 수집·이용 / 국외이전 안내')),
+                          Expanded(child: Text('개인정보 수집·이용 / 국외이전 현황')),
                         ]),
                       ),
                       const PopupMenuItem<String>(
