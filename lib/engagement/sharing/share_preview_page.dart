@@ -68,7 +68,10 @@ class _SharePreviewPageState extends State<SharePreviewPage> {
   @override
   Widget build(BuildContext context) => SpaceScaffold(
       appBar: AppBar(title: const Text('공유 미리보기')),
-      body: ListView(padding: const EdgeInsets.all(20), children: [
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: ListView(padding: const EdgeInsets.all(20), children: [
         const Text('이 이미지에 보이는 내용만 나눠요.',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
@@ -121,5 +124,5 @@ class _SharePreviewPageState extends State<SharePreviewPage> {
                   label: const Text('이미지 파일 저장'))),
           const Text('저장할 위치를 직접 선택해 주세요.', textAlign: TextAlign.center),
         ],
-      ]));
+      ]))));
 }

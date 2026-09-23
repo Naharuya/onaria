@@ -33,7 +33,7 @@ test('public routes have unique canonical SEO and do not disclose operational da
   assert.equal(social.status, 200);
   const png = Buffer.from(await social.arrayBuffer());
   assert.equal(png.readUInt32BE(16), 1200); assert.equal(png.readUInt32BE(20), 630);
-  for (const path of ['/admin/dashboard', '/admin/users', '/admin/ai-usage', '/admin/safety', '/admin/content', '/admin/analytics', '/admin/system']) {
+  for (const path of ['/admin/dashboard', '/admin/users', '/admin/ai-usage', '/admin/safety', '/admin/content', '/admin/analytics', '/admin/system', '/admin/privacy']) {
     const response = await fetch(base + path);
     assert.equal(response.status, 200); assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow');
     assert.match(await response.text(), /id="dashboard" class="hidden"/);

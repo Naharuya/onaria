@@ -57,7 +57,7 @@ test('keyboard, interactive journey and reduced motion', async ({ page }) => {
   expect(await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length)).toBe(0);
 });
 
-for (const width of [390, 768, 1440]) {
+for (const width of [360, 390, 430, 768, 1024, 1440]) {
   test(`visual checkpoints and bounds ${width}`, async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width, height: 900 });

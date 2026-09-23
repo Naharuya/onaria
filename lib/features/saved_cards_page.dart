@@ -59,7 +59,10 @@ class _SavedCardsPageState extends State<SavedCardsPage> {
           }
 
           final cards = snapshot.data!;
-          return ListView.builder(
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: cards.length,
             itemBuilder: (context, index) {
@@ -136,7 +139,7 @@ class _SavedCardsPageState extends State<SavedCardsPage> {
                 ),
               );
             },
-          );
+          )));
         },
       ),
     );

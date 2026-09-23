@@ -49,7 +49,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
 
           return SpaceScaffold(
               appBar: AppBar(title: const Text('알림 설정')),
-              body: ListView(padding: const EdgeInsets.all(20), children: [
+              body: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 620),
+                  child: ListView(padding: const EdgeInsets.all(20), children: [
                 const Text('원할 때만, 조용히',
                     style:
                         TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
@@ -127,7 +130,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   const Padding(
                       padding: EdgeInsets.all(20),
                       child: Center(child: CircularProgressIndicator())),
-              ]));
+              ]))));
         });
   }
 }

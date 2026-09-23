@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve, dirname, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const packageId = 'com.example.bible_mind_core';
+export const packageId = 'com.onaria.app';
 export const productionApi = 'https://api.onaria.ai.kr';
 export const releaseCert = '692eabafe55986612f5aa3d475cea16e0e5e7db20ce2e09219a2f536f7e8f6bb';
 

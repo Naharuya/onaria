@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../app/onaria_emblem.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../onaria.dart';
 import '../app/mind_card_store.dart';
+import '../app/emotion_card_store.dart';
 import 'conversation_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
@@ -20,15 +23,40 @@ class CheckInPage extends StatefulWidget {
   State<CheckInPage> createState() => _CheckInPageState();
 }
 
+class _EmotionCardEntry {
+  const _EmotionCardEntry({
+    required this.label,
+    required this.icon,
+    required this.count,
+    this.emotion,
+    this.customKeyword,
+    this.originalIndex = 0,
+  });
+
+  final String label;
+  final String icon;
+  final int count;
+  final EmotionType? emotion;
+  final String? customKeyword;
+  final int originalIndex;
+}
+
 class _CheckInPageState extends State<CheckInPage> {
   EmotionType? _emotion;
   bool _otherEmotion = false;
   final _customEmotion = TextEditingController();
   double _intensity = 5;
   final _dailyUsageStore = DailyUsageStore();
+  final _emotionCardStore = EmotionCardStore();
+  EmotionCardStats _emotionStats =
+      const EmotionCardStats(presetCounts: {}, customKeywordCounts: {});
+  String? _promotedKeyword;
   int _dailyUsageCount = 0;
   bool _loadingUsage = true;
+  bool _loadingEmotionCards = true;
   bool _startingConversation = false;
+  String _versionLabel = '버전 확인 중';
+  String _versionOnly = '';
   final _scrollController = ScrollController();
 
   static const _icons = <EmotionType, String>{
@@ -49,6 +77,32 @@ class _CheckInPageState extends State<CheckInPage> {
     EmotionType.overwhelmed: '🌋',
     EmotionType.jealousy: '🍏',
   };
+
+  List<_EmotionCardEntry> get _emotionCards {
+    final cards = <_EmotionCardEntry>[
+      for (var i = 0; i < EmotionType.values.length; i++)
+        _EmotionCardEntry(
+          label: EmotionType.values[i].label,
+          icon: _icons[EmotionType.values[i]]!,
+          count: _emotionStats.presetCount(EmotionType.values[i]),
+          emotion: EmotionType.values[i],
+          originalIndex: i,
+        ),
+      for (final item in _emotionStats.popularCustomKeywords())
+        _EmotionCardEntry(
+          label: item.key,
+          icon: '✨',
+          count: item.value,
+          customKeyword: item.key,
+          originalIndex: EmotionType.values.length,
+        ),
+    ];
+    cards.sort((a, b) {
+      final byCount = b.count.compareTo(a.count);
+      return byCount != 0 ? byCount : a.originalIndex.compareTo(b.originalIndex);
+    });
+    return cards;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +145,21 @@ class _CheckInPageState extends State<CheckInPage> {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CrossLightPage()));
                       } else if (value == 'reminders') {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationSettingsPage()));
+                      } else if (value == 'privacy') {
+                        _openLegalUrl('/privacy');
+                      } else if (value == 'privacy_transfer') {
+                        _openLegalUrl('/privacy');
+                      } else if (value == 'terms') {
+                        _openLegalUrl('/terms');
+                      } else if (value == 'licenses') {
+                        showLicensePage(
+                          context: context,
+                          applicationName: 'ONARIA',
+                          applicationVersion: _versionOnly,
+                        );
                       }
                     },
-                    itemBuilder: (_) => const [
+                    itemBuilder: (_) => [
                       PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
                       PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
                       PopupMenuItem(value: 'engagement', child: Text('말씀과 작은 기록')),
@@ -107,13 +173,59 @@ class _CheckInPageState extends State<CheckInPage> {
                           Text('회원가입'),
                         ]),
                       ),
-                      PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                         value: 'saved_cards',
                         child: Row(children: [
                           Icon(Icons.bookmarks_outlined),
                           SizedBox(width: 12),
                           Text('저장된 카드'),
                         ]),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem<String>(
+                        value: 'privacy',
+                        child: Row(children: [
+                          Icon(Icons.privacy_tip_outlined),
+                          SizedBox(width: 12),
+                          Text('개인정보 처리방침'),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'privacy_transfer',
+                        child: Row(children: [
+                          Icon(Icons.public_outlined),
+                          SizedBox(width: 12),
+                          Expanded(child: Text('개인정보 수집·이용 / 국외이전 현황')),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'terms',
+                        child: Row(children: [
+                          Icon(Icons.description_outlined),
+                          SizedBox(width: 12),
+                          Text('서비스 이용약관'),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'licenses',
+                        child: Row(children: [
+                          Icon(Icons.code_outlined),
+                          SizedBox(width: 12),
+                          Text('오픈소스 라이선스'),
+                        ]),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        value: 'version',
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            _versionLabel,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -148,9 +260,31 @@ class _CheckInPageState extends State<CheckInPage> {
                   Expanded(child: Divider(color: AppTheme.of(context).gold)),
                 ]),
                 const SizedBox(height: 18),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('지금 가장 가까운 마음을 골라주세요', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.of(context).ink)),
-                  if (_emotion != null || _otherEmotion) Text('선택됨', style: TextStyle(fontSize: 12, color: AppTheme.of(context).green, fontWeight: FontWeight.w700)),
+                Row(children: [
+                  Expanded(
+                    child: Text(
+                      '지금 가장 가까운 마음을 골라주세요',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.of(context).ink,
+                      ),
+                    ),
+                  ),
+                  if (_emotion != null || _otherEmotion || _promotedKeyword != null) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '선택됨',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.of(context).green,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ]),
                 const SizedBox(height: 12),
                 GridView.count(
@@ -160,34 +294,109 @@ class _CheckInPageState extends State<CheckInPage> {
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                   childAspectRatio: 1.12,
-                  children: <EmotionType?>[...EmotionType.values, null].map((emotion) {
-                    final selected = emotion == null ? _otherEmotion : !_otherEmotion && emotion == _emotion;
-                    return Semantics(
+                  children: [
+                    ..._emotionCards.map((card) {
+                      final selected = card.customKeyword != null
+                          ? _promotedKeyword == card.customKeyword
+                          : !_otherEmotion &&
+                              _promotedKeyword == null &&
+                              card.emotion == _emotion;
+                      return Semantics(
+                        button: true,
+                        selected: selected,
+                        label: '${card.label}${selected ? ' 선택됨' : ''}',
+                        child: InkWell(
+                          onTap: () => card.customKeyword != null
+                              ? _selectPromotedKeyword(card.customKeyword!)
+                              : _selectEmotion(card.emotion),
+                          borderRadius: BorderRadius.circular(16),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            decoration: BoxDecoration(
+                              color: selected ? AppTheme.of(context).sage : AppTheme.of(context).panel,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: selected ? AppTheme.of(context).gold : AppTheme.of(context).border,
+                                width: selected ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Stack(children: [
+                              Center(child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(card.icon, style: const TextStyle(fontSize: 20)),
+                                  const SizedBox(height: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    child: Text(
+                                      card.label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: selected ? AppTheme.of(context).ink : AppTheme.of(context).muted,
+                                        fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )),
+                              if (selected)
+                                Positioned(
+                                  top: 7,
+                                  right: 7,
+                                  child: Icon(Icons.check_circle, size: 17, color: AppTheme.of(context).green),
+                                ),
+                            ]),
+                          ),
+                        ),
+                      );
+                    }),
+                    Semantics(
                       button: true,
-                      selected: selected,
-                      label: '${emotion?.label ?? '기타'}${selected ? ' 선택됨' : ''}',
+                      selected: _otherEmotion,
+                      label: '기타${_otherEmotion ? ' 선택됨' : ''}',
                       child: InkWell(
-                        onTap: () => _selectEmotion(emotion),
+                        onTap: () => _selectEmotion(null),
                         borderRadius: BorderRadius.circular(16),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           decoration: BoxDecoration(
-                            color: selected ? AppTheme.of(context).sage : AppTheme.of(context).panel,
+                            color: _otherEmotion ? AppTheme.of(context).sage : AppTheme.of(context).panel,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: selected ? AppTheme.of(context).gold : AppTheme.of(context).border, width: selected ? 1.5 : 1),
+                            border: Border.all(
+                              color: _otherEmotion ? AppTheme.of(context).gold : AppTheme.of(context).border,
+                              width: _otherEmotion ? 1.5 : 1,
+                            ),
                           ),
                           child: Stack(children: [
-                            Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Text(emotion == null ? '✏️' : _icons[emotion]!, style: const TextStyle(fontSize: 20)),
-                              const SizedBox(height: 5),
-                              Text(emotion?.label ?? '기타', style: TextStyle(fontSize: 13, color: selected ? AppTheme.of(context).ink : AppTheme.of(context).muted, fontWeight: selected ? FontWeight.w800 : FontWeight.w600)),
-                            ])),
-                            if (selected) Positioned(top: 7, right: 7, child: Icon(Icons.check_circle, size: 17, color: AppTheme.of(context).green)),
+                            Center(child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('✏️', style: TextStyle(fontSize: 20)),
+                                const SizedBox(height: 5),
+                                Text(
+                                  '기타',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: _otherEmotion ? AppTheme.of(context).ink : AppTheme.of(context).muted,
+                                    fontWeight: _otherEmotion ? FontWeight.w800 : FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            )),
+                            if (_otherEmotion)
+                              Positioned(
+                                top: 7,
+                                right: 7,
+                                child: Icon(Icons.check_circle, size: 17, color: AppTheme.of(context).green),
+                              ),
                           ]),
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
                 if (_otherEmotion) ...[
                   const SizedBox(height: 16),
@@ -208,7 +417,7 @@ class _CheckInPageState extends State<CheckInPage> {
                     onChanged: (_) => setState(() {}),
                   ),
                 ],
-                if (_emotion != null || _otherEmotion) ...[
+                if (_emotion != null || _otherEmotion || _promotedKeyword != null) ...[
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -228,7 +437,7 @@ class _CheckInPageState extends State<CheckInPage> {
                 const SizedBox(height: 16),
                 FilledButton(
                   style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                    onPressed: (_otherEmotion ? _customEmotion.text.trim().isEmpty : _emotion == null) || _loadingUsage || _startingConversation
+                    onPressed: (_otherEmotion ? _customEmotion.text.trim().isEmpty : (_emotion == null && _promotedKeyword == null)) || _loadingUsage || _loadingEmotionCards || _startingConversation
                       ? null
                       : _startConversation,
                     child: const Text('AI 마음대화 시작하기'),
@@ -253,6 +462,8 @@ class _CheckInPageState extends State<CheckInPage> {
   void initState() {
     super.initState();
     _loadDailyUsage();
+    _loadEmotionCards();
+    _loadVersionInfo();
   }
 
   @override
@@ -266,6 +477,7 @@ class _CheckInPageState extends State<CheckInPage> {
     setState(() {
       _emotion = emotion;
       _otherEmotion = emotion == null;
+      _promotedKeyword = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
@@ -275,6 +487,45 @@ class _CheckInPageState extends State<CheckInPage> {
         curve: Curves.easeOutCubic,
       );
     });
+  }
+
+  void _selectPromotedKeyword(String keyword) {
+    setState(() {
+      _emotion = EmotionType.complexity;
+      _otherEmotion = false;
+      _promotedKeyword = keyword;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  Future<void> _loadEmotionCards() async {
+    final stats = await _emotionCardStore.load();
+    if (!mounted) return;
+    setState(() {
+      _emotionStats = stats;
+      _loadingEmotionCards = false;
+    });
+  }
+
+  Future<void> _loadVersionInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (!mounted) return;
+    setState(() {
+      _versionOnly = info.version;
+      _versionLabel = 'ONARIA v${info.version} (${info.buildNumber})';
+    });
+  }
+
+  Future<void> _openLegalUrl(String path) async {
+    final uri = Uri.https('onaria.ai.kr', path);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Future<void> _loadDailyUsage() async {
@@ -287,12 +538,21 @@ class _CheckInPageState extends State<CheckInPage> {
   }
 
   Future<void> _startConversation() async {
-    if (_startingConversation || (_otherEmotion ? _customEmotion.text.trim().isEmpty : _emotion == null)) return;
+    if (_startingConversation || (_otherEmotion ? _customEmotion.text.trim().isEmpty : (_emotion == null && _promotedKeyword == null))) return;
     FocusScope.of(context).unfocus();
-    final customEmotion = _otherEmotion ? _customEmotion.text.trim() : null;
+    final customEmotion = _otherEmotion
+        ? _customEmotion.text.trim()
+        : _promotedKeyword;
     final emotion = _emotion ?? EmotionType.complexity;
     setState(() => _startingConversation = true);
     final consumed = await _dailyUsageStore.tryConsume();
+    if (_otherEmotion) {
+      await _emotionCardStore.recordCustom(customEmotion!);
+    } else if (_promotedKeyword != null) {
+      await _emotionCardStore.recordCustom(_promotedKeyword!);
+    } else {
+      await _emotionCardStore.recordPreset(emotion);
+    }
     if (!mounted) return;
     if (!consumed) {
       setState(() => _startingConversation = false);
@@ -312,9 +572,11 @@ class _CheckInPageState extends State<CheckInPage> {
       setState(() {
         _emotion = null;
         _otherEmotion = false;
+        _promotedKeyword = null;
         _customEmotion.clear();
         _intensity = 5;
       });
+      await _loadEmotionCards();
     }
   }
 }

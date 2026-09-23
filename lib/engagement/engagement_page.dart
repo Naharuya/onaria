@@ -24,7 +24,10 @@ class EngagementPage extends StatelessWidget {
             ]))
           : !controller.ready
               ? const Center(child: CircularProgressIndicator())
-              : ListView(padding: const EdgeInsets.all(20), children: [
+              : Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 620),
+                    child: ListView(padding: const EdgeInsets.all(20), children: [
                   if (!savedOnly)
                     ListTile(
                       leading: const Icon(Icons.light_mode_outlined),
@@ -81,7 +84,7 @@ class EngagementPage extends StatelessWidget {
                           title: Text(egg.label),
                           subtitle: Text(egg.message)),
                   ],
-                ]),
+                ]))),
     );
   }
 
