@@ -5,6 +5,7 @@ import '../app/space_scaffold.dart';
 import '../onaria.dart';
 import '../app/mind_card_store.dart';
 import 'conversation_page.dart';
+import 'app_info_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
 import 'signup_page.dart';
@@ -91,6 +92,8 @@ class _CheckInPageState extends State<CheckInPage> {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CrossLightPage()));
                       } else if (value == 'reminders') {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationSettingsPage()));
+                      } else if (value == 'app_info') {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AppInfoPage()));
                       }
                     },
                     itemBuilder: (_) => const [
@@ -105,6 +108,14 @@ class _CheckInPageState extends State<CheckInPage> {
                           Icon(Icons.person_add_outlined),
                           SizedBox(width: 12),
                           Text('회원가입'),
+                        ]),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'app_info',
+                        child: Row(children: [
+                          Icon(Icons.info_outline),
+                          SizedBox(width: 12),
+                          Text('앱 정보'),
                         ]),
                       ),
                       PopupMenuItem<String>(
