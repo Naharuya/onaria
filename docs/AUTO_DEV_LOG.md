@@ -219,3 +219,11 @@
 - 공유창 열기/취소, 음성 시작 성공 표시/중단, 알림 권한 거절·허용, 실제 알림 도착 및 취소 확인. 음성 실제 청취와 실기기 위기 시나리오는 미검증으로 유지.
 - 임시 USB 화면 유지 설정 원복 확인. 합성 카드 1개 유지, 데이터 삭제/코드 변경/재설치/운영 변경/push 없음.
 - 상세 결과와 제한: BUDDHIST_DEVICE_CHECK.md.
+
+## 2026-09-28 보류 변경 커밋·푸시 전 검증
+
+- 사용자 커밋·푸시 요청에 따라 보류된 로컬 Ollama 연결, Web/Flutter 테스트 보완, iOS 프로젝트 갱신 및 로드맵 문서를 검토했다. 운영 서버와 main 병합은 작업 범위에 포함하지 않았다.
+- backend 421 PASS, Christian Flutter 125 PASS/1 SKIP, Buddhist 57 PASS, Web E2E 19 PASS, 설치 도구 25 PASS/1 Windows SKIP.
+- Flutter analyze 오류/경고 없음, 기존 example avoid_print 정보 4개. Android debug 및 iOS 미서명 Release 컴파일 PASS. 이번 빌드를 기기에 설치하지 않았다.
+- Info.plist 갱신 전후 파싱 결과 동일. outgoing Git blob 및 작업 파일 비밀정보 패턴 검사와 diff 공백 검사 PASS. 키/자격증명/실제 경전 수집 없음.
+- 대상 브랜치 feature/onaria-buddhist. CI는 원격 커밋 SHA로 별도 확인하며 로컬 통과를 CI 통과로 간주하지 않는다.
