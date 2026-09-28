@@ -60,3 +60,8 @@ byId('admin-load').onclick = async () => {
   try { byId('admin').textContent = JSON.stringify(await api('/api/admin'), null, 2); }
   catch (error) { byId('admin').textContent = error.message; }
 };
+
+byId('diagnostics-load').onclick = async () => {
+  try { byId('diagnostics').textContent = JSON.stringify(await api('/api/admin/diagnostics'), null, 2); }
+  catch (error) { byId('diagnostics').textContent = error.message; }
+};

@@ -3,6 +3,7 @@ import 'package:onaria_core/onaria_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mind_card_store.dart';
 import 'local_conversation_client.dart';
+import 'dev_identity.dart';
 
 const noMatch = '검색된 테스트 자료가 없습니다. 경전 문구나 출처를 생성하지 않습니다.';
 
@@ -17,13 +18,37 @@ class BuddhistSession {
   LocalConversationClient? _client;
   final List<String> _previousInputs = [];
   bool lastReplyUsedFallback = false;
+  final DevIdentityProvider _identity = DevIdentityProvider();
+  late final DevCardRepository _devCards = DevCardRepository(_identity);
+  RecordScope get recordScope => _identity.current;
+  final List<void Function()> _safetyListeners = [];
+  void addSafetyListener(void Function() listener) =>
+      _safetyListeners.add(listener);
+  void removeSafetyListener(void Function() listener) =>
+      _safetyListeners.remove(listener);
+
+  bool switchDevIdentity(DevPrincipal principal, {String pendingInput = ''}) {
+    if (!allowPendingInput(pendingInput)) return false;
+    _identity.switchTo(principal);
+    _state = ConversationState.start(ReligionProfile.buddhist);
+    _previousInputs.clear();
+    _client = null;
+    _guided = false;
+    citations = const [];
+    card = null;
+    selectedAction = null;
+    message = '';
+    return true;
+  }
+
   static const storageKey = MindCardStore.legacyKey;
   final BuddhistScriptureProvider provider;
   final SharedPreferences preferences;
   final MindCardStore _cardStore;
-  String? get storageNotice => _cardStore.loadFailed
-      ? '저장 기록을 읽지 못했습니다. 기존 기록을 보호하기 위해 새 저장을 중단했습니다.'
-      : null;
+  String? get storageNotice =>
+      recordScope.principal == DevPrincipal.guest && _cardStore.loadFailed
+          ? '저장 기록을 읽지 못했습니다. 기존 기록을 보호하기 위해 새 저장을 중단했습니다.'
+          : null;
   List<String> get savedIds =>
       List.unmodifiable(savedDetails.map((r) => r.scripture.id));
   ConversationState _state = ConversationState.start(ReligionProfile.buddhist);
@@ -202,6 +227,11 @@ class BuddhistSession {
     card = null;
     selectedAction = null;
     message = localCrisisMessage(riskLevel);
+    for (final listener in List.of(_safetyListeners)) {
+      try {
+        listener();
+      } catch (_) {/* Device effects cannot interrupt Safety. */}
+    }
     return true;
   }
 
@@ -237,13 +267,23 @@ class BuddhistSession {
     final record = card;
     if (record == null) throw StateError('NO_CARD');
     provider.assertCitation(record.metadata);
-    await _cardStore.save(record.id);
+    final scope = recordScope;
+    if (scope.principal == DevPrincipal.guest) {
+      await _cardStore.save(record.id);
+    } else {
+      _devCards.save(
+          scope, MindCardReference(record.id, DateTime.now().toUtc()));
+    }
+    _identity.validate(scope);
   }
 
   List<SavedMindCard> get savedDetails {
     if (isCrisis) return const [];
     final result = <SavedMindCard>[];
-    for (final reference in _cardStore.records) {
+    final references = recordScope.principal == DevPrincipal.guest
+        ? _cardStore.records
+        : _devCards.list(recordScope);
+    for (final reference in references) {
       final record = provider.getById(reference.scriptureId);
       if (record == null || record.copyrightStatus != 'TEST_DATA_ONLY') {
         continue;

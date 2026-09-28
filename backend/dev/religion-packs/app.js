@@ -32,7 +32,7 @@ export function createBuddhistDevApp() {
     for (const [key, session] of sessions) if (session.expires < now) sessions.delete(key);
     if (sessions.size >= 100) return res.sendStatus(429);
     const token = randomBytes(32).toString('hex');
-    sessions.set(token, { riskLevel: 0, expires: now + 3600_000 });
+    sessions.set(token, { riskLevel: 0, expires: now + 3600_000, counts: { respond: 0, search: 0, cards: 0 } });
     res.cookie('buddhist_dev_session', token, { httpOnly: true, sameSite: 'strict', path: '/', maxAge: 3600_000 });
     res.sendFile(`${publicDirectory}/index.html`);
   });
@@ -44,6 +44,7 @@ export function createBuddhistDevApp() {
     next();
   });
   app.post('/api/respond', async (req, res) => {
+    req.devSession.counts.respond++;
     const { userMessage, religion = 'buddhist' } = req.body ?? {};
     if (typeof userMessage !== 'string' || !userMessage.trim() || userMessage.length > 2000
       || Object.keys(req.body).some((key) => !['userMessage', 'religion'].includes(key))) return res.sendStatus(400);
@@ -57,20 +58,38 @@ export function createBuddhistDevApp() {
     }
   });
   app.get('/api/search', (req, res) => {
+    req.devSession.counts.search++;
     if (req.devSession.riskLevel > 0) return res.status(409).json({ error: 'SAFETY_FIRST' });
     if (typeof req.query.q !== 'string' || req.query.q.length > 2000) return res.sendStatus(400);
     res.json({ mode: 'TEST_DATA_ONLY', results: pack.provider.search(req.query.q) });
   });
   app.post('/api/cards', (req, res) => {
+    req.devSession.counts.cards++;
     if (req.devSession.riskLevel > 0) return res.status(409).json({ error: 'SAFETY_FIRST' });
     if (!req.body || Object.keys(req.body).join(',') !== 'scriptureId') return res.sendStatus(400);
     try { res.json(pack.provider.mindCard(req.body.scriptureId)); }
     catch { res.status(404).json({ error: 'UNSUPPORTED_SCRIPTURE' }); }
   });
-  // Read-only development metadata; no production admin routes/settings/credentials.
+  // Local browser session capability only; never production admin authentication.
+  app.use('/api/admin', (req, res, next) => {
+    if (req.method !== 'GET') return res.sendStatus(404);
+    if (Object.keys(req.query).some(key => key !== 'religion') ||
+        (req.query.religion !== undefined && req.query.religion !== 'buddhist')) {
+      return res.status(400).json({ error: 'PACK_MISMATCH' });
+    }
+    next();
+  });
   app.get('/api/admin', (req, res) => res.json({ ...pack.provider.status(),
     storage: 'isolated-ephemeral-memory', modelCalls: 0, openAiClientCreations: 0,
     publicationEnabled: false, adminMode: 'read-only-local-development' }));
+  app.get('/api/admin/diagnostics', (req, res) => res.json({
+    mode: 'TEST_DATA_ONLY', religion: 'buddhist',
+    scope: 'current-browser-session-only', counts: { ...req.devSession.counts },
+    privacy: { storesMessages: false, storesIdentity: false, exposesSecrets: false },
+    controls: { import: false, approveExternal: false, publish: false, resetData: false },
+    copyrightStatus: 'BLOCKED_EXTERNAL_REVIEW',
+    dataPolicy: 'provider-canonical-fixtures-only',
+  }));
   app.use(express.static(publicDirectory, { index: false, etag: false, maxAge: 0 }));
   app.use((_req, res) => res.sendStatus(404));
   app.use((_error, _req, res, _next) => res.status(400).json({ error: 'INVALID_REQUEST' }));

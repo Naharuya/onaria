@@ -3,6 +3,7 @@ import 'package:onaria_buddhist_pack/onaria_buddhist_pack.dart';
 import 'package:onaria_core/onaria_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'session.dart';
+import 'engagement.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +48,62 @@ class BuddhistHome extends StatefulWidget {
   State<BuddhistHome> createState() => _BuddhistHomeState();
 }
 
-class _BuddhistHomeState extends State<BuddhistHome> {
+class _BuddhistHomeState extends State<BuddhistHome>
+    with WidgetsBindingObserver {
+  late final BuddhistEngagement effects;
+  String featureStatus = '';
+  bool featureBusy = false;
+  String? sharePreviewId;
+  @override
+  void initState() {
+    super.initState();
+    effects = BuddhistEngagement(widget.session);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) effects.stopSpeech();
+  }
+
+  Future<void> runFeature(
+      Future<bool> Function() operation, String success) async {
+    if (!session.allowPendingInput(input.text)) {
+      setState(() {
+        input.clear();
+        sharePreviewId = null;
+        featureStatus = '';
+      });
+      return;
+    }
+    setState(() {
+      featureBusy = true;
+      featureStatus = '';
+    });
+    try {
+      final ok = await operation();
+      if (mounted && !session.isCrisis) {
+        setState(() {
+          featureStatus = ok
+              ? success
+              : '기기 설정이나 권한을 확인해 주세요. 오프라인 한국어 음성이 없으면 읽기를 사용할 수 없습니다.';
+        });
+      }
+    } catch (_) {
+      if (mounted && !session.isCrisis) {
+        setState(() {
+          featureStatus = '기기 기능을 실행하지 못했습니다. 다시 시도해 주세요.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          featureBusy = false;
+        });
+      }
+    }
+  }
+
   final input = TextEditingController();
   EmotionType emotion = EmotionType.anxiety;
   double intensity = 5;
@@ -59,6 +115,8 @@ class _BuddhistHomeState extends State<BuddhistHome> {
   BuddhistSession get session => widget.session;
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    effects.dispose();
     input.dispose();
     super.dispose();
   }
@@ -314,6 +372,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
       ];
     }
     final records = session.savedDetails;
+    final growth = GrowthSnapshot(session, DateTime.now());
     final detail =
         selectedSavedId == null ? null : session.savedDetail(selectedSavedId!);
     return [
@@ -329,6 +388,41 @@ class _BuddhistHomeState extends State<BuddhistHome> {
           Text('마음카드 상세', style: Theme.of(context).textTheme.titleLarge),
           source(detail.scripture),
           panel([
+            OutlinedButton(
+                onPressed: featureBusy
+                    ? null
+                    : () => setState(() {
+                          if (!session.allowPendingInput(input.text)) {
+                            input.clear();
+                            return;
+                          }
+                          sharePreviewId = detail.scripture.id;
+                        }),
+                child: const Text('공유 내용 미리보기')),
+            if (sharePreviewId == detail.scripture.id) ...[
+              SelectableText(effects.preview(detail.scripture.id)),
+              const Text('공유되는 내용은 위 테스트 자료뿐입니다. 대화 내용과 계정 정보는 포함하지 않습니다.'),
+              FilledButton(
+                  onPressed: featureBusy
+                      ? null
+                      : () => runFeature(
+                          () => effects.share(detail.scripture.id),
+                          '공유 앱 선택 화면을 열었습니다. 전송 여부는 선택한 앱에서 확인해 주세요.'),
+                  child: const Text('공유 앱 선택')),
+            ],
+            OutlinedButton(
+                onPressed: featureBusy
+                    ? null
+                    : () => runFeature(() => effects.speak(detail.scripture.id),
+                        '기기 내 음성 읽기를 시작했습니다.'),
+                child: const Text('오프라인 음성으로 읽기')),
+            TextButton(
+                onPressed: () =>
+                    runFeature(effects.stopSpeech, '음성 읽기를 중단했습니다.'),
+                child: const Text('읽기 중단')),
+            if (featureStatus.isNotEmpty) Text(featureStatus),
+          ]),
+          panel([
             Text(savedDate(detail.savedAt)),
             Text('이용 조건: ${detail.scripture.license}'),
             Text('권리 상태: ${detail.scripture.copyrightStatus}'),
@@ -341,6 +435,34 @@ class _BuddhistHomeState extends State<BuddhistHome> {
           const Text('자신의 속도로 돌아보세요. 저장 기록은 이 앱 안에만 남습니다.'),
           if (records.isEmpty && session.storageNotice == null)
             const Text('아직 저장한 마음카드가 없습니다. 마음 화면에서 테스트 자료를 보고 카드를 저장해 보세요.'),
+        ]),
+        panel([
+          Text('최근 7일 저장한 카드 ${growth.total}개'),
+          const Text('저장 시각이 있는 카드만 집계합니다. 마음의 좋고 나쁨을 평가하는 점수가 아닙니다.'),
+          for (final day in growth.days.entries)
+            Text('${day.key.month}/${day.key.day} · ${day.value}개'),
+        ]),
+        panel([
+          const Text('작은 쉼 알림 · 직접 켰을 때 한 번만 알립니다.'),
+          const Text(
+              '알림에는 대화나 경전 문구가 없습니다. 기기 절전 설정에 따라 늦어질 수 있으며 재부팅 후 다시 설정해 주세요.'),
+          OutlinedButton(
+              onPressed: featureBusy
+                  ? null
+                  : () => runFeature(
+                      () => effects.reminder(1), '1분 뒤 쉼 알림을 요청했습니다.'),
+              child: const Text('1분 뒤 알림 테스트')),
+          OutlinedButton(
+              onPressed: featureBusy
+                  ? null
+                  : () => runFeature(
+                      () => effects.reminder(1440), '내일 이맘때 쉼 알림을 요청했습니다.'),
+              child: const Text('내일 쉼 알림')),
+          TextButton(
+              onPressed: () =>
+                  runFeature(effects.cancelReminder, '예약한 쉼 알림을 취소했습니다.'),
+              child: const Text('알림 취소')),
+          if (featureStatus.isNotEmpty) Text(featureStatus),
         ]),
         for (final record in records)
           panel([
@@ -366,6 +488,13 @@ class _BuddhistHomeState extends State<BuddhistHome> {
 
   List<Widget> admin() => [
         Text('개발 상태', style: Theme.of(context).textTheme.headlineMedium),
+        panel([
+          Text(
+              '현재 세션의 저장 가능 상태: ${session.storageNotice == null ? '정상' : '기록 보호 중'}'),
+          Text(
+              '최근 로컬 응답 복구: ${session.lastReplyUsedFallback ? '고정 안내 사용' : '정상'}'),
+          const Text('대화 원문·계정·키 값은 진단에 표시하지 않습니다.'),
+        ]),
         panel(const [
           Text('TEST_DATA_ONLY · 읽기 전용'),
           Text('Religion Profile: buddhist'),
@@ -404,6 +533,9 @@ class _BuddhistHomeState extends State<BuddhistHome> {
             onDestinationSelected: (value) => setState(() {
                   if (!session.allowPendingInput(input.text)) input.clear();
                   selectedSavedId = null;
+                  sharePreviewId = null;
+                  featureStatus = '';
+                  effects.stopSpeech();
                   tab = value;
                 }),
             destinations: const [

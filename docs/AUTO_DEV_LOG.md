@@ -172,3 +172,12 @@
 - 소스만 읽어 확인했으며 Christian 사용자/운영 DB/토큰을 읽지 않았다. 실제 로그인/동기화/데이터 migration/경전 수집 없음.
 - 문서만 변경하여 Flutter/backend 테스트·빌드·실기기/API 검사는 NOT RUN. 문서 링크/범위/diff/secret 검사 수행. push는 사용자 요청에 따라 보류.
 - 다음 후보: 5-A 합성 identity와 메모리 repository 계약을 테스트로 구현. 계정 UI·실제 인증 활성화는 제외.
+
+## 2026-09-28 Buddhist 5-A~8 (local; device UI pending)
+
+- 합성 identity/기록 격리, 저장 카드 성장 현황·공유 미리보기·오프라인 TTS·opt-in 단발 알림, localhost Admin 세션 진단 구현.
+- 위기 시 인용 제거와 고정 응답을 기기 listener 예외보다 먼저 보장하고 음성/알림을 취소한다.
+- Buddhist 50 PASS/analyze clean, Christian 125 PASS/1 SKIP 및 기능별 집중 회귀 10 PASS, backend 작업 트리 415 PASS/staged snapshot 409 PASS, Web E2E 5 PASS.
+- Buddhist Release 0.2.0+6 및 기존 인증서·패키지·자산 분리 검사 PASS. Christian Android debug/iOS simulator compile PASS.
+- 같은 Release 설치 엔진으로 adb install -r 성공. 휴대폰이 잠겨 있어 기기 UI·음성 청취·알림 도착은 NOT RUN; 8단계 전체 완료로 표시하지 않는다.
+- 상세 범위/검증/제한은 BUDDHIST_STEPS_5A_8_REPORT.md 참조. 실제 경전·운영 변경·배포 없음. push는 사용자 요청으로 보류.

@@ -60,3 +60,14 @@ test('Buddhist E2E: narrow viewport has no horizontal overflow', async ({ page }
   await expect(page.locator('#admin')).toContainText('TEST_DATA_ONLY');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('Development Admin diagnostics never display entered private text or enable external approval', async ({ page }) => {
+  await page.goto(url);
+  await page.getByLabel('어떤 마음이 드시나요?').fill('불안 PRIVATE_E2E_921');
+  await page.getByRole('button', { name: '마음 살펴보기' }).click();
+  await expect(page.locator('#answer')).not.toBeEmpty();
+  await page.getByRole('button', { name: '세션 진단 확인' }).click();
+  await expect(page.locator('#diagnostics')).toContainText('"respond": 1');
+  await expect(page.locator('#diagnostics')).not.toContainText('PRIVATE_E2E_921');
+  await expect(page.locator('#diagnostics')).toContainText('"approveExternal": false');
+});
