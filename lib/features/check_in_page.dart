@@ -515,12 +515,20 @@ class _CheckInPageState extends State<CheckInPage> {
   }
 
   Future<void> _loadVersionInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    if (!mounted) return;
-    setState(() {
-      _versionOnly = info.version;
-      _versionLabel = 'ONARIA v${info.version} (${info.buildNumber})';
-    });
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      setState(() {
+        _versionOnly = info.version;
+        _versionLabel = 'ONARIA v${info.version} (${info.buildNumber})';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _versionOnly = '';
+        _versionLabel = 'ONARIA';
+      });
+    }
   }
 
   Future<void> _openLegalUrl(String path) async {
