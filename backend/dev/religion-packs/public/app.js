@@ -65,3 +65,33 @@ byId('diagnostics-load').onclick = async () => {
   try { byId('diagnostics').textContent = JSON.stringify(await api('/api/admin/diagnostics'), null, 2); }
   catch (error) { byId('diagnostics').textContent = error.message; }
 };
+
+byId('source-review-load').onclick = async () => {
+  const target = byId('source-review');
+  target.replaceChildren();
+  try {
+    const catalog = await api('/api/admin/source-review');
+    const notice = document.createElement('p');
+    notice.textContent = `${catalog.checked_on} 확인 · BLOCKED_EXTERNAL_REVIEW · 본문 수집/사용 비활성. 네이버·구글 직접 검색은 자동 접근 제한으로 결과 확인 불가.`;
+    target.append(notice);
+    for (const row of catalog.candidates) {
+      const article = document.createElement('article');
+      const title = document.createElement('h4'); title.textContent = row.name;
+      const rights = document.createElement('p'); rights.textContent = row.rights_note;
+      const evidence = document.createElement('p'); evidence.textContent = row.verification_note;
+      article.append(title, rights, evidence);
+      const query = encodeURIComponent(`${row.name} 저작권 이용 조건`);
+      const links = [ ['공식 출처', row.source_url], ['확인 근거', row.evidence_url],
+        ...(row.license_url ? [['권리 안내', row.license_url]] : []),
+        ['네이버에서 직접 검색', `https://search.naver.com/search.naver?query=${query}`],
+        ['구글에서 직접 검색', `https://www.google.com/search?q=${query}`] ];
+      for (const [label, href] of links) {
+        const line = document.createElement('p');
+        const link = document.createElement('a'); link.textContent = label; link.href = href;
+        link.target = '_blank'; link.rel = 'noopener noreferrer'; link.referrerPolicy = 'no-referrer';
+        line.append(link); article.append(line);
+      }
+      target.append(article);
+    }
+  } catch (error) { target.textContent = error.message; }
+};

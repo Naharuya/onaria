@@ -71,3 +71,24 @@ test('Development Admin diagnostics never display entered private text or enable
   await expect(page.locator('#diagnostics')).not.toContainText('PRIVATE_E2E_921');
   await expect(page.locator('#diagnostics')).toContainText('"approveExternal": false');
 });
+
+test('Source review has explicit blocked status and safe manual links without fetching external content', async ({ page }) => {
+  const external=[];
+  page.on('request', request => { if (!request.url().startsWith(url+'/')) external.push(request.url()); });
+  await page.setViewportSize({width:360,height:780});
+  await page.goto(url);
+  await page.getByRole('button',{name:'출처 검토 목록 확인'}).click();
+  const catalog=page.locator('#source-review');
+  await expect(catalog).toContainText('BLOCKED_EXTERNAL_REVIEW');
+  await expect(catalog.locator('article')).toHaveCount(4);
+  await expect(catalog.getByRole('link',{name:'네이버에서 직접 검색'})).toHaveCount(4);
+  await expect(catalog.getByRole('link',{name:'구글에서 직접 검색'})).toHaveCount(4);
+  await expect(catalog.getByRole('button')).toHaveCount(0);
+  for(const link of await catalog.getByRole('link').all()) {
+    await expect(link).toHaveAttribute('rel','noopener noreferrer');
+    await expect(link).toHaveAttribute('href',/^https:\/\//);
+  }
+  expect(external).toEqual([]);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);
+});

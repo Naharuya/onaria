@@ -197,3 +197,11 @@
 - 실제 로컬 모델 합성 요청 1건 200/약 5.7초. 0.3.0+8 USB Release 업데이트 성공. 휴대폰 keyguard 잠금으로 UI/공유/음성/알림/기기 AI E2E는 미검증.
 - 실제 경전 자료와 번역 라이선스 근거 요청 중. 미확인 자료는 BLOCKED_EXTERNAL_REVIEW; 자동 수집/투입 없음. 운영 변경/배포/push 없음.
 - 세부 증거·한계·실행법: BUDDHIST_ONARIA_MAC_AI.md.
+
+## 2026-09-28 Buddhist 외부 출처 경로 검토
+
+- 동국대 불교학술원/SuttaCentral Bilara/CBETA/BDRC의 기관·권리 안내만 검색/확인해 기존 metadata 경로에 기록.
+- localhost 개발 Admin에 읽기 전용 출처 목록과 공식 근거·네이버/구글 수동 검색 링크 추가. 실제 문구/번역은 저장하지 않고 모두 BLOCKED_EXTERNAL_REVIEW 유지.
+- 네이버 robots 제한, 구글 직접 검색 도구 오류는 명시. 공식 페이지/색인으로 확인한 수준만 기록.
+- Admin/Pack 11 PASS, Web E2E 6 PASS, Christian 집중 회귀 4 PASS. 외부 자동 요청 없음·검색/카드 배제 확인.
+- 앱/운영/키 변경·실제 경전 수집·push 없음. 자세한 근거와 경계는 BUDDHIST_SOURCE_REVIEW.md 참조.

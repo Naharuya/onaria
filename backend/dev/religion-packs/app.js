@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createBuddhistPack } from './buddhist/pack.js';
 import { createReligionRouter } from './router.js';
+import { sourceReviewCatalog } from './buddhist/source_review.js';
 
 const publicDirectory = fileURLToPath(new URL('./public/', import.meta.url));
 export function createBuddhistDevApp() {
@@ -82,6 +83,7 @@ export function createBuddhistDevApp() {
   app.get('/api/admin', (req, res) => res.json({ ...pack.provider.status(),
     storage: 'isolated-ephemeral-memory', modelCalls: 0, openAiClientCreations: 0,
     publicationEnabled: false, adminMode: 'read-only-local-development' }));
+  app.get('/api/admin/source-review', (_req, res) => res.json(sourceReviewCatalog()));
   app.get('/api/admin/diagnostics', (req, res) => res.json({
     mode: 'TEST_DATA_ONLY', religion: 'buddhist',
     scope: 'current-browser-session-only', counts: { ...req.devSession.counts },

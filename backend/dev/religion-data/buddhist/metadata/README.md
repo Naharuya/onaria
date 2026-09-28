@@ -1,6 +1,6 @@
 # Buddhist metadata — TEST_DATA_ONLY
 
-자료 식별·출처·권리 정보의 개발 전용 디렉터리다. 현재 자료 레코드는 없다.
+자료 식별·출처·권리 정보의 개발 전용 디렉터리다. 실제 경전 자료 레코드는 없다. `source_candidates.json`은 기관·출처 URL의 수동 검토 목록이며 경전 데이터나 인용 근거가 아니다. 개발 Admin에서만 확인하고 Provider/검색 인덱스에는 연결하지 않는다.
 
 향후 metadata에 필요한 필드:
 

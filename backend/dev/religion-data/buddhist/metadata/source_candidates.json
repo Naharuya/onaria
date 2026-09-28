@@ -1,0 +1,55 @@
+{
+  "mode": "SOURCE_REVIEW_ONLY",
+  "checked_on": "2026-09-28",
+  "search_access": {
+    "naver": "ROBOTS_BLOCKED",
+    "google": "DIRECT_SEARCH_UNAVAILABLE",
+    "fallback": "WEB_SEARCH_AND_OFFICIAL_DOCUMENTS"
+  },
+  "candidates": [
+    {
+      "id": "review-dongguk",
+      "name": "동국대학교 불교학술원 불교기록문화유산 아카이브",
+      "source_url": "https://kabc.dongguk.edu/",
+      "evidence_url": "https://abchome.dongguk.edu/sub/contMasterView?cateType=&clsType=%EC%95%8C%EB%A6%BC%EB%A7%88%EB%8B%B9_%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD&dateE=&dateS=&dateType=&id=3643&q=&qw=&sortField=&sortOrder=desc&used=Y&viewType=",
+      "license_url": null,
+      "verification_note": "공식 기관 공지 검색 색인에서 서비스 주소 확인. 서비스 직접 접속은 시간초과.",
+      "rights_note": "한국어 번역자의 권리 및 앱 내 표시·저장·재배포 허가를 개별 확인해야 함.",
+      "copyright_status": "BLOCKED_EXTERNAL_REVIEW",
+      "ingest_allowed": false
+    },
+    {
+      "id": "review-suttacentral",
+      "name": "SuttaCentral Bilara",
+      "source_url": "https://suttacentral.net/",
+      "evidence_url": "https://github.com/suttacentral/bilara-data/blob/published/LICENSE.md",
+      "license_url": "https://github.com/suttacentral/bilara-data/blob/published/LICENSE.md",
+      "verification_note": "공식 저장소 LICENSE.md 직접 확인. 사이트 라이선스 화면은 JavaScript 필요.",
+      "rights_note": "Bilara에서 제작하고 SuttaCentral이 지원하는 번역의 CC0 안내 확인. 사용할 개별 작품·언어·번역자·버전의 해당 여부는 미검증. 한국어 번역에 일괄 적용하지 않음.",
+      "copyright_status": "BLOCKED_EXTERNAL_REVIEW",
+      "ingest_allowed": false
+    },
+    {
+      "id": "review-cbeta",
+      "name": "CBETA 전자불전",
+      "source_url": "https://cbeta.org/",
+      "evidence_url": "https://cbeta.org/en/faq",
+      "license_url": "https://cbeta.org/en/faq",
+      "verification_note": "공식 FAQ의 Texts & Collection 이용권한 안내 직접 확인.",
+      "rights_note": "공식 FAQ는 자료별 이용 조건이 다르므로 원 출판사·권리자에게 구체적 권한을 확인하도록 안내함. 앱 사용 허가 미확인.",
+      "copyright_status": "BLOCKED_EXTERNAL_REVIEW",
+      "ingest_allowed": false
+    },
+    {
+      "id": "review-bdrc",
+      "name": "Buddhist Digital Resource Center",
+      "source_url": "https://www.bdrc.io/",
+      "evidence_url": "https://www.bdrc.io/access-policies/",
+      "license_url": "https://www.bdrc.io/access-policies/",
+      "verification_note": "공식 Access Policies 검색 색인 내용 확인. 직접 접속은 시간초과.",
+      "rights_note": "자료별 공개·제한 접근이 구분됨. BDRC가 제3자 저작권을 대신 면제할 수 없으므로 개별 판본의 권리를 검토해야 함.",
+      "copyright_status": "BLOCKED_EXTERNAL_REVIEW",
+      "ingest_allowed": false
+    }
+  ]
+}
