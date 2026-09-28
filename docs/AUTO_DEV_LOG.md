@@ -128,3 +128,13 @@
 - 상세 변경·수용 기준·로컬 검증은 docs/BUDDHIST_CHECKIN_STEP_2A.md에 기록했다.
 - 기존 사용자 작업 14개가 덮어써지지 않았음을 해시 비교로 확인했다.
 - 이번 단계는 신규 설치, 운영 변경, 실제 경전 투입 없이 코드·테스트·CI 연결까지 진행한다.
+
+## 2026-09-28 Buddhist 2-B (local)
+
+- P1: Buddhist 세션에 공통 ConversationState/ReligionProfile 경계가 없어 후속 대화 확장 전에 고정 profile과 Safety 선행 계약을 구현했다.
+- Core 불변 상태를 BuddhistSession에 연결. 교차 Pack 거부, sticky crisis, 이전 인용/카드 제거, 무검색 시 문구 생성 금지 회귀 검사.
+- Christian legacy 단계용 변환 어댑터 추가. 기존 실행 경로 및 wire 형식 유지.
+- Flutter Christian 125 pass/1 skip (working tree), Buddhist 14 pass; 집중 Safety/계약 18 pass. backend 격리 10 pass, Web E2E 4 pass. analyze 기존 print info 4건만 남음.
+- Buddhist Release 빌드 및 인증서/package/offline/mock 자산 검증 PASS. 실기기 설치/배포/실경전 수집 없음.
+- 기존 사용자 미커밋 파일 보존. 이전 자동 승인 심사의 remote push 차단 유지, 원격 CI 미실행.
+- 다음 후보: 3-A Mock 기반 단계별 대화·회고·실천 흐름. 실제 경전 투입은 별도 라이선스 검증과 2차 지시까지 금지.

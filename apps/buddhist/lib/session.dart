@@ -14,30 +14,25 @@ class BuddhistSession {
   final BuddhistScriptureProvider provider;
   final SharedPreferences preferences;
   final List<String> savedIds = [];
-  int riskLevel = 0;
+  ConversationState _state = ConversationState.start(ReligionProfile.buddhist);
+  ConversationState get state => _state;
+  int get riskLevel => _state.riskLevel;
   String message = '';
   List<MockScripture> citations = const [];
   MockScripture? card;
-  CheckInInput? _checkIn;
-  CheckInInput? get checkIn => _checkIn;
+  CheckInInput? get checkIn => _state.checkIn;
   bool get isCrisis => riskLevel > 0;
 
   /// False means safety intercepted before conversation or retrieval starts.
   bool beginCheckIn(CheckInInput input) {
-    _checkIn = input;
+    _state = _state.beginCheckIn(input);
     citations = const [];
     card = null;
     message = '';
-    return !_interceptCrisis(input.customEmotion ?? '');
+    return !_showCrisis();
   }
 
-  bool _interceptCrisis(String input) {
-    const detector = CrisisDetector();
-    final current = detector.assess(input).level;
-    final custom = detector.assess(_checkIn?.customEmotion ?? '').level;
-    for (final level in [current, custom]) {
-      if (level > riskLevel) riskLevel = level;
-    }
+  bool _showCrisis() {
     if (!isCrisis) return false;
     citations = const [];
     card = null;
@@ -45,10 +40,13 @@ class BuddhistSession {
     return true;
   }
 
-  void respond(String input) {
+  void respond(String input,
+      {ReligionProfile requestedProfile = ReligionProfile.buddhist}) {
     citations = const [];
     card = null;
-    if (_interceptCrisis(input)) return;
+    message = '';
+    _state = _state.acceptInput(input, requestedProfile: requestedProfile);
+    if (_showCrisis()) return;
     citations = provider.search(input);
     message = citations.isEmpty
         ? noMatch

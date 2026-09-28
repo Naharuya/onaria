@@ -1,3 +1,4 @@
+export 'src/conversation_state.dart';
 export 'src/crisis_detector.dart';
 export 'src/crisis_models.dart';
 export 'src/emotion.dart';
