@@ -123,6 +123,17 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('마음 살펴보기'));
     await tester.pumpAndSettle();
+    for (final answer in ['오늘 일이 많았어요', '잠시 쉬고 싶어요']) {
+      await tester.enterText(find.byType(TextField), answer);
+      await tester.ensureVisible(find.text('이야기 보내기'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('이야기 보내기'));
+      await tester.pumpAndSettle();
+    }
+    await tester.ensureVisible(find.text('테스트 자료 보기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('테스트 자료 보기'));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('마음카드 만들기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('마음카드 만들기'));

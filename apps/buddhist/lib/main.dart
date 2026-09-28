@@ -78,6 +78,10 @@ class _BuddhistHomeState extends State<BuddhistHome> {
         if (button)
           OutlinedButton(
               onPressed: () => setState(() {
+                    if (!session.allowPendingInput(input.text)) {
+                      input.clear();
+                      return;
+                    }
                     session.makeCard(record.id);
                     saveStatus = '';
                   }),
@@ -88,70 +92,69 @@ class _BuddhistHomeState extends State<BuddhistHome> {
         Text('잠시 쉬어 가는 마음', style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 8),
         const Text('지금의 마음을 알아차리고 작은 쉼을 선택해 보세요.'),
-        panel([
-          const Text('오늘의 마음'),
-          const SizedBox(height: 8),
-          Wrap(
-              spacing: 8,
-              children: EmotionType.values
-                  .map((value) => ChoiceChip(
-                        label: Text(value.label),
-                        selected: emotion == value,
-                        onSelected: session.isCrisis
-                            ? null
-                            : (_) => setState(() {
-                                  emotion = value;
-                                }),
-                      ))
-                  .toList()),
-          const SizedBox(height: 12),
-          Text('감정 강도 · ${intensity.round()}/10'),
-          Slider(
-            key: const Key('emotion-intensity'),
-            min: 1,
-            max: 10,
-            divisions: 9,
-            value: intensity,
-            label: '${intensity.round()}/10',
-            semanticFormatterCallback: (value) => '${value.round()} / 10',
-            onChanged: session.isCrisis
-                ? null
-                : (value) => setState(() {
-                      intensity = value;
-                    }),
-          ),
-          TextField(
-              controller: input,
-              maxLength: CheckInInput.maxCustomEmotionLength,
-              minLines: 2,
-              maxLines: 5,
-              decoration: InputDecoration(
-                  labelText: '어떤 마음이 드시나요?',
-                  hintText: '지금의 마음이나 테스트 키워드를 적어 주세요.',
-                  errorText: inputError,
-                  border: const OutlineInputBorder())),
-          FilledButton(
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                setState(() {
-                  inputError = null;
-                  try {
-                    final checkIn = CheckInInput(
-                        emotion: emotion,
-                        intensity: intensity.round(),
-                        customEmotion: input.text);
-                    if (session.beginCheckIn(checkIn)) {
-                      session.respond(
-                          checkIn.customEmotion ?? checkIn.emotion.label);
+        if (!session.isGuided || session.isCrisis)
+          panel([
+            const Text('오늘의 마음'),
+            const SizedBox(height: 8),
+            Wrap(
+                spacing: 8,
+                children: EmotionType.values
+                    .map((value) => ChoiceChip(
+                          label: Text(value.label),
+                          selected: emotion == value,
+                          onSelected: session.isCrisis
+                              ? null
+                              : (_) => setState(() {
+                                    emotion = value;
+                                  }),
+                        ))
+                    .toList()),
+            const SizedBox(height: 12),
+            Text('감정 강도 · ${intensity.round()}/10'),
+            Slider(
+              key: const Key('emotion-intensity'),
+              min: 1,
+              max: 10,
+              divisions: 9,
+              value: intensity,
+              label: '${intensity.round()}/10',
+              semanticFormatterCallback: (value) => '${value.round()} / 10',
+              onChanged: session.isCrisis
+                  ? null
+                  : (value) => setState(() {
+                        intensity = value;
+                      }),
+            ),
+            TextField(
+                controller: input,
+                maxLength: CheckInInput.maxCustomEmotionLength,
+                minLines: 2,
+                maxLines: 5,
+                decoration: InputDecoration(
+                    labelText: '어떤 마음이 드시나요?',
+                    hintText: '지금의 마음이나 테스트 키워드를 적어 주세요.',
+                    errorText: inputError,
+                    border: const OutlineInputBorder())),
+            FilledButton(
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  setState(() {
+                    inputError = null;
+                    try {
+                      final checkIn = CheckInInput(
+                          emotion: emotion,
+                          intensity: intensity.round(),
+                          customEmotion: input.text);
+                      session.startConversation(checkIn);
+                      input.clear();
+                    } on ArgumentError {
+                      inputError = '직접 입력한 마음을 2,000자 이내로 적어 주세요.';
                     }
-                  } on ArgumentError {
-                    inputError = '직접 입력한 마음을 2,000자 이내로 적어 주세요.';
-                  }
-                  saveStatus = '';
-                });
-              },
-              child: const Text('마음 살펴보기')),
-        ]),
+                    saveStatus = '';
+                  });
+                },
+                child: const Text('마음 살펴보기')),
+          ]),
         if (session.message.isNotEmpty)
           panel([
             if (session.checkIn != null)
@@ -166,6 +169,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
                   padding: EdgeInsets.only(top: 12),
                   child: Text('지금 안전한 곳에 계신가요? 곁에 함께 있어 줄 사람에게 연락할 수 있나요?')),
           ]),
+        if (session.isGuided && !session.isCrisis) guidedControls(),
         if (!session.isCrisis)
           ...session.citations.map((record) => source(record, button: true)),
         if (!session.isCrisis && session.card != null)
@@ -179,9 +183,13 @@ class _BuddhistHomeState extends State<BuddhistHome> {
                 onPressed: saving
                     ? null
                     : () async {
+                        var allowed = false;
                         setState(() {
-                          saving = true;
+                          allowed = session.allowPendingInput(input.text);
+                          if (!allowed) input.clear();
+                          saving = allowed;
                         });
+                        if (!allowed) return;
                         try {
                           await session.saveCard();
                           if (mounted && !session.isCrisis) {
@@ -207,6 +215,89 @@ class _BuddhistHomeState extends State<BuddhistHome> {
             if (saveStatus.isNotEmpty) Text(saveStatus),
           ]),
       ];
+
+  Widget guidedControls() => panel([
+        Text(
+            switch (session.phase) {
+              ConversationPhase.situation => '1 · 상황 살펴보기',
+              ConversationPhase.need => '2 · 필요한 것 알아차리기',
+              ConversationPhase.sourceOffer => '3 · 자료 보기 선택',
+              ConversationPhase.sourceReflection => '4 · 돌아보기',
+              ConversationPhase.action => '5 · 작은 실천',
+              _ => '6 · 마무리',
+            },
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 12),
+        if (session.phase != ConversationPhase.summary) ...[
+          TextField(
+            controller: input,
+            maxLength: CheckInInput.maxCustomEmotionLength,
+            minLines: 2,
+            maxLines: 5,
+            decoration: InputDecoration(
+              labelText: '이어서 이야기하기',
+              errorText: inputError,
+              border: const OutlineInputBorder(),
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              FocusScope.of(context).unfocus();
+              setState(() {
+                inputError = null;
+                try {
+                  session.reply(input.text);
+                  input.clear();
+                } on ArgumentError {
+                  inputError = '1~2,000자 이내로 적어 주세요.';
+                } on StateError {
+                  inputError = '아래 선택 버튼으로 계속해 주세요.';
+                }
+                saveStatus = '';
+              });
+            },
+            child: const Text('이야기 보내기'),
+          ),
+        ],
+        if (session.phase == ConversationPhase.sourceOffer) ...[
+          FilledButton(
+            onPressed: () => setState(() {
+              session.chooseSource(true, pendingInput: input.text);
+              inputError = null;
+              input.clear();
+            }),
+            child: const Text('테스트 자료 보기'),
+          ),
+          TextButton(
+            onPressed: () => setState(() {
+              session.chooseSource(false, pendingInput: input.text);
+              inputError = null;
+              input.clear();
+            }),
+            child: const Text('자료 없이 계속하기'),
+          ),
+        ],
+        if (session.phase == ConversationPhase.action)
+          ...BuddhistSession.actions.map((action) => OutlinedButton(
+                onPressed: () => setState(() {
+                  session.chooseAction(action, pendingInput: input.text);
+                  inputError = null;
+                  input.clear();
+                }),
+                child: Text(action),
+              )),
+        if (session.phase == ConversationPhase.summary) ...[
+          const Text('대화 내용은 저장하지 않습니다. 마음카드는 별도로 저장할 수 있습니다.'),
+          TextButton(
+              onPressed: () => setState(() {
+                    session.newCheckIn();
+                    input.clear();
+                    inputError = null;
+                    saveStatus = '';
+                  }),
+              child: const Text('새 마음 살펴보기')),
+        ],
+      ]);
 
   List<Widget> saved() => [
         Text('나의 작은 쉼', style: Theme.of(context).textTheme.headlineMedium),
@@ -259,6 +350,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
         bottomNavigationBar: NavigationBar(
             selectedIndex: tab,
             onDestinationSelected: (value) => setState(() {
+                  if (!session.allowPendingInput(input.text)) input.clear();
                   tab = value;
                 }),
             destinations: const [

@@ -138,3 +138,12 @@
 - Buddhist Release 빌드 및 인증서/package/offline/mock 자산 검증 PASS. 실기기 설치/배포/실경전 수집 없음.
 - 기존 사용자 미커밋 파일 보존. 이전 자동 승인 심사의 remote push 차단 유지, 원격 CI 미실행.
 - 다음 후보: 3-A Mock 기반 단계별 대화·회고·실천 흐름. 실제 경전 투입은 별도 라이선스 검증과 2차 지시까지 금지.
+
+## 2026-09-28 Buddhist 3-A (local)
+
+- P1 핵심 기능: 단일 검색 UI를 상황 → 필요 → 자료 동의 → 회고 → 실천 → 마무리의 고정 로컬 대화로 연결.
+- 동의 전 검색 차단, 거절/무검색 결과의 실천 경로, Provider 오류 재시도, 입력/단계 검증 구현. 미전송 위기 입력도 선택·카드·탭 동작 전에 검사.
+- Christian 전체 Flutter 125 PASS/1 SKIP, Buddhist 26 PASS. backend 10 PASS, 기존 Web E2E 4 PASS.
+- Buddhist analyze clean; Christian 기존 print info 4건. Buddhist Release 0.1.2+3, Christian Android debug 및 iOS simulator compile PASS. APK 자산 분리 및 Buddhist 기존 인증서/패키지/offline 검증 PASS.
+- 실기기 설치, 운영 호출, 실제 경전 수집, push/배포 없음. 상세 내용과 중간 테스트 수정 이력은 BUDDHIST_CONVERSATION_STEP_3A.md 참조.
+- 다음 후보: 3-B 카드 상세·저장/복원·목록. 사용자 기존 미커밋 변경은 제외한다.

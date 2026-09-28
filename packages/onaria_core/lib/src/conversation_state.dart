@@ -45,17 +45,27 @@ class ConversationState {
   /// Safety precedes the profile boundary. Callers must stop on isCrisis before
   /// invoking any provider, agent, psychology service or model client.
   ConversationState acceptInput(String input,
-      {required ReligionProfile requestedProfile}) {
+      {required ReligionProfile requestedProfile,
+      ConversationPhase nextPhase = ConversationPhase.sourceReflection}) {
     final assessed = _assess(input, checkIn);
     if (assessed.isCrisis) return assessed;
     if (requestedProfile != profile) throw StateError('PACK_MISMATCH');
     return ConversationState._(
       profile: profile,
-      phase: ConversationPhase.sourceReflection,
+      phase: nextPhase,
       checkIn: checkIn,
       turnCount: turnCount + 1,
     );
   }
+
+  /// Presentation transitions never clear a detected crisis or change profile.
+  ConversationState atPhase(ConversationPhase next) => ConversationState._(
+        profile: profile,
+        phase: isCrisis ? ConversationPhase.crisis : next,
+        checkIn: checkIn,
+        turnCount: turnCount,
+        riskLevel: riskLevel,
+      );
 
   ConversationState _assess(String input, CheckInInput? nextCheckIn) {
     const detector = CrisisDetector();

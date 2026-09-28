@@ -115,7 +115,7 @@ void main() {
       expect(session.checkIn!.emotion, EmotionType.jealousy);
       expect(session.checkIn!.intensity, selectedIntensity);
       expect(session.checkIn!.customEmotion, '쉬고 싶은 불안');
-      expect(provider.searchCalls, 1);
+      expect(provider.searchCalls, 0);
       expect(tester.takeException(), isNull);
     });
   }
