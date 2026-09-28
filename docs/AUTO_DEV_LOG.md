@@ -205,3 +205,10 @@
 - 네이버 robots 제한, 구글 직접 검색 도구 오류는 명시. 공식 페이지/색인으로 확인한 수준만 기록.
 - Admin/Pack 11 PASS, Web E2E 6 PASS, Christian 집중 회귀 4 PASS. 외부 자동 요청 없음·검색/카드 배제 확인.
 - 앱/운영/키 변경·실제 경전 수집·push 없음. 자세한 근거와 경계는 BUDDHIST_SOURCE_REVIEW.md 참조.
+
+## 2026-09-28 Buddhist 오방색 장식 컴포넌트
+
+- 먹색 위 오방색 빛/곡선 배경, 벡터 다섯 꽃잎 심볼, 오방색 감정 카드 아이콘·테두리·선택 체크 적용.
+- Buddhist 변경 전후 57 PASS/analyze clean, Christian 집중 4 PASS. 임시 렌더링 확인.
+- 0.3.1+9 USB AI Release 검증 후 데이터 보존 업데이트 성공. 실제 가로 화면의 배경/한글/심볼 일부 확인, 감정 카드 검증 중 재잠금되어 해당 부분은 미완료로 기록.
+- 실제 경전/운영/키/push 변경 없음. 상세: BUDDHIST_OBANG_COMPONENTS.md.

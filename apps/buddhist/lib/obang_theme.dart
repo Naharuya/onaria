@@ -129,28 +129,154 @@ class _SkyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     canvas.drawRect(rect, Paint()..color = ObangTheme.black);
-    canvas.drawRect(
-        rect,
-        Paint()
-          ..shader = RadialGradient(
-              center: const Alignment(.8, -.7),
-              radius: 1.2,
-              colors: [
-                ObangTheme.blue.withValues(alpha: .18),
-                ObangTheme.black
-              ]).createShader(rect));
+    // Low-contrast pools keep the five colors visible without competing with text.
+    const glows = [
+      (Alignment(-.95, -.9), ObangTheme.blue, .17),
+      (Alignment(.95, -.35), ObangTheme.red, .10),
+      (Alignment(.6, .95), ObangTheme.yellow, .08),
+      (Alignment(-.9, .6), ObangTheme.white, .045),
+    ];
+    for (final glow in glows) {
+      canvas.drawRect(
+          rect,
+          Paint()
+            ..shader = RadialGradient(center: glow.$1, radius: .95, colors: [
+              glow.$2.withValues(alpha: glow.$3),
+              glow.$2.withValues(alpha: 0)
+            ]).createShader(rect));
+    }
+    final stroke = Paint()
+      ..color = ObangTheme.yellow.withValues(alpha: .07)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .8;
+    for (var i = 0; i < 3; i++) {
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: Offset(size.width * .95, size.height * .5),
+              width: size.width * (1.2 + i * .18),
+              height: size.height * (.55 + i * .12)),
+          stroke);
+    }
     final random = math.Random(27);
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 42; i++) {
       canvas.drawCircle(
           Offset(random.nextDouble() * size.width,
               random.nextDouble() * size.height),
           i % 9 == 0 ? 1.2 : .6,
           Paint()
             ..color = ObangTheme.white
-                .withValues(alpha: .12 + random.nextDouble() * .25));
+                .withValues(alpha: .08 + random.nextDouble() * .16));
     }
   }
 
   @override
   bool shouldRepaint(covariant _SkyPainter oldDelegate) => false;
+}
+
+/// Decorative five-petal mark; carries no doctrinal or diagnostic meaning.
+class ObangSymbol extends StatelessWidget {
+  const ObangSymbol({super.key});
+  @override
+  Widget build(BuildContext context) => const ExcludeSemantics(
+      child: SizedBox(
+          width: 116,
+          height: 100,
+          child: CustomPaint(painter: _PetalPainter())));
+}
+
+class _PetalPainter extends CustomPainter {
+  const _PetalPainter();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    canvas.drawCircle(
+        center,
+        44,
+        Paint()
+          ..color = ObangTheme.yellow.withValues(alpha: .18)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = .8);
+    const colors = [
+      ObangTheme.blue,
+      ObangTheme.red,
+      ObangTheme.yellow,
+      ObangTheme.white,
+      ObangTheme.black
+    ];
+    for (var i = 0; i < colors.length; i++) {
+      canvas.save();
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(i * math.pi * 2 / 5);
+      final petal = Path()
+        ..moveTo(0, 8)
+        ..cubicTo(-24, -7, -20, -29, 0, -39)
+        ..cubicTo(20, -29, 24, -7, 0, 8)
+        ..close();
+      canvas.drawPath(
+          petal, Paint()..color = colors[i].withValues(alpha: i == 4 ? 1 : .8));
+      canvas.drawPath(
+          petal,
+          Paint()
+            ..color =
+                (i == 4 ? ObangTheme.white : colors[i]).withValues(alpha: .7)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1);
+      canvas.restore();
+    }
+    canvas.drawCircle(center, 7, Paint()..color = ObangTheme.yellow);
+    canvas.drawCircle(center, 3, Paint()..color = ObangTheme.black);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PetalPainter oldDelegate) => false;
+}
+
+class ObangEmotionMark extends StatelessWidget {
+  const ObangEmotionMark(
+      {super.key, required this.index, required this.selected});
+  final int index;
+  final bool selected;
+  static const colors = [
+    ObangTheme.blue,
+    ObangTheme.white,
+    ObangTheme.yellow,
+    ObangTheme.red,
+    ObangTheme.black
+  ];
+  static const icons = [
+    Icons.waves_rounded,
+    Icons.nightlight_outlined,
+    Icons.eco_outlined,
+    Icons.local_fire_department_outlined,
+    Icons.water_drop_outlined,
+    Icons.blur_on_rounded,
+    Icons.spa_outlined,
+    Icons.wb_sunny_outlined,
+    Icons.shield_outlined,
+    Icons.do_not_disturb_on_outlined,
+    Icons.bolt_rounded,
+    Icons.sentiment_satisfied_alt_outlined,
+    Icons.air_outlined,
+    Icons.auto_awesome_outlined,
+    Icons.landscape_outlined,
+    Icons.visibility_outlined,
+  ];
+  static Color accent(int index) => colors[index % colors.length];
+  static Color edge(int index) =>
+      accent(index) == ObangTheme.black ? ObangTheme.white : accent(index);
+  @override
+  Widget build(BuildContext context) {
+    final color = accent(index);
+    return ExcludeSemantics(
+        child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color == ObangTheme.black
+                    ? ObangTheme.white
+                    : color.withValues(alpha: selected ? .22 : .1),
+                border: Border.all(color: edge(index).withValues(alpha: .5))),
+            child: Icon(icons[index % icons.length], color: color, size: 25)));
+  }
 }

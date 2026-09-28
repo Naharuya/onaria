@@ -146,9 +146,8 @@ class _BuddhistHomeState extends State<BuddhistHome>
         if (!session.isGuided && !session.isCrisis) ...[
           const Center(
               child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 18),
-                  child: Icon(Icons.spa_outlined,
-                      size: 58, color: ObangTheme.yellow))),
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: ObangSymbol())),
           const Text('모든 마음은 저마다의 길이 있습니다',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, letterSpacing: 1.2, height: 1.6)),
@@ -204,37 +203,46 @@ class _BuddhistHomeState extends State<BuddhistHome>
                   MediaQuery.textScalerOf(context).scale(14) > 20 ? 2 : 3;
               final width =
                   (constraints.maxWidth - (columns - 1) * 10) / columns;
-              const icons = [
-                '🌊',
-                '🌙',
-                '🍂',
-                '🔥',
-                '🌧️',
-                '🫧',
-                '🌿',
-                '☀️',
-                '🌑',
-                '🌵',
-                '⚡',
-                '🌈',
-                '🎈',
-                '🎆',
-                '🌋',
-                '🍏'
-              ];
               return Wrap(spacing: 10, runSpacing: 10, children: [
                 for (final value in EmotionType.values)
                   SizedBox(
                       width: width,
                       child: ChoiceChip(
+                        showCheckmark: false,
+                        backgroundColor: Color.alphaBlend(
+                            ObangEmotionMark.edge(value.index)
+                                .withValues(alpha: .045),
+                            ObangTheme.black),
+                        selectedColor: Color.alphaBlend(
+                            ObangEmotionMark.edge(value.index)
+                                .withValues(alpha: .18),
+                            ObangTheme.black),
+                        side: BorderSide(
+                            color: ObangEmotionMark.edge(value.index)
+                                .withValues(alpha: emotion == value ? .9 : .28),
+                            width: emotion == value ? 1.5 : 1),
                         label: SizedBox(
                             width: width,
                             child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(icons[value.index],
-                                      style: const TextStyle(fontSize: 20)),
-                                  const SizedBox(height: 5),
+                                  Stack(alignment: Alignment.center, children: [
+                                    SizedBox(
+                                        width: width - 20,
+                                        child: Center(
+                                            child: ObangEmotionMark(
+                                                index: value.index,
+                                                selected: emotion == value))),
+                                    if (emotion == value)
+                                      const Positioned(
+                                          right: 0,
+                                          top: 0,
+                                          child: ExcludeSemantics(
+                                              child: Icon(Icons.check_circle,
+                                                  size: 16,
+                                                  color: ObangTheme.yellow))),
+                                  ]),
+                                  const SizedBox(height: 10),
                                   Text(value.label,
                                       textAlign: TextAlign.center),
                                 ])),
