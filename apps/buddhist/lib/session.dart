@@ -1,19 +1,22 @@
 import 'package:onaria_buddhist_pack/onaria_buddhist_pack.dart';
 import 'package:onaria_core/onaria_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'mind_card_store.dart';
 
 const noMatch = '검색된 테스트 자료가 없습니다. 경전 문구나 출처를 생성하지 않습니다.';
 
 class BuddhistSession {
-  BuddhistSession(this.provider, this.preferences) {
-    savedIds.addAll((preferences.getStringList(storageKey) ?? [])
-        .where((id) => provider.getById(id) != null)
-        .toSet());
-  }
-  static const storageKey = 'onaria.buddhist.test_only.cards.v1';
+  BuddhistSession(this.provider, this.preferences, {MindCardStore? cardStore})
+      : _cardStore = cardStore ?? MindCardStore(preferences);
+  static const storageKey = MindCardStore.legacyKey;
   final BuddhistScriptureProvider provider;
   final SharedPreferences preferences;
-  final List<String> savedIds = [];
+  final MindCardStore _cardStore;
+  String? get storageNotice => _cardStore.loadFailed
+      ? '저장 기록을 읽지 못했습니다. 기존 기록을 보호하기 위해 새 저장을 중단했습니다.'
+      : null;
+  List<String> get savedIds =>
+      List.unmodifiable(savedDetails.map((r) => r.scripture.id));
   ConversationState _state = ConversationState.start(ReligionProfile.buddhist);
   ConversationState get state => _state;
   int get riskLevel => _state.riskLevel;
@@ -199,20 +202,39 @@ class BuddhistSession {
     final record = card;
     if (record == null) throw StateError('NO_CARD');
     provider.assertCitation(record.metadata);
-    final updated = {...savedIds, record.id}.toList();
-    // Only provider IDs are persisted, never user messages or editable citations.
-    if (!await preferences.setStringList(storageKey, updated)) {
-      throw StateError('SAVE_FAILED');
-    }
-    savedIds
-      ..clear()
-      ..addAll(updated);
+    await _cardStore.save(record.id);
   }
 
-  List<MockScripture> get savedCards => isCrisis
-      ? const []
-      : savedIds
-          .map(provider.getById)
-          .whereType<MockScripture>()
-          .toList(growable: false);
+  List<SavedMindCard> get savedDetails {
+    if (isCrisis) return const [];
+    final result = <SavedMindCard>[];
+    for (final reference in _cardStore.records) {
+      final record = provider.getById(reference.scriptureId);
+      if (record == null || record.copyrightStatus != 'TEST_DATA_ONLY') {
+        continue;
+      }
+      try {
+        provider.assertCitation(record.metadata);
+        result.add(SavedMindCard._(record, reference.savedAt));
+      } on StateError {/* Unverified references are never displayed. */}
+    }
+    return List.unmodifiable(result);
+  }
+
+  SavedMindCard? savedDetail(String id) {
+    if (isCrisis) throw StateError('SAFETY_FIRST');
+    for (final detail in savedDetails) {
+      if (detail.scripture.id == id) return detail;
+    }
+    return null;
+  }
+
+  List<MockScripture> get savedCards =>
+      List.unmodifiable(savedDetails.map((r) => r.scripture));
+}
+
+class SavedMindCard {
+  const SavedMindCard._(this.scripture, this.savedAt);
+  final MockScripture scripture;
+  final DateTime? savedAt;
 }

@@ -147,3 +147,12 @@
 - Buddhist analyze clean; Christian 기존 print info 4건. Buddhist Release 0.1.2+3, Christian Android debug 및 iOS simulator compile PASS. APK 자산 분리 및 Buddhist 기존 인증서/패키지/offline 검증 PASS.
 - 실기기 설치, 운영 호출, 실제 경전 수집, push/배포 없음. 상세 내용과 중간 테스트 수정 이력은 BUDDHIST_CONVERSATION_STEP_3A.md 참조.
 - 다음 후보: 3-B 카드 상세·저장/복원·목록. 사용자 기존 미커밋 변경은 제외한다.
+
+## 2026-09-28 Buddhist 3-B (local; push deferred by user)
+
+- P1 핵심 기능: 저장 목록·상세 출처·권리 상태·저장 시각과 재시도 UI 추가.
+- v2 로컬 참조 저장: scriptureId/UTC savedAt만 저장, 기존 v1 원본 보존. Provider로 다시 검증한 합성 자료만 노출. 손상 기록은 덮어쓰기 차단.
+- Buddhist 34 PASS/analyze clean, Christian 전체 125 PASS/1 SKIP, backend 10 PASS, 기존 Web E2E 4 PASS.
+- Buddhist Release 0.1.3+4 빌드와 전용 서명/package/offline/Mock 자산 검사 PASS.
+- 실기기 설치, 실제 경전 수집, 운영 변경, push 없음. 사용자가 push를 나중에 일괄 수행하도록 명시했다.
+- 상세 검증·제한·중간 수정 이력은 BUDDHIST_CARD_STEP_3B.md 참조. 다음 후보는 가짜 클라이언트 기반 맥락/감정 계약 고도화.

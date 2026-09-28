@@ -55,6 +55,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
   int tab = 0;
   bool saving = false;
   String saveStatus = '';
+  String? selectedSavedId;
   BuddhistSession get session => widget.session;
   @override
   void dispose() {
@@ -179,8 +180,11 @@ class _BuddhistHomeState extends State<BuddhistHome> {
             const SizedBox(height: 12),
             Text(session.card!.text),
             Text(session.card!.source),
+            Text('이용 조건: ${session.card!.license}'),
+            const Text('저장되는 정보: 테스트 자료 ID와 저장 시각. 대화 내용은 저장하지 않습니다.'),
+            if (session.storageNotice != null) Text(session.storageNotice!),
             FilledButton(
-                onPressed: saving
+                onPressed: saving || session.storageNotice != null
                     ? null
                     : () async {
                         var allowed = false;
@@ -299,18 +303,66 @@ class _BuddhistHomeState extends State<BuddhistHome> {
         ],
       ]);
 
-  List<Widget> saved() => [
-        Text('나의 작은 쉼', style: Theme.of(context).textTheme.headlineMedium),
-        if (session.isCrisis)
-          panel([Text(session.message)])
-        else ...[
-          panel([
-            Text('저장한 테스트 마음카드 ${session.savedCards.length}개'),
-            const Text('자신의 속도로 돌아보세요. 저장 기록은 이 앱 안에만 남습니다.')
-          ]),
-          ...session.savedCards.map((record) => source(record)),
-        ],
+  String savedDate(DateTime? date) => date == null
+      ? '저장 시각 정보 없음 · 이전 버전 기록'
+      : '저장 시각: ${date.toLocal().toIso8601String().replaceFirst('T', ' ').split('.').first}';
+
+  List<Widget> saved() {
+    if (session.isCrisis) {
+      return [
+        panel([Text(session.message)])
       ];
+    }
+    final records = session.savedDetails;
+    final detail =
+        selectedSavedId == null ? null : session.savedDetail(selectedSavedId!);
+    return [
+      Text('나의 작은 쉼', style: Theme.of(context).textTheme.headlineMedium),
+      if (session.storageNotice != null) panel([Text(session.storageNotice!)]),
+      if (selectedSavedId != null) ...[
+        TextButton(
+            onPressed: () => setState(() => selectedSavedId = null),
+            child: const Text('목록으로 돌아가기')),
+        if (detail == null)
+          panel([const Text('확인할 수 없는 테스트 자료입니다. 인용을 표시하지 않습니다.')])
+        else ...[
+          Text('마음카드 상세', style: Theme.of(context).textTheme.titleLarge),
+          source(detail.scripture),
+          panel([
+            Text(savedDate(detail.savedAt)),
+            Text('이용 조건: ${detail.scripture.license}'),
+            Text('권리 상태: ${detail.scripture.copyrightStatus}'),
+            const Text('본문과 출처는 앱의 검증된 테스트 자료에서 확인합니다.'),
+          ]),
+        ],
+      ] else ...[
+        panel([
+          Text('저장한 테스트 마음카드 ${records.length}개'),
+          const Text('자신의 속도로 돌아보세요. 저장 기록은 이 앱 안에만 남습니다.'),
+          if (records.isEmpty && session.storageNotice == null)
+            const Text('아직 저장한 마음카드가 없습니다. 마음 화면에서 테스트 자료를 보고 카드를 저장해 보세요.'),
+        ]),
+        for (final record in records)
+          panel([
+            Text(record.scripture.title,
+                style: Theme.of(context).textTheme.titleMedium),
+            Text(savedDate(record.savedAt)),
+            const Text('TEST_DATA_ONLY · 합성 테스트 자료'),
+            OutlinedButton(
+              key: ValueKey('open-${record.scripture.id}'),
+              onPressed: () => setState(() {
+                if (!session.allowPendingInput(input.text)) {
+                  input.clear();
+                  return;
+                }
+                selectedSavedId = record.scripture.id;
+              }),
+              child: const Text('카드 자세히 보기'),
+            ),
+          ]),
+      ],
+    ];
+  }
 
   List<Widget> admin() => [
         Text('개발 상태', style: Theme.of(context).textTheme.headlineMedium),
@@ -330,7 +382,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
         appBar: AppBar(title: const Text('ONARIA · 불교 TEST')),
         body: SafeArea(
             child: ListView(
-                key: ValueKey(tab),
+                key: ValueKey('$tab:$selectedSavedId'),
                 padding: const EdgeInsets.all(20),
                 children: [
               Container(
@@ -351,6 +403,7 @@ class _BuddhistHomeState extends State<BuddhistHome> {
             selectedIndex: tab,
             onDestinationSelected: (value) => setState(() {
                   if (!session.allowPendingInput(input.text)) input.clear();
+                  selectedSavedId = null;
                   tab = value;
                 }),
             destinations: const [
