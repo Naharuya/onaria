@@ -156,3 +156,11 @@
 - Buddhist Release 0.1.3+4 빌드와 전용 서명/package/offline/Mock 자산 검사 PASS.
 - 실기기 설치, 실제 경전 수집, 운영 변경, push 없음. 사용자가 push를 나중에 일괄 수행하도록 명시했다.
 - 상세 검증·제한·중간 수정 이력은 BUDDHIST_CARD_STEP_3B.md 참조. 다음 후보는 가짜 클라이언트 기반 맥락/감정 계약 고도화.
+
+## 2026-09-28 Buddhist 4단계 local context contract
+
+- P1 핵심 기능: LocalConversationClient 계약을 guided reply에 연결. 감정/강도 및 최근 두 답변의 메모리 맥락으로 고정 안내문 선택.
+- Safety·profile·길이·단계 검사 후에만 Mock factory 호출. 폐쇄형 응답 schema로 임의 인용/문구 차단, 실패 시 고정 응답 복구, 재진입 위기 덮어쓰기 방지.
+- Buddhist 전체 40 PASS, 신규 계약 재검사 6 PASS, analyze clean. Christian 전체 125 PASS/1 SKIP, backend 10 PASS, Web E2E 4 PASS.
+- Buddhist Release 0.1.4+5 및 전용 서명/package/offline/Mock 자산 검증 PASS. 실제 모델·경전·운영 API·기기 설치 없음.
+- push는 사용자 요청대로 보류. 자세한 범위와 원격 API 미구현 제한은 BUDDHIST_CONTEXT_STEP_4.md 참조.

@@ -2,12 +2,21 @@ import 'package:onaria_buddhist_pack/onaria_buddhist_pack.dart';
 import 'package:onaria_core/onaria_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mind_card_store.dart';
+import 'local_conversation_client.dart';
 
 const noMatch = '검색된 테스트 자료가 없습니다. 경전 문구나 출처를 생성하지 않습니다.';
 
 class BuddhistSession {
-  BuddhistSession(this.provider, this.preferences, {MindCardStore? cardStore})
-      : _cardStore = cardStore ?? MindCardStore(preferences);
+  BuddhistSession(this.provider, this.preferences,
+      {MindCardStore? cardStore,
+      LocalConversationClient Function()? clientFactory})
+      : _cardStore = cardStore ?? MindCardStore(preferences),
+        _clientFactory =
+            clientFactory ?? (() => const MockConversationClient());
+  final LocalConversationClient Function() _clientFactory;
+  LocalConversationClient? _client;
+  final List<String> _previousInputs = [];
+  bool lastReplyUsedFallback = false;
   static const storageKey = MindCardStore.legacyKey;
   final BuddhistScriptureProvider provider;
   final SharedPreferences preferences;
@@ -75,14 +84,36 @@ class BuddhistSession {
       ConversationPhase.sourceReflection => ConversationPhase.action,
       _ => throw StateError('INVALID_PHASE'),
     };
+    final request = LocalConversationRequest(
+        emotion: checkIn!.emotion,
+        intensity: checkIn!.intensity,
+        phase: target,
+        input: trimmed,
+        previousInputs: _previousInputs);
+    final sourceState = _state;
+    String? reply;
+    lastReplyUsedFallback = false;
+    try {
+      _client ??= _clientFactory();
+      reply = validatedLocalReply(_client!.respond(request), request);
+    } catch (_) {
+      lastReplyUsedFallback = true;
+    }
+    if (!identical(_state, sourceState)) {
+      if (isCrisis) _showCrisis();
+      return;
+    }
+    _previousInputs.add(trimmed);
+    if (_previousInputs.length > 2) _previousInputs.removeAt(0);
     _state = next.atPhase(target);
-    message = switch (target) {
-      ConversationPhase.need =>
-        '지금 나에게 필요한 것은 무엇인가요? 쉼이나 누군가의 이해처럼 편하게 적어 주세요.',
-      ConversationPhase.sourceOffer =>
-        '마음을 돌아볼 합성 테스트 자료를 볼까요? 실제 경전이나 번역문은 아닙니다.',
-      _ => '오늘 할 수 있는 작은 실천을 하나 골라 주세요. 선택하지 않아도 괜찮습니다.',
-    };
+    message = reply ??
+        switch (target) {
+          ConversationPhase.need =>
+            '지금 나에게 필요한 것은 무엇인가요? 쉼이나 누군가의 이해처럼 편하게 적어 주세요.',
+          ConversationPhase.sourceOffer =>
+            '마음을 돌아볼 합성 테스트 자료를 볼까요? 실제 경전이나 번역문은 아닙니다.',
+          _ => '오늘 할 수 있는 작은 실천을 하나 골라 주세요. 선택하지 않아도 괜찮습니다.',
+        };
   }
 
   void chooseSource(bool accepted, {String pendingInput = ''}) {
@@ -140,6 +171,7 @@ class BuddhistSession {
   void newCheckIn() {
     _requirePhase(ConversationPhase.summary);
     _guided = false;
+    _previousInputs.clear();
     _state = _state.atPhase(ConversationPhase.emotion);
     citations = const [];
     card = null;
@@ -154,6 +186,8 @@ class BuddhistSession {
 
   /// False means safety intercepted before conversation or retrieval starts.
   bool beginCheckIn(CheckInInput input) {
+    _previousInputs.clear();
+    lastReplyUsedFallback = false;
     _state = _state.beginCheckIn(input);
     citations = const [];
     card = null;
@@ -163,6 +197,7 @@ class BuddhistSession {
 
   bool _showCrisis() {
     if (!isCrisis) return false;
+    _previousInputs.clear();
     citations = const [];
     card = null;
     selectedAction = null;
