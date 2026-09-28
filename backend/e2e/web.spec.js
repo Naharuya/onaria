@@ -70,9 +70,18 @@ test('PWA shell works offline without caching API responses', async ({ page, con
 
 test('populated admin metrics stay readable, escaped and accurate at every target width', async ({ page }, testInfo) => {
   // Synthetic API fixture only; these values are never served by production.
+  // Capture one authenticated response; viewport checks reuse that snapshot
+  // instead of consuming the shared server's rate limit for synthetic data.
+  let overviewResponse;
+  let overviewData;
   await page.route('**/v1/admin/overview', async route => {
-    const response = await route.fetch();
-    const data = await response.json();
+    if (!overviewResponse) {
+      overviewResponse = await route.fetch();
+      expect(overviewResponse.ok()).toBe(true);
+      overviewData = await overviewResponse.json();
+    }
+    const response = overviewResponse;
+    const data = structuredClone(overviewData);
     data.aiUsage = { available: true, scope: 'sqlite', today: { aiRequests: 3, modelCalls: 4, inputTokens: 1000, cachedInputTokens: 400, outputTokens: 500, estimatedCostUsd: 0.006 },
       averageCostPerAiSession: 0.003, cacheHitRate: 0.4, routing: { cheap: 2, standard: 1 } };
     data.modelUsage = { available: true, entryCount: 4, sessionCosts: { sessionCount: 2, unknownSessions: 0, p50CostUsd: 0.002, p90CostUsd: 0.004 },

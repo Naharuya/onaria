@@ -356,7 +356,13 @@ void main() {
         await tester.pump();
       }
       expect(tester.widget<CrossLightSky>(find.byType(CrossLightSky)).pieces, hasLength(6));
-      await tester.ensureVisible(find.widgetWithText(FilledButton, '작은 성장 기록 보기'));
+      // ListView builds the completion controls only after scrolling to them.
+      await tester.scrollUntilVisible(
+        find.widgetWithText(FilledButton, '작은 성장 기록 보기'),
+        250,
+        scrollable: find.descendant(
+          of: find.byType(CrossLightPage), matching: find.byType(Scrollable)),
+      );
       await tester.pump(const Duration(seconds: 1));
       await tester.tap(find.text('작은 성장 기록 보기'));
     }

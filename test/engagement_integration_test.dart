@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:onaria/app/onaria_app.dart';
 import 'package:onaria/app/mind_card_store.dart';
 import 'package:onaria/features/conversation_page.dart';
@@ -66,6 +67,10 @@ void main() {
   late EngagementController controller;
   final analyticsEvents = <EngagementEvent>[];
   setUp(() async {
+    PackageInfo.setMockInitialValues(
+      appName: 'ONARIA', packageName: 'com.onaria.app',
+      version: '1.0.0', buildNumber: '1', buildSignature: '',
+    );
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
     gateway = _Notifications();
