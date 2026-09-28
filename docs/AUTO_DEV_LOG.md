@@ -164,3 +164,11 @@
 - Buddhist 전체 40 PASS, 신규 계약 재검사 6 PASS, analyze clean. Christian 전체 125 PASS/1 SKIP, backend 10 PASS, Web E2E 4 PASS.
 - Buddhist Release 0.1.4+5 및 전용 서명/package/offline/Mock 자산 검증 PASS. 실제 모델·경전·운영 API·기기 설치 없음.
 - push는 사용자 요청대로 보류. 자세한 범위와 원격 API 미구현 제한은 BUDDHIST_CONTEXT_STEP_4.md 참조.
+
+## 2026-09-28 Buddhist 5단계 identity/records requirements (docs only)
+
+- P1 설계 과제: 현재 guest v1/v2 기록에 계정 소유권·전환 계약이 없다. 실제 인증을 붙이기 전에 기존 기록과 계정별 데이터 분리 요구사항을 정의했다.
+- BUDDHIST_IDENTITY_RECORDS_STEP_5.md에 guest 기본 흐름, 합성 dev identity, 메모리 repository, scope/generation 경계, 데이터 보관, 실패 처리, 후속 수용 테스트 12개를 기록.
+- 소스만 읽어 확인했으며 Christian 사용자/운영 DB/토큰을 읽지 않았다. 실제 로그인/동기화/데이터 migration/경전 수집 없음.
+- 문서만 변경하여 Flutter/backend 테스트·빌드·실기기/API 검사는 NOT RUN. 문서 링크/범위/diff/secret 검사 수행. push는 사용자 요청에 따라 보류.
+- 다음 후보: 5-A 합성 identity와 메모리 repository 계약을 테스트로 구현. 계정 UI·실제 인증 활성화는 제외.
