@@ -234,7 +234,8 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       Future<void> tap(String label) async {
-        await tester.ensureVisible(find.text(label));
+        await tester.scrollUntilVisible(find.text(label), 180,
+            scrollable: find.byType(Scrollable).first);
         await tester.pumpAndSettle();
         await tester.tap(find.text(label));
         await tester.pumpAndSettle();

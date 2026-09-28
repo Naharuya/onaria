@@ -95,6 +95,9 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       await tester.pumpWidget(BuddhistApp(session: session));
+      await tester.scrollUntilVisible(
+          find.widgetWithText(ChoiceChip, '질투'), 180,
+          scrollable: find.byType(Scrollable).first);
       expect(find.byType(ChoiceChip), findsNWidgets(16));
       await tester.ensureVisible(find.widgetWithText(ChoiceChip, '질투'));
       await tester.pumpAndSettle();

@@ -4,6 +4,7 @@ import 'package:onaria_core/onaria_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'session.dart';
 import 'engagement.dart';
+import 'obang_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,15 +29,7 @@ class BuddhistApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
         title: 'ONARIA 불교 TEST',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xff456854),
-              surface: const Color(0xfff8f5eb)),
-          scaffoldBackgroundColor: const Color(0xfff8f5eb),
-          cardTheme:
-              const CardThemeData(margin: EdgeInsets.symmetric(vertical: 8)),
-        ),
+        theme: ObangTheme.theme,
         home: BuddhistHome(session: session),
       );
 }
@@ -148,15 +141,31 @@ class _BuddhistHomeState extends State<BuddhistHome>
       ]);
 
   List<Widget> conversation() => [
-        Text('잠시 쉬어 가는 마음', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 8),
-        const Text('지금의 마음을 알아차리고 작은 쉼을 선택해 보세요.'),
+        Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+              color: ObangTheme.blue, borderRadius: BorderRadius.circular(24)),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Icon(Icons.spa_outlined, color: ObangTheme.yellow, size: 32),
+            const SizedBox(height: 18),
+            Text('잠시 쉬어 가는 마음',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(color: ObangTheme.white)),
+            const SizedBox(height: 10),
+            const Text('지금의 마음을 알아차리고 작은 쉼을 선택해 보세요.',
+                style: TextStyle(color: ObangTheme.white, height: 1.6)),
+          ]),
+        ),
         if (!session.isGuided || session.isCrisis)
           panel([
-            const Text('오늘의 마음'),
+            Text('오늘의 마음', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: EmotionType.values
                     .map((value) => ChoiceChip(
                           label: Text(value.label),
@@ -193,7 +202,8 @@ class _BuddhistHomeState extends State<BuddhistHome>
                     labelText: '어떤 마음이 드시나요?',
                     hintText: '지금의 마음이나 테스트 키워드를 적어 주세요.',
                     errorText: inputError,
-                    border: const OutlineInputBorder())),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14)))),
             FilledButton(
                 onPressed: () {
                   FocusScope.of(context).unfocus();
@@ -508,26 +518,38 @@ class _BuddhistHomeState extends State<BuddhistHome>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('ONARIA · 불교 TEST')),
+        appBar: AppBar(
+          title: const Text('ONARIA · 불교 TEST',
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 1)),
+          bottom: const PreferredSize(
+              preferredSize: Size.fromHeight(4), child: ObangBand()),
+        ),
         body: SafeArea(
-            child: ListView(
-                key: ValueKey('$tab:$selectedSavedId'),
-                padding: const EdgeInsets.all(20),
-                children: [
-              Container(
-                  padding: const EdgeInsets.all(14),
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                      color: const Color(0xffffedc8),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: const Text(
-                      'TEST_DATA_ONLY\n실제 경전이 아닌 합성 자료로 동작하는 오프라인 개발 앱입니다.')),
-              ...switch (tab) {
-                0 => conversation(),
-                1 => saved(),
-                _ => admin()
-              },
-            ])),
+            child: Center(
+                child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 680),
+                    child: ListView(
+                        key: ValueKey('$tab:$selectedSavedId'),
+                        padding: const EdgeInsets.all(20),
+                        children: [
+                          Container(
+                              padding: const EdgeInsets.all(14),
+                              margin: const EdgeInsets.only(bottom: 20),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xffF5E8BE),
+                                  border: const Border(
+                                      left: BorderSide(
+                                          color: ObangTheme.red, width: 3)),
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: const Text(
+                                  'TEST_DATA_ONLY\n실제 경전이 아닌 합성 자료로 동작하는 오프라인 개발 앱입니다.')),
+                          ...switch (tab) {
+                            0 => conversation(),
+                            1 => saved(),
+                            _ => admin()
+                          },
+                        ])))),
         bottomNavigationBar: NavigationBar(
             selectedIndex: tab,
             onDestinationSelected: (value) => setState(() {

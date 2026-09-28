@@ -181,3 +181,10 @@
 - Buddhist Release 0.2.0+6 및 기존 인증서·패키지·자산 분리 검사 PASS. Christian Android debug/iOS simulator compile PASS.
 - 같은 Release 설치 엔진으로 adb install -r 성공. 휴대폰이 잠겨 있어 기기 UI·음성 청취·알림 도착은 NOT RUN; 8단계 전체 완료로 표시하지 않는다.
 - 상세 범위/검증/제한은 BUDDHIST_STEPS_5A_8_REPORT.md 참조. 실제 경전·운영 변경·배포 없음. push는 사용자 요청으로 보류.
+
+## 2026-09-28 Buddhist 오방색 UI
+
+- Buddhist에 청/적/황/백/흑 테마, 안내 영역, 통일된 카드·입력·버튼·선택 표시 적용. 공통 Core/Christian 소스 변경 없음.
+- Buddhist 변경 전후 50 PASS, analyze clean, Christian 집중 회귀 4 PASS. 큰 글꼴 스크롤 접근 테스트 보완.
+- 0.2.1+7 Release 서명 검증 후 기존 데이터 보존 업데이트 성공. 기기 잠금이 다시 확인되어 실기기 UI 확인 요청 중.
+- 상세: BUDDHIST_OBANG_UI.md. push/운영 배포/실제 경전 투입 없음.
