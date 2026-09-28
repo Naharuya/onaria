@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'mind_card_store.dart';
 import 'local_conversation_client.dart';
 import 'dev_identity.dart';
+import 'mac_ai_client.dart';
 
 const noMatch = '검색된 테스트 자료가 없습니다. 경전 문구나 출처를 생성하지 않습니다.';
 
@@ -29,6 +30,7 @@ class BuddhistSession {
 
   bool switchDevIdentity(DevPrincipal principal, {String pendingInput = ''}) {
     if (!allowPendingInput(pendingInput)) return false;
+    cancelAiReply();
     _identity.switchTo(principal);
     _state = ConversationState.start(ReligionProfile.buddhist);
     _previousInputs.clear();
@@ -141,6 +143,74 @@ class BuddhistSession {
         };
   }
 
+  AsyncConversationClient? _pendingAi;
+  int _aiGeneration = 0;
+  bool get aiPending => _pendingAi != null;
+  void cancelAiReply() {
+    _aiGeneration++;
+    _closeAi();
+  }
+
+  void _closeAi() {
+    final pending = _pendingAi;
+    _pendingAi = null;
+    try {
+      pending?.cancel();
+    } catch (_) {/* Cancellation must not interrupt Safety. */}
+  }
+
+  Future<void> replyWithMacAi(String input,
+      {required AsyncConversationClient Function() factory}) async {
+    // Safety is evaluated before constructing any network/model client.
+    if (!allowPendingInput(input)) return;
+    if (input.trim().isEmpty ||
+        input.trim().length > CheckInInput.maxCustomEmotionLength) {
+      throw ArgumentError('INPUT_LENGTH');
+    }
+    if (_pendingAi != null) throw StateError('AI_BUSY');
+    if (!_guided) throw StateError('CONVERSATION_NOT_STARTED');
+    final target = switch (phase) {
+      ConversationPhase.situation => ConversationPhase.need,
+      ConversationPhase.need => ConversationPhase.sourceOffer,
+      ConversationPhase.sourceReflection => ConversationPhase.action,
+      _ => throw StateError('INVALID_PHASE'),
+    };
+    final request = LocalConversationRequest(
+        emotion: checkIn!.emotion,
+        intensity: checkIn!.intensity,
+        phase: target,
+        input: input.trim(),
+        previousInputs: _previousInputs);
+    final before = _state;
+    final scope = recordScope;
+    final generation = ++_aiGeneration;
+    Map<String, Object?>? response;
+    try {
+      final client = _pendingAi = factory();
+      response = await client.respond(request);
+      validatedLocalReply(response, request);
+    } catch (_) {
+      response = null;
+    } finally {
+      if (generation == _aiGeneration) {
+        _closeAi();
+      }
+    }
+    if (generation != _aiGeneration ||
+        !identical(before, _state) ||
+        !identical(scope, recordScope) ||
+        isCrisis) {
+      return;
+    }
+    final old = _client;
+    try {
+      _client = _CompletedAiReply(response);
+      reply(input);
+    } finally {
+      _client = old;
+    }
+  }
+
   void chooseSource(bool accepted, {String pendingInput = ''}) {
     if (_interceptPending(pendingInput)) return;
     _requirePhase(ConversationPhase.sourceOffer);
@@ -222,6 +292,7 @@ class BuddhistSession {
 
   bool _showCrisis() {
     if (!isCrisis) return false;
+    cancelAiReply();
     _previousInputs.clear();
     citations = const [];
     card = null;
@@ -312,4 +383,14 @@ class SavedMindCard {
   const SavedMindCard._(this.scripture, this.savedAt);
   final MockScripture scripture;
   final DateTime? savedAt;
+}
+
+class _CompletedAiReply implements LocalConversationClient {
+  _CompletedAiReply(this.response);
+  final Map<String, Object?>? response;
+  @override
+  Map<String, Object?> respond(LocalConversationRequest request) {
+    if (response == null) throw StateError('MAC_AI_FALLBACK');
+    return response!;
+  }
 }

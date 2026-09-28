@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'session.dart';
 import 'engagement.dart';
 import 'obang_theme.dart';
+import 'mac_ai_client.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -109,6 +110,7 @@ class _BuddhistHomeState extends State<BuddhistHome>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    session.cancelAiReply();
     effects.dispose();
     input.dispose();
     super.dispose();
@@ -141,42 +143,110 @@ class _BuddhistHomeState extends State<BuddhistHome>
       ]);
 
   List<Widget> conversation() => [
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-              color: ObangTheme.blue, borderRadius: BorderRadius.circular(24)),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Icon(Icons.spa_outlined, color: ObangTheme.yellow, size: 32),
-            const SizedBox(height: 18),
-            Text('잠시 쉬어 가는 마음',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(color: ObangTheme.white)),
-            const SizedBox(height: 10),
-            const Text('지금의 마음을 알아차리고 작은 쉼을 선택해 보세요.',
-                style: TextStyle(color: ObangTheme.white, height: 1.6)),
-          ]),
-        ),
+        if (!session.isGuided && !session.isCrisis) ...[
+          const Center(
+              child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 18),
+                  child: Icon(Icons.spa_outlined,
+                      size: 58, color: ObangTheme.yellow))),
+          const Text('모든 마음은 저마다의 길이 있습니다',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, letterSpacing: 1.2, height: 1.6)),
+          const SizedBox(height: 6),
+          const Text('EVERY HEART HAS ITS OWN WAY',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: ObangTheme.blue, fontSize: 9, letterSpacing: 2)),
+          const SizedBox(height: 24),
+          Container(
+              padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Theme.of(context).colorScheme.primaryContainer,
+                        Theme.of(context).colorScheme.surfaceContainer
+                      ]),
+                  border: Border.all(color: ObangTheme.line),
+                  borderRadius: BorderRadius.circular(18)),
+              child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('매일 3분 마음대화',
+                        style: TextStyle(
+                            color: ObangTheme.blue,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2)),
+                    SizedBox(height: 12),
+                    Text('오늘 마음은\n어떤가요?',
+                        style: TextStyle(
+                            color: ObangTheme.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            height: 1.15)),
+                    SizedBox(height: 12),
+                    Text('판단하지 않고, 천천히 마음을 살펴보는 시간입니다.',
+                        style: TextStyle(
+                            color: ObangTheme.white,
+                            fontSize: 14,
+                            height: 1.5)),
+                  ])),
+          const SizedBox(height: 18),
+        ],
         if (!session.isGuided || session.isCrisis)
           panel([
             Text('오늘의 마음', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: EmotionType.values
-                    .map((value) => ChoiceChip(
-                          label: Text(value.label),
-                          selected: emotion == value,
-                          onSelected: session.isCrisis
-                              ? null
-                              : (_) => setState(() {
-                                    emotion = value;
-                                  }),
-                        ))
-                    .toList()),
+            LayoutBuilder(builder: (context, constraints) {
+              final columns =
+                  MediaQuery.textScalerOf(context).scale(14) > 20 ? 2 : 3;
+              final width =
+                  (constraints.maxWidth - (columns - 1) * 10) / columns;
+              const icons = [
+                '🌊',
+                '🌙',
+                '🍂',
+                '🔥',
+                '🌧️',
+                '🫧',
+                '🌿',
+                '☀️',
+                '🌑',
+                '🌵',
+                '⚡',
+                '🌈',
+                '🎈',
+                '🎆',
+                '🌋',
+                '🍏'
+              ];
+              return Wrap(spacing: 10, runSpacing: 10, children: [
+                for (final value in EmotionType.values)
+                  SizedBox(
+                      width: width,
+                      child: ChoiceChip(
+                        label: SizedBox(
+                            width: width,
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(icons[value.index],
+                                      style: const TextStyle(fontSize: 20)),
+                                  const SizedBox(height: 5),
+                                  Text(value.label,
+                                      textAlign: TextAlign.center),
+                                ])),
+                        selected: emotion == value,
+                        onSelected: session.isCrisis
+                            ? null
+                            : (_) => setState(() {
+                                  emotion = value;
+                                }),
+                      )),
+              ]);
+            }),
             const SizedBox(height: 12),
             Text('감정 강도 · ${intensity.round()}/10'),
             Slider(
@@ -300,6 +370,9 @@ class _BuddhistHomeState extends State<BuddhistHome>
             },
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
+        if (session.aiPending) const Text('맥미니 AI가 안내를 고르고 있습니다…'),
+        if (MacAiClient.enabled && session.lastReplyUsedFallback)
+          const Text('AI 연결을 사용할 수 없어 기본 안내로 이어갑니다.'),
         if (session.phase != ConversationPhase.summary) ...[
           TextField(
             controller: input,
@@ -313,20 +386,42 @@ class _BuddhistHomeState extends State<BuddhistHome>
             ),
           ),
           OutlinedButton(
-            onPressed: () {
+            onPressed: () async {
               FocusScope.of(context).unfocus();
+              final text = input.text;
               setState(() {
                 inputError = null;
-                try {
-                  session.reply(input.text);
-                  input.clear();
-                } on ArgumentError {
-                  inputError = '1~2,000자 이내로 적어 주세요.';
-                } on StateError {
-                  inputError = '아래 선택 버튼으로 계속해 주세요.';
-                }
-                saveStatus = '';
               });
+              try {
+                if (MacAiClient.enabled) {
+                  final pending =
+                      session.replyWithMacAi(text, factory: MacAiClient.new);
+                  setState(() {});
+                  await pending;
+                } else {
+                  session.reply(text);
+                }
+                if (mounted) {
+                  setState(() {
+                    if (input.text == text) input.clear();
+                    saveStatus = '';
+                  });
+                }
+              } on ArgumentError {
+                if (mounted) {
+                  setState(() {
+                    inputError = '1~2,000자 이내로 적어 주세요.';
+                  });
+                }
+              } on StateError {
+                if (mounted) {
+                  setState(() {
+                    inputError = session.aiPending
+                        ? '답변을 기다리고 있습니다. 위험한 상황이라면 바로 입력해 주세요.'
+                        : '아래 선택 버튼으로 계속해 주세요.';
+                  });
+                }
+              }
             },
             child: const Text('이야기 보내기'),
           ),
@@ -505,11 +600,13 @@ class _BuddhistHomeState extends State<BuddhistHome>
               '최근 로컬 응답 복구: ${session.lastReplyUsedFallback ? '고정 안내 사용' : '정상'}'),
           const Text('대화 원문·계정·키 값은 진단에 표시하지 않습니다.'),
         ]),
-        panel(const [
+        panel([
           Text('TEST_DATA_ONLY · 읽기 전용'),
           Text('Religion Profile: buddhist'),
           Text('실제 경전: 0개 / 합성 문장: 2개'),
-          Text('모델 호출: 0 / 외부 API 호출: 0'),
+          Text(MacAiClient.enabled
+              ? '맥미니 AI · USB 개발 연결 / 클라우드 호출 없음'
+              : '모델 호출: 0 / 외부 API 호출: 0'),
           Text('외부 자료: BLOCKED_EXTERNAL_REVIEW'),
           Text('자료 가져오기 및 승인 기능: 비활성'),
           Text('번역자의 저작권은 원전과 별도로 검증해야 합니다.'),
@@ -517,9 +614,11 @@ class _BuddhistHomeState extends State<BuddhistHome>
       ];
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => ObangSky(
+          child: Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: const Text('ONARIA · 불교 TEST',
+          title: const Text('onaria · 불교 TEST',
               style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 1)),
           bottom: const PreferredSize(
@@ -528,28 +627,31 @@ class _BuddhistHomeState extends State<BuddhistHome>
         body: SafeArea(
             child: Center(
                 child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 680),
-                    child: ListView(
+                    constraints: const BoxConstraints(maxWidth: 620),
+                    child: SingleChildScrollView(
                         key: ValueKey('$tab:$selectedSavedId'),
                         padding: const EdgeInsets.all(20),
-                        children: [
-                          Container(
-                              padding: const EdgeInsets.all(14),
-                              margin: const EdgeInsets.only(bottom: 20),
-                              decoration: BoxDecoration(
-                                  color: const Color(0xffF5E8BE),
-                                  border: const Border(
-                                      left: BorderSide(
-                                          color: ObangTheme.red, width: 3)),
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: const Text(
-                                  'TEST_DATA_ONLY\n실제 경전이 아닌 합성 자료로 동작하는 오프라인 개발 앱입니다.')),
-                          ...switch (tab) {
-                            0 => conversation(),
-                            1 => saved(),
-                            _ => admin()
-                          },
-                        ])))),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                  padding: const EdgeInsets.all(14),
+                                  margin: const EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xff302B25),
+                                      border: const Border(
+                                          left: BorderSide(
+                                              color: ObangTheme.red, width: 3)),
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: Text(MacAiClient.enabled
+                                      ? 'TEST_DATA_ONLY · 맥미니 AI\n대화 입력과 최근 두 답변을 USB로 연결한 맥에서 처리합니다. 경전은 합성 자료입니다.'
+                                      : 'TEST_DATA_ONLY\n실제 경전이 아닌 합성 자료로 동작하는 오프라인 개발 앱입니다.')),
+                              ...switch (tab) {
+                                0 => conversation(),
+                                1 => saved(),
+                                _ => admin()
+                              },
+                            ]))))),
         bottomNavigationBar: NavigationBar(
             selectedIndex: tab,
             onDestinationSelected: (value) => setState(() {
@@ -557,6 +659,7 @@ class _BuddhistHomeState extends State<BuddhistHome>
                   selectedSavedId = null;
                   sharePreviewId = null;
                   featureStatus = '';
+                  session.cancelAiReply();
                   effects.stopSpeech();
                   tab = value;
                 }),
@@ -568,5 +671,5 @@ class _BuddhistHomeState extends State<BuddhistHome>
               NavigationDestination(
                   icon: Icon(Icons.info_outline), label: '개발 상태'),
             ]),
-      );
+      ));
 }

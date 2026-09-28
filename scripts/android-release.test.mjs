@@ -23,6 +23,9 @@ function fixture(overrides = {}) {
       if (tool === 'adb' && args[0] === 'devices') return overrides.devices ?? 'List of devices attached\nfixture-device device\n';
       if (tool === 'adb' && args.includes('packages')) return overrides.path === '' ? '' : 'package:com.onaria.buddhist\n';
       if (tool === 'signer') return `Signer #1 certificate SHA-256 digest: ${overrides[args.at(-1).endsWith('installed.apk') ? 'installedCert' : 'apkCert'] ?? (overrides.profile === 'buddhist' ? 'c'.repeat(64) : releaseCert)}\n`;
+      if (tool === 'aapt' && args.includes('resources')) return 'resource 0x7f100000 com.onaria.buddhist:xml/mac_ai_network: t=0x03\n  (string8) "res/7q.xml"';
+      if (tool === 'aapt' && args.includes('xmltree')) return overrides.policy ?? 'E: network-security-config\nE: base-config\nA: cleartextTrafficPermitted=(type 0x12)0x0\nE: domain-config\nA: cleartextTrafficPermitted=(type 0x12)0xffffffff\nE: domain\nA: includeSubdomains=(type 0x12)0x0\nC: "127.0.0.1"';
+      if (tool === 'adb' && args.includes('reverse') && args.includes('--list')) return overrides.mappings ?? '';
       if (tool === 'aapt' && args[0] === 'list') return overrides.entries ?? 'assets/flutter_assets/packages/onaria_buddhist_pack/assets/mock_scriptures.json';
       if (tool === 'aapt') return overrides.badging ?? `package: name='${overrides.profile === 'buddhist' ? 'com.onaria.buddhist' : packageId}' versionCode='7' versionName='0.4.2'\n`;
       if (tool === 'adb' && args.includes('path')) return overrides.path ?? 'package:/data/app/fixture/base.apk\n';
@@ -114,4 +117,30 @@ for (const override of [
   const { options, calls } = fixture({ profile: 'buddhist', ...override });
   assert.throws(() => updateRelease(options));
   assert.equal(calls.filter(c => c.includes('install')).length, 0);
+});
+
+function pairingFile() {
+ const file=join(mkdtempSync(join(tmpdir(),'buddhist-pair-test-')),'pairing.json');
+ writeFileSync(file,JSON.stringify({BUDDHIST_MAC_AI_PORT:54321,BUDDHIST_MAC_AI_TOKEN:'a'.repeat(64)}));return file;
+}
+test('USB AI release explicitly pairs loopback and retains certificate/update validation',()=>{
+ const {options,calls}=fixture({profile:'buddhist',badging:"package: name='com.onaria.buddhist' versionCode='7' versionName='test'\nuses-permission: name='android.permission.INTERNET'"});
+ options.macAiConfig=pairingFile();updateRelease(options);
+ assert.ok(calls.some(c=>c.includes('--dart-define-from-file='+options.macAiConfig)));
+ assert.ok(calls.some(c=>c.includes('--no-rebind')&&c.includes('tcp:54321')));
+ assert.equal(calls.filter(c=>c.includes('install')).length,1);noDeletion(calls);
+});
+test('USB permission mismatch and conflicting reverse mapping stop before installation',()=>{
+ for(const override of [{}, {badging:"package: name='com.onaria.buddhist' versionCode='7' versionName='test'\nuses-permission: name='android.permission.INTERNET'",mappings:'device tcp:54321 tcp:11111'}]) {
+  const {options,calls}=fixture({profile:'buddhist',...override});options.macAiConfig=pairingFile();
+  assert.throws(()=>updateRelease(options));assert.ok(!calls.some(c=>c.includes('install')));
+ }
+});
+test('Christian installer refuses a Buddhist pairing configuration',()=>{
+ const {options,calls}=fixture();options.macAiConfig=pairingFile();assert.throws(()=>updateRelease(options));assert.equal(calls.length,0);
+});
+
+test('USB cleartext policy cannot be broadened',()=>{
+ const {options,calls}=fixture({profile:'buddhist',badging:"package: name='com.onaria.buddhist' versionCode='7' versionName='test'\nuses-permission: name='android.permission.INTERNET'",policy:'E: base-config\nA: cleartextTrafficPermitted=(type 0x12)0xffffffff'});
+ options.macAiConfig=pairingFile();assert.throws(()=>updateRelease(options));assert.ok(!calls.some(c=>c.includes('install')));
 });

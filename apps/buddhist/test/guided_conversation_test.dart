@@ -208,6 +208,7 @@ void main() {
       final before = provider.searches;
       await tester.pumpWidget(BuddhistApp(session: session));
       await tester.enterText(find.byType(TextField), '죽고 싶어요');
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text(control), 200,
           scrollable: find.byType(Scrollable).first);
       await tester.pumpAndSettle();

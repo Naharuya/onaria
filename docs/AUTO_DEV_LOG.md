@@ -188,3 +188,12 @@
 - Buddhist 변경 전후 50 PASS, analyze clean, Christian 집중 회귀 4 PASS. 큰 글꼴 스크롤 접근 테스트 보완.
 - 0.2.1+7 Release 서명 검증 후 기존 데이터 보존 업데이트 성공. 기기 잠금이 다시 확인되어 실기기 UI 확인 요청 중.
 - 상세: BUDDHIST_OBANG_UI.md. push/운영 배포/실제 경전 투입 없음.
+
+## 2026-09-28 Buddhist ONARIA 디자인 + USB Mac AI
+
+- 사용자 후속 지시로 ONARIA의 어두운 배경/감정 카드/버튼 구성에 오방색을 적용하고, localhost Ollama qwen3:8b의 폐쇄형 안내 템플릿 선택 연결을 추가했다.
+- 기본 앱은 offline 유지. 별도 USB 개발 빌드만 임시 pairing·localhost HTTP 예외를 사용하며 기존 전용 서명/패키지/저장 데이터를 유지한다.
+- 최종 Buddhist 57 PASS/analyze clean, Christian 125 PASS/1 SKIP + 집중 4 PASS, backend 작업 트리 420/staged 414 PASS, Web E2E 5 PASS, 설치 도구 25 PASS/1 SKIP.
+- 실제 로컬 모델 합성 요청 1건 200/약 5.7초. 0.3.0+8 USB Release 업데이트 성공. 휴대폰 keyguard 잠금으로 UI/공유/음성/알림/기기 AI E2E는 미검증.
+- 실제 경전 자료와 번역 라이선스 근거 요청 중. 미확인 자료는 BLOCKED_EXTERNAL_REVIEW; 자동 수집/투입 없음. 운영 변경/배포/push 없음.
+- 세부 증거·한계·실행법: BUDDHIST_ONARIA_MAC_AI.md.

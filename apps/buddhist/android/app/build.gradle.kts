@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.util.Base64
 
 plugins {
     id("com.android.application")
@@ -35,6 +36,15 @@ android {
                 storePassword = signingProperties["storePassword"] as String?
             }
         }
+    }
+    // Only the explicitly paired USB build gets loopback network access.
+    val macAi = (project.findProperty("dart-defines") as? String).orEmpty()
+        .split(",").filter { it.isNotEmpty() }.map {
+            String(Base64.getDecoder().decode(it))
+        }.any { it.startsWith("BUDDHIST_MAC_AI_PORT=") }
+    if (macAi) {
+        sourceSets.getByName("release").manifest.srcFile("src/macAi/AndroidManifest.xml")
+        sourceSets.getByName("release").res.srcDir("src/macAi/res")
     }
     buildTypes {
         release {
