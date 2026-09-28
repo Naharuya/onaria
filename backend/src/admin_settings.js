@@ -27,7 +27,7 @@ export function createAdminSettings({ directory, env = process.env, usageLedger,
       if (event !== 'conversation_result') return;
       lastResult = {
         at: new Date().toISOString(),
-        provider: ['openai', 'local', 'rag', 'safety'].includes(data.provider) ? data.provider : 'unknown',
+        provider: ['openai', 'ollama', 'local', 'rag', 'safety'].includes(data.provider) ? data.provider : 'unknown',
         fallback: data.fallback === true,
         fallbackReason: ['missing_api_key', 'provider_auth', 'rate_limit', 'timeout', 'provider_error',
           'budget_exceeded', 'external_api_disabled'].includes(data.fallbackReason) ? data.fallbackReason :

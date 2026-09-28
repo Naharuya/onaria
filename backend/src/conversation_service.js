@@ -1,4 +1,5 @@
 import { brandEnv } from './brand_env.js';
+import { createOllamaConversationService } from './ollama_conversation_service.js';
 import { ZodError } from 'zod';
 import OpenAI from 'openai';
 import { createLocalConversationService } from './local_conversation_service.js';
@@ -72,8 +73,11 @@ async function withDeadline(generate, body, agent, memorySummary, timeoutMs) {
 }
 
 export function createConversationService({ env = process.env, logger = console,
-  openAiFactory = createOpenAiService, timeoutMs = 18_000, selectReligion, knowledgeProvider,
+  openAiFactory = createOpenAiService, ollamaFactory, timeoutMs = 18_000, selectReligion, knowledgeProvider,
   usageLedger = createUsageLedger({ env, pricing: readPricing(env) }), costKnowledgeProvider } = {}) {
+  if (brandEnv(env).ONARIA_AI_MODE === 'ollama') {
+    return createOllamaConversationService({ env, logger, ollamaFactory, timeoutMs, knowledgeProvider, selectReligion, usageLedger });
+  }
   const local = createLocalConversationService();
   const v1 = costRouterEnabled(env);
   const apiKey = (env.OPENAI_API_KEY || '').trim();
