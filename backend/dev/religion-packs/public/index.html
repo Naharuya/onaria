@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ONARIA 불교 개발실 · TEST_DATA_ONLY</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main>
+  <header><p class="eyebrow">ONARIA · LOCAL DEVELOPMENT</p><h1>잠시 쉬어 가는 마음</h1>
+  <p>불교 Pack 개발실</p><p class="notice"><strong>TEST_DATA_ONLY</strong> · 실제 경전이나 번역문이 아닙니다. 합성 문장으로 화면과 안전 흐름만 검증합니다.</p></header>
+  <section aria-labelledby="conversation-heading"><h2 id="conversation-heading">지금의 마음</h2>
+  <form id="conversation"><label for="message">어떤 마음이 드시나요?</label>
+  <textarea id="message" name="message" maxlength="2000" required placeholder="예: 불안한 마음이 들어요"></textarea>
+  <button type="submit">마음 살펴보기</button></form>
+  <div id="answer" role="status" aria-live="polite"></div>
+  <div id="citations"></div></section>
+  <section aria-labelledby="search-heading"><h2 id="search-heading">테스트 자료 검색</h2>
+  <form id="search"><label for="query">테스트 키워드</label><input id="query" maxlength="2000" required placeholder="불안, 쉼, 지침, 돌봄, 테스트">
+  <button type="submit">검색</button></form><div id="results" role="status"></div></section>
+  <section aria-labelledby="card-heading"><h2 id="card-heading">마음카드</h2><div id="card" role="status">검색된 테스트 자료에서 마음카드를 만들 수 있습니다.</div></section>
+  <section aria-labelledby="admin-heading"><h2 id="admin-heading">개발 Admin</h2><p>읽기 전용 · 이 프로세스의 테스트 상태만 표시합니다.</p>
+  <button id="admin-load" type="button">상태 확인</button><pre id="admin" role="status"></pre></section>
+</main></body></html>

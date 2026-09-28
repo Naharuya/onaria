@@ -33,7 +33,14 @@ export function certificate(output) {
   return fingerprints[0];
 }
 
-export function updateRelease({ root, tools, device, run = execute, report = console.log }) {
+export function updateRelease({ root, tools, device, profile = 'christian', run = execute, report = console.log }) {
+  if (!['christian', 'buddhist'].includes(profile)) throw Error('Unknown release profile');
+  const targetPackage = profile === 'buddhist' ? 'com.onaria.buddhist' : packageId;
+  const appRoot = profile === 'buddhist' ? join(root, 'apps/buddhist') : root;
+  const pinFile = join(appRoot, 'android/release-certificate.sha256');
+  const expectedCert = profile === 'buddhist'
+    ? (existsSync(pinFile) ? readFileSync(pinFile, 'utf8').trim() : '') : releaseCert;
+  if (!/^[a-f0-9]{64}$/.test(expectedCert)) throw Error('Valid Buddhist release certificate pin required');
   const call = (tool, args) => run(tools[tool], args, root);
   const listing = call('adb', ['devices']);
   const devices = listing.split(/\r?\n/).map(line => line.trim().split(/\s+/))
@@ -46,7 +53,15 @@ export function updateRelease({ root, tools, device, run = execute, report = con
   if (state === 'unauthorized') throw Error('Allow USB debugging on the phone, then retry');
   if (state !== 'device') throw Error('Selected device is not connected and authorized');
   const adb = args => call('adb', ['-s', device, ...args]);
-  const installed = adb(['shell', 'pm', 'path', packageId]);
+  // Android exits 1 for `pm path` on a new package. Determine absence explicitly
+  // rather than treating transport errors as evidence that no app is installed.
+  let packagePresent = true;
+  if (profile === 'buddhist') {
+    const packages = adb(['shell', 'pm', 'list', 'packages', targetPackage]).trim();
+    if (packages && packages.split(/\r?\n/).some(line => !/^package:[a-zA-Z0-9_.]+$/.test(line))) throw Error('Installed package query failed');
+    packagePresent = packages.split(/\r?\n/).includes(`package:${targetPackage}`);
+  }
+  const installed = packagePresent ? adb(['shell', 'pm', 'path', targetPackage]) : '';
   const base = installed.split(/\r?\n/).find(line => /^package:\/[^\r\n]*\/base\.apk$/.test(line));
   let previousVersion = null;
   if (installed.trim() && !base) throw Error('Could not identify installed base APK; stopped');
@@ -54,33 +69,40 @@ export function updateRelease({ root, tools, device, run = execute, report = con
     const snapshot = join(mkdtempSync(join(tmpdir(), 'onaria-cert-')), 'installed.apk');
     // Copies APK code only, never app data. No recursive cleanup operation.
     adb(['pull', base.slice('package:'.length), snapshot]);
-    if (certificate(call('signer', ['verify', '--print-certs', snapshot])) !== releaseCert) {
+    if (certificate(call('signer', ['verify', '--print-certs', snapshot])) !== expectedCert) {
       throw Error('Installed certificate differs from the approved release key; stopped');
     }
-    const details = adb(['shell', 'dumpsys', 'package', packageId]);
+    const details = adb(['shell', 'dumpsys', 'package', targetPackage]);
     previousVersion = details.match(/\bversionCode=(\d+)/)?.[1];
     if (!previousVersion) throw Error('Installed versionCode unavailable; stopped');
   }
-  if (!existsSync(join(root, 'android/key.properties')) || !existsSync(join(root, 'android/soul-bible-release.jks'))) {
+  const keyName = profile === 'buddhist' ? 'buddhist-release.jks' : 'soul-bible-release.jks';
+  if (!existsSync(join(appRoot, 'android/key.properties')) || !existsSync(join(appRoot, 'android', keyName))) {
     throw Error('Existing release keystore/key.properties required; no key will be generated');
   }
-  report('Building release with the official API; signing secrets are not printed.');
-  call('flutter', ['pub', 'get']);
-  call('flutter', ['build', 'apk', '--release', `--dart-define=ONARIA_API_BASE_URL=${productionApi}`]);
-  const apk = join(root, 'build/app/outputs/flutter-apk/app-release.apk');
+  report(profile === 'buddhist' ? 'Building isolated offline Buddhist TEST_DATA_ONLY release.' : 'Building release with the official API; signing secrets are not printed.');
+  run(tools.flutter, ['pub', 'get'], appRoot);
+  run(tools.flutter, ['build', 'apk', '--release', ...(profile === 'christian' ? [`--dart-define=ONARIA_API_BASE_URL=${productionApi}`] : [])], appRoot);
+  const apk = join(appRoot, 'build/app/outputs/flutter-apk/app-release.apk');
   if (!existsSync(apk)) throw Error('Release APK missing');
-  if (certificate(call('signer', ['verify', '--print-certs', apk])) !== releaseCert) throw Error('Built APK certificate mismatch; stopped');
+  if (certificate(call('signer', ['verify', '--print-certs', apk])) !== expectedCert) throw Error('Built APK certificate mismatch; stopped');
   const badging = call('aapt', ['dump', 'badging', apk]);
   const metadata = badging.match(/^package: name='([^']+)' versionCode='(\d+)' versionName='([^']*)'/m);
-  if (!metadata || metadata[1] !== packageId || /^application-debuggable\b/m.test(badging)) throw Error('APK must be the non-debuggable production package');
+  if (!metadata || metadata[1] !== targetPackage || /^application-debuggable\b/m.test(badging)) throw Error('APK must be the expected non-debuggable release package');
+  if (profile === 'buddhist') {
+    if (/android\.permission\.INTERNET/.test(badging)) throw Error('Buddhist test app must remain offline');
+    const entries = call('aapt', ['list', apk]);
+    if (/bible|system_prompt_ko|packages\/onaria\//i.test(entries)
+      || !entries.includes('packages/onaria_buddhist_pack/assets/mock_scriptures.json')) throw Error('Buddhist asset isolation failed');
+  }
   if (previousVersion && BigInt(metadata[2]) < BigInt(previousVersion)) throw Error('Version downgrade refused; keep the newer installed app');
   const result = adb(['install', '-r', apk]);
   if (!/^Success\s*$/m.test(result) || /Failure|INSTALL_FAILED_/.test(result)) throw Error('Update failed; stopped without uninstall or retry');
-  report(`Installed ${packageId} ${metadata[3]}+${metadata[2]} with adb install -r.`);
-  const launch = adb(['shell', 'am', 'start', '-W', '-n', `${packageId}/.MainActivity`]);
+  report(`Installed ${targetPackage} ${metadata[3]}+${metadata[2]} with adb install -r.`);
+  const launch = adb(['shell', 'am', 'start', '-W', '-n', `${targetPackage}/.MainActivity`]);
   if (!/^Status: ok\s*$/m.test(launch)) throw Error('Update installed; application launch not confirmed');
   report('Application launch confirmed.');
-  return { apk, packageId, version: metadata[3], versionCode: metadata[2], certificate: releaseCert, api: productionApi };
+  return { apk, packageId: targetPackage, version: metadata[3], versionCode: metadata[2], certificate: expectedCert, api: profile === 'christian' ? productionApi : null };
 }
 
 export function discoverTools(root) {
@@ -116,7 +138,10 @@ export function discoverTools(root) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   try {
-    if (process.argv.length > 3) throw Error('Only an optional device serial is accepted');
-    updateRelease({ root, tools: discoverTools(root), device: process.argv[2] });
+    const args = process.argv.slice(2);
+    const buddhist = args[0] === '--buddhist';
+    if (buddhist) args.shift();
+    if (args.length > 1 || args.some(arg => arg.startsWith('-'))) throw Error('Only --buddhist and an optional device serial are accepted');
+    updateRelease({ root, tools: discoverTools(root), device: args[0], profile: buddhist ? 'buddhist' : 'christian' });
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

@@ -1,0 +1,47 @@
+enum EmotionType {
+  anxiety('불안'),
+  loneliness('외로움'),
+  exhaustion('지침'),
+  anger('분노'),
+  sadness('슬픔'),
+  complexity('복잡함'),
+  gratitude('감사'),
+  joy('기쁨'),
+  fear('공포'),
+  disgust('혐오'),
+  surprise('놀람'),
+  happiness('행복'),
+  anticipation('기대'),
+  admiration('감탄'),
+  overwhelmed('벅찬'),
+  jealousy('질투');
+
+  const EmotionType(this.label);
+  final String label;
+
+  String get naturalFeelingPhrase => switch (this) {
+        EmotionType.anxiety => '불안한 마음',
+        EmotionType.loneliness => '외로운 마음',
+        EmotionType.exhaustion => '지친 마음',
+        EmotionType.anger => '분노가 느껴지는 마음',
+        EmotionType.sadness => '슬픈 마음',
+        EmotionType.complexity => '복잡한 마음',
+        EmotionType.gratitude => '감사한 마음',
+        EmotionType.joy => '기쁜 마음',
+        EmotionType.fear => '두려운 마음',
+        EmotionType.disgust => '불편한 마음',
+        EmotionType.surprise => '놀란 마음',
+        EmotionType.happiness => '행복한 마음',
+        EmotionType.anticipation => '기대되는 마음',
+        EmotionType.admiration => '감탄하는 마음',
+        EmotionType.overwhelmed => '벅찬 마음',
+        EmotionType.jealousy => '질투가 나는 마음',
+      };
+
+  static EmotionType fromWire(String value) {
+    return EmotionType.values.firstWhere(
+      (item) => item.name == value || item.label == value,
+      orElse: () => EmotionType.happiness,
+    );
+  }
+}

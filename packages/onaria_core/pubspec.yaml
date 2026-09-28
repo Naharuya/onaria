@@ -1,0 +1,6 @@
+name: onaria_core
+description: Shared ONARIA safety primitives without religion content or network clients.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: '>=3.5.0 <4.0.0'

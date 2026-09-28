@@ -101,6 +101,40 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  buddhist-checkin:
+    needs: backend-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/buddhist
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Set up Flutter 3.47.2
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 --branch 3.47.2 "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter pub get
+      - name: Verify Buddhist check-in, safety and card flow
+        run: flutter test
+      - run: flutter analyze lib test --no-fatal-infos
+      - name: Compile unsigned Release for verification only
+        # No signing credentials and no device installation or artifact publication.
+        run: flutter build apk --release
+      - name: Check Buddhist APK asset isolation
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('build/app/outputs/flutter-apk/app-release.apk') as apk:
+              entries = apk.namelist()
+          assert any(p.endswith('packages/onaria_buddhist_pack/assets/mock_scriptures.json') for p in entries)
+          assert not any('bible' in p.lower() or 'system_prompt_ko' in p for p in entries)
+          PY
+
   ios-compile:
     needs: backend-tests
     runs-on: macos-latest

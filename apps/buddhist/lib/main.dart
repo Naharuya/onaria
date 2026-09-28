@@ -1,0 +1,273 @@
+import 'package:flutter/material.dart';
+import 'package:onaria_buddhist_pack/onaria_buddhist_pack.dart';
+import 'package:onaria_core/onaria_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'session.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    final provider = await BuddhistScriptureProvider.load();
+    final preferences = await SharedPreferences.getInstance();
+    runApp(BuddhistApp(session: BuddhistSession(provider, preferences)));
+  } catch (_) {
+    runApp(const MaterialApp(
+        home: Scaffold(
+            body: SafeArea(
+                child: Center(
+      child: Text('테스트 자료를 열 수 없습니다. 앱을 다시 실행해 주세요.'),
+    )))));
+  }
+}
+
+class BuddhistApp extends StatelessWidget {
+  const BuddhistApp({super.key, required this.session});
+  final BuddhistSession session;
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'ONARIA 불교 TEST',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xff456854),
+              surface: const Color(0xfff8f5eb)),
+          scaffoldBackgroundColor: const Color(0xfff8f5eb),
+          cardTheme:
+              const CardThemeData(margin: EdgeInsets.symmetric(vertical: 8)),
+        ),
+        home: BuddhistHome(session: session),
+      );
+}
+
+class BuddhistHome extends StatefulWidget {
+  const BuddhistHome({super.key, required this.session});
+  final BuddhistSession session;
+  @override
+  State<BuddhistHome> createState() => _BuddhistHomeState();
+}
+
+class _BuddhistHomeState extends State<BuddhistHome> {
+  final input = TextEditingController();
+  EmotionType emotion = EmotionType.anxiety;
+  double intensity = 5;
+  String? inputError;
+  int tab = 0;
+  bool saving = false;
+  String saveStatus = '';
+  BuddhistSession get session => widget.session;
+  @override
+  void dispose() {
+    input.dispose();
+    super.dispose();
+  }
+
+  Widget panel(List<Widget> children) => Card(
+          child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+      ));
+  Widget source(MockScripture record, {bool button = false}) => panel([
+        Text(record.title, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 12),
+        Text(record.text),
+        const SizedBox(height: 12),
+        Text(record.source),
+        const Text('실제 경전·번역문이 아닌 합성 테스트 자료'),
+        if (button)
+          OutlinedButton(
+              onPressed: () => setState(() {
+                    session.makeCard(record.id);
+                    saveStatus = '';
+                  }),
+              child: const Text('마음카드 만들기')),
+      ]);
+
+  List<Widget> conversation() => [
+        Text('잠시 쉬어 가는 마음', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 8),
+        const Text('지금의 마음을 알아차리고 작은 쉼을 선택해 보세요.'),
+        panel([
+          const Text('오늘의 마음'),
+          const SizedBox(height: 8),
+          Wrap(
+              spacing: 8,
+              children: EmotionType.values
+                  .map((value) => ChoiceChip(
+                        label: Text(value.label),
+                        selected: emotion == value,
+                        onSelected: session.isCrisis
+                            ? null
+                            : (_) => setState(() {
+                                  emotion = value;
+                                }),
+                      ))
+                  .toList()),
+          const SizedBox(height: 12),
+          Text('감정 강도 · ${intensity.round()}/10'),
+          Slider(
+            key: const Key('emotion-intensity'),
+            min: 1,
+            max: 10,
+            divisions: 9,
+            value: intensity,
+            label: '${intensity.round()}/10',
+            semanticFormatterCallback: (value) => '${value.round()} / 10',
+            onChanged: session.isCrisis
+                ? null
+                : (value) => setState(() {
+                      intensity = value;
+                    }),
+          ),
+          TextField(
+              controller: input,
+              maxLength: CheckInInput.maxCustomEmotionLength,
+              minLines: 2,
+              maxLines: 5,
+              decoration: InputDecoration(
+                  labelText: '어떤 마음이 드시나요?',
+                  hintText: '지금의 마음이나 테스트 키워드를 적어 주세요.',
+                  errorText: inputError,
+                  border: const OutlineInputBorder())),
+          FilledButton(
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                setState(() {
+                  inputError = null;
+                  try {
+                    final checkIn = CheckInInput(
+                        emotion: emotion,
+                        intensity: intensity.round(),
+                        customEmotion: input.text);
+                    if (session.beginCheckIn(checkIn)) {
+                      session.respond(
+                          checkIn.customEmotion ?? checkIn.emotion.label);
+                    }
+                  } on ArgumentError {
+                    inputError = '직접 입력한 마음을 2,000자 이내로 적어 주세요.';
+                  }
+                  saveStatus = '';
+                });
+              },
+              child: const Text('마음 살펴보기')),
+        ]),
+        if (session.message.isNotEmpty)
+          panel([
+            if (session.checkIn != null)
+              Text(
+                  '선택한 마음: ${session.checkIn!.emotion.label} · ${session.checkIn!.intensity}/10'),
+            Semantics(
+                liveRegion: true,
+                child: Text(session.message,
+                    style: Theme.of(context).textTheme.bodyLarge)),
+            if (session.isCrisis)
+              const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                  child: Text('지금 안전한 곳에 계신가요? 곁에 함께 있어 줄 사람에게 연락할 수 있나요?')),
+          ]),
+        if (!session.isCrisis)
+          ...session.citations.map((record) => source(record, button: true)),
+        if (!session.isCrisis && session.card != null)
+          panel([
+            Text('TEST_DATA_ONLY 마음카드',
+                style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            Text(session.card!.text),
+            Text(session.card!.source),
+            FilledButton(
+                onPressed: saving
+                    ? null
+                    : () async {
+                        setState(() {
+                          saving = true;
+                        });
+                        try {
+                          await session.saveCard();
+                          if (mounted && !session.isCrisis) {
+                            setState(() {
+                              saveStatus = '이 기기에 저장했습니다.';
+                            });
+                          }
+                        } catch (_) {
+                          if (mounted && !session.isCrisis) {
+                            setState(() {
+                              saveStatus = '저장하지 못했습니다. 다시 시도해 주세요.';
+                            });
+                          }
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              saving = false;
+                            });
+                          }
+                        }
+                      },
+                child: const Text('마음카드 저장')),
+            if (saveStatus.isNotEmpty) Text(saveStatus),
+          ]),
+      ];
+
+  List<Widget> saved() => [
+        Text('나의 작은 쉼', style: Theme.of(context).textTheme.headlineMedium),
+        if (session.isCrisis)
+          panel([Text(session.message)])
+        else ...[
+          panel([
+            Text('저장한 테스트 마음카드 ${session.savedCards.length}개'),
+            const Text('자신의 속도로 돌아보세요. 저장 기록은 이 앱 안에만 남습니다.')
+          ]),
+          ...session.savedCards.map((record) => source(record)),
+        ],
+      ];
+
+  List<Widget> admin() => [
+        Text('개발 상태', style: Theme.of(context).textTheme.headlineMedium),
+        panel(const [
+          Text('TEST_DATA_ONLY · 읽기 전용'),
+          Text('Religion Profile: buddhist'),
+          Text('실제 경전: 0개 / 합성 문장: 2개'),
+          Text('모델 호출: 0 / 외부 API 호출: 0'),
+          Text('외부 자료: BLOCKED_EXTERNAL_REVIEW'),
+          Text('자료 가져오기 및 승인 기능: 비활성'),
+          Text('번역자의 저작권은 원전과 별도로 검증해야 합니다.'),
+        ]),
+      ];
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('ONARIA · 불교 TEST')),
+        body: SafeArea(
+            child: ListView(
+                key: ValueKey(tab),
+                padding: const EdgeInsets.all(20),
+                children: [
+              Container(
+                  padding: const EdgeInsets.all(14),
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                      color: const Color(0xffffedc8),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: const Text(
+                      'TEST_DATA_ONLY\n실제 경전이 아닌 합성 자료로 동작하는 오프라인 개발 앱입니다.')),
+              ...switch (tab) {
+                0 => conversation(),
+                1 => saved(),
+                _ => admin()
+              },
+            ])),
+        bottomNavigationBar: NavigationBar(
+            selectedIndex: tab,
+            onDestinationSelected: (value) => setState(() {
+                  tab = value;
+                }),
+            destinations: const [
+              NavigationDestination(
+                  icon: Icon(Icons.spa_outlined), label: '마음'),
+              NavigationDestination(
+                  icon: Icon(Icons.bookmark_border), label: '저장·성장'),
+              NavigationDestination(
+                  icon: Icon(Icons.info_outline), label: '개발 상태'),
+            ]),
+      );
+}

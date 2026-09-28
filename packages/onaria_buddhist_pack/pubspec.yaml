@@ -1,0 +1,12 @@
+name: onaria_buddhist_pack
+description: Closed TEST_DATA_ONLY Buddhist fixtures and provider.
+version: 0.1.0
+publish_to: none
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+flutter:
+  assets:
+    - assets/mock_scriptures.json

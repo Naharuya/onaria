@@ -2,10 +2,10 @@ name: ONARIA Web and Admin
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['backend/**', '.github/workflows/onaria-web.yml']
+    paths: ['backend/**', 'packages/onaria_buddhist_pack/**', '.github/workflows/onaria-web.yml']
   push:
     branches: [main]
-    paths: ['backend/**', '.github/workflows/onaria-web.yml']
+    paths: ['backend/**', 'packages/onaria_buddhist_pack/**', '.github/workflows/onaria-web.yml']
 permissions:
   contents: read
 jobs:
@@ -30,6 +30,8 @@ jobs:
       - run: npm test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:web
+      - name: Verify isolated Buddhist Mock UI
+        run: npx playwright test --config dev/religion-packs/playwright.config.js
       - run: npm run test:web:performance
       - uses: actions/upload-artifact@v4
         if: always()
