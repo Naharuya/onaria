@@ -71,15 +71,21 @@ test('PWA shell works offline without caching API responses', async ({ page, con
 test('populated admin metrics stay readable, escaped and accurate at every target width', async ({ page }, testInfo) => {
   // Synthetic API fixture only; these values are never served by production.
   await page.route('**/v1/admin/overview', async route => {
-    const response = await route.fetch();
-    const data = await response.json();
-    data.aiUsage = { available: true, scope: 'sqlite', today: { aiRequests: 3, modelCalls: 4, inputTokens: 1000, cachedInputTokens: 400, outputTokens: 500, estimatedCostUsd: 0.006 },
-      averageCostPerAiSession: 0.003, cacheHitRate: 0.4, routing: { cheap: 2, standard: 1 } };
-    data.modelUsage = { available: true, entryCount: 4, sessionCosts: { sessionCount: 2, unknownSessions: 0, p50CostUsd: 0.002, p90CostUsd: 0.004 },
-      rows: [{ tier: 'Luna', model: 'synthetic-model-with-long-name-for-layout', modelCalls: 3, inputTokens: 700, cachedInputTokens: 400, outputTokens: 300, estimatedCostUsd: 0.002, fallback: 0 },
-        { tier: 'Sol', model: '<img src=x onerror=alert(1)>', modelCalls: 1, inputTokens: 300, cachedInputTokens: 0, outputTokens: 200, estimatedCostUsd: 0.004, fallback: 0 }] };
-    data.operations = { ...data.operations, completed: 3, fallbackRate: 0, safety: [{ category: 'self_harm', riskLevel: 2, crisisTriggered: true, count: 1, timestamp: data.generatedAt }] };
-    await route.fulfill({ response, json: data });
+    const generatedAt = '2026-09-29T00:00:00.000Z';
+    const data = {
+      generatedAt,
+      service: { status: 'operational', mode: 'local', startedAt: generatedAt, uptimeSeconds: 120 },
+      metrics: { requests: 10, chats: 3, crises: 1, errors: 0, statusCodes: { '200': 10 }, activeSessions: null },
+      members: { total: 2, recent: [] },
+      aiUsage: { available: true, scope: 'sqlite', today: { aiRequests: 3, modelCalls: 4, inputTokens: 1000, cachedInputTokens: 400, outputTokens: 500, estimatedCostUsd: 0.006 },
+        averageCostPerAiSession: 0.003, cacheHitRate: 0.4, routing: { cheap: 2, standard: 1 } },
+      modelUsage: { available: true, entryCount: 4, sessionCosts: { sessionCount: 2, unknownSessions: 0, p50CostUsd: 0.002, p90CostUsd: 0.004 },
+        rows: [{ tier: 'Luna', model: 'synthetic-model-with-long-name-for-layout', modelCalls: 3, inputTokens: 700, cachedInputTokens: 400, outputTokens: 300, estimatedCostUsd: 0.002, fallback: 0 },
+          { tier: 'Sol', model: '<img src=x onerror=alert(1)>', modelCalls: 1, inputTokens: 300, cachedInputTokens: 0, outputTokens: 200, estimatedCostUsd: 0.004, fallback: 0 }] },
+      operations: { completed: 3, fallbackRate: 0, safety: [{ category: 'self_harm', riskLevel: 2, crisisTriggered: true, count: 1, timestamp: generatedAt }] },
+      aiRuntime: null,
+    };
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
   });
   await page.goto('/admin/dashboard');
   await page.locator('#tokenInput').fill('onaria-browser-test-only');
