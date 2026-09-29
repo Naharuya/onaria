@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'web_app_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app/onaria_emblem.dart';
@@ -131,7 +133,9 @@ class _CheckInPageState extends State<CheckInPage> {
                     icon: Icon(Icons.menu, color: AppTheme.of(context).green, size: 24),
                     tooltip: '메뉴',
                     onSelected: (value) {
-                      if (value == 'growth') {
+                      if (value == 'web_info') {
+                        showWebAppInfo(context);
+                      } else if (value == 'growth') {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GrowthPage()));
                       } else if (value == 'saved_cards') {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SavedCardsPage()));
@@ -160,12 +164,14 @@ class _CheckInPageState extends State<CheckInPage> {
                       }
                     },
                     itemBuilder: (_) => [
+                      if (kIsWeb)
+                        const PopupMenuItem(value: 'web_info', child: Text('웹앱 이용 안내')),
                       PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
                       PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
                       PopupMenuItem(value: 'engagement', child: Text('말씀과 작은 기록')),
                       PopupMenuItem(value: 'cross_light', child: Text('십자가 미니게임')),
                       PopupMenuItem(value: 'reminders', child: Text('알림 설정')),
-                      PopupMenuItem<String>(
+                      if (!kIsWeb) PopupMenuItem<String>(
                         value: 'signup',
                         child: Row(children: [
                           Icon(Icons.person_add_outlined),

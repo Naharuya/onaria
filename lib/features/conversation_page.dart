@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'web_app_info.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -41,6 +43,7 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
+  bool _webAiConsent = false;
   String? get _customFeeling {
     final text = widget.customEmotion?.trim();
     return text == null || text.isEmpty ? null : text;
@@ -276,6 +279,18 @@ class _ConversationPageState extends State<ConversationPage> {
     if (text.isEmpty || _busy || _session.isEnded ||
         _session.turnCount >= _machine.maxCoreTurns) {
       return;
+    }
+    // Local crisis support must remain available without consent or networking.
+    if (kIsWeb && !_webAiConsent &&
+        !_detector.assess(text).isCrisis &&
+        !_detector.assess(_customFeeling ?? '').isCrisis &&
+        _session.riskLevel == 0) {
+      setState(() => _busy = true);
+      final accepted = await requestWebAiConsent(context);
+      if (!mounted) return;
+      setState(() => _busy = false);
+      if (!accepted) return;
+      _webAiConsent = true;
     }
     _controller.clear();
     setState(() {

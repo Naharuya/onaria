@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../app/space_scaffold.dart';
 import '../engagement_controller.dart';
 import '../domain_events.dart';
@@ -16,6 +17,17 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   bool _busy = false;
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return SpaceScaffold(
+        appBar: AppBar(title: const Text('알림 설정')),
+        body: const SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text('예약 알림은 Android·iPhone 앱에서 사용할 수 있어요. 웹에서는 알림 없이 마음대화와 기록을 이용할 수 있어요.'),
+          ),
+        ),
+      );
+    }
     final engagement = EngagementScope.of(context),
         controller = engagement.reminders;
     return ListenableBuilder(

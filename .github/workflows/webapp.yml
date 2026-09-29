@@ -1,0 +1,59 @@
+name: ONARIA Flutter Web App
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['lib/**', 'web/**', 'test/**', 'packages/onaria_core/**', 'assets/**', 'pubspec.*', 'scripts/serve-webapp.mjs', 'backend/webapp-e2e/**', 'backend/package*.json', 'backend/src/**', 'docs/WEBAPP_DEPLOYMENT.md', 'backend/playwright.webapp.config.js', '.github/workflows/webapp.yml']
+  push:
+    branches: [main, release/webapp]
+    paths: ['lib/**', 'web/**', 'test/**', 'packages/onaria_core/**', 'assets/**', 'pubspec.*', 'scripts/serve-webapp.mjs', 'backend/webapp-e2e/**', 'backend/package*.json', 'backend/src/**', 'docs/WEBAPP_DEPLOYMENT.md', 'backend/playwright.webapp.config.js', '.github/workflows/webapp.yml']
+permissions:
+  contents: read
+jobs:
+  webapp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ONARIA_AI_MODE: local
+      ONARIA_EXTERNAL_API_DISABLED: 'true'
+      OPENAI_API_KEY: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install repository Flutter baseline
+        run: |
+          git clone https://github.com/flutter/flutter.git --depth 1 --branch 3.47.2 "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter pub get
+      - run: flutter analyze lib test example --no-fatal-infos
+      - run: flutter test
+      - name: Build public web app without embedded credentials
+        run: flutter build web --release --base-href /webapp/ --dart-define=ONARIA_API_BASE_URL=https://api.onaria.ai.kr
+      - run: npm ci
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+      - run: npx playwright install --with-deps chromium webkit
+        working-directory: backend
+      - run: npx playwright test --config playwright.webapp.config.js
+        working-directory: backend
+      - name: Record artifact provenance
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > build/web/SOURCE_COMMIT.txt
+          cp docs/WEBAPP_DEPLOYMENT.md build/web/DEPLOYMENT.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onaria-webapp-${{ github.sha }}
+          path: build/web/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: onaria-webapp-browser-results
+          path: |
+            build/webapp-test-results/
+            build/webapp-*.png
+          if-no-files-found: ignore
