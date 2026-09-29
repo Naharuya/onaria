@@ -11,6 +11,7 @@ import 'conversation_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
 import 'signup_page.dart';
+import 'content_copyright_page.dart';
 import '../engagement/engagement_page.dart';
 import '../engagement/journey/journey_page.dart';
 import '../engagement/mini_games/cross_light/cross_light_page.dart';
@@ -151,6 +152,8 @@ class _CheckInPageState extends State<CheckInPage> {
                         _openLegalUrl('/privacy');
                       } else if (value == 'terms') {
                         _openLegalUrl('/terms');
+                      } else if (value == 'content_copyright') {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContentCopyrightPage()));
                       } else if (value == 'licenses') {
                         showLicensePage(
                           context: context,
@@ -204,6 +207,14 @@ class _CheckInPageState extends State<CheckInPage> {
                           Icon(Icons.description_outlined),
                           SizedBox(width: 12),
                           Text('서비스 이용약관'),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'content_copyright',
+                        child: Row(children: [
+                          Icon(Icons.menu_book_outlined),
+                          SizedBox(width: 12),
+                          Text('콘텐츠 및 성경 저작권'),
                         ]),
                       ),
                       const PopupMenuItem<String>(

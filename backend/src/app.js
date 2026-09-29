@@ -15,6 +15,7 @@ import { appLinksRouter } from './app_links.js';
 import { adminAuth } from './admin_auth.js';
 import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
+import { getBibleContent } from './bible_content.js';
 
 export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
@@ -43,6 +44,10 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
 
   app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+  app.get('/v1/content/bible', (_req, res) => {
+    res.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+    return res.json(getBibleContent());
+  });
   app.use('/v1/admin', adminAuth({ token: adminToken, production, allowBearer: allowAdminBearer }));
   app.use('/v1/admin/settings', (req, res, next) => {
     if (!adminSettings) return res.status(503).json({ message: '설정 저장소를 사용할 수 없습니다.' });

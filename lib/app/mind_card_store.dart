@@ -47,8 +47,6 @@ class MindCardRecord {
         '내 마음: $emotion · $intensity/10',
         '함께한 말씀: $verseReference',
         verseText,
-        if (englishVerseText != null && englishVerseText!.isNotEmpty)
-          'English (NIV):\n$englishVerseText',
         '묵상 질문: $reflectionQuestion',
         '작은 실천: $action',
         if (clinicalReflection != null && clinicalReflection!.isNotEmpty)
