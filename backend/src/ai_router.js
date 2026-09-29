@@ -22,7 +22,7 @@ export const agents = {
 };
 
 const keywordAgents = [
-  { id: 'bible_en', pattern: /영어|english|niv|esv|영문/ },
+  { id: 'bible_en', pattern: /영어|english|영문/ },
   { id: 'bible_ko', pattern: /성경|말씀|구절|묵상|기도|한글/ },
   { id: 'clinical_reflection', pattern: /임상|심리|인지|생각의 오류|감정 조절|트라우마|상담 기법/ },
 ];
