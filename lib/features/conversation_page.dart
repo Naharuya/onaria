@@ -211,7 +211,7 @@ class _ConversationPageState extends State<ConversationPage> {
   final _detector = const CrisisDetector();
   final _machine = const ConversationMachine();
   late final LlmApiClient? _client;
-  final _verseRepository = VerseRepository(loader: const FlutterVerseAssetLoader());
+  final _verseRepository = VerseRepository(loader: const ServerFirstVerseAssetLoader());
   final _items = <_ChatItem>[];
   late ConversationSession _session;
   bool _busy = false;
@@ -956,7 +956,7 @@ class _ConversationPageState extends State<ConversationPage> {
     Text('“${verse.text}”', style: const TextStyle(fontSize: 17, height: 1.8, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
     if (verse.englishText.isNotEmpty) ...[
       const SizedBox(height: 16),
-      Text('English (NIV)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.of(context).muted)),
+      Text('English', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.of(context).muted)),
       const SizedBox(height: 6),
       Text(verse.englishText, style: TextStyle(fontSize: 15, height: 1.6, color: AppTheme.of(context).muted, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
     ],
