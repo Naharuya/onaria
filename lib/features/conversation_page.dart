@@ -828,10 +828,19 @@ class _ConversationPageState extends State<ConversationPage> {
                     if (_isListening)
                       Padding(
                         padding: EdgeInsets.only(bottom: 8),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        child: Row(children: [
+                          const Spacer(),
                           SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.of(context).coral)),
-                          SizedBox(width: 7),
-                          Text('듣고 있어요 · 다시 누르면 멈춰요', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.of(context).coral)),
+                          const SizedBox(width: 7),
+                          Flexible(
+                            child: Text(
+                              '듣고 있어요 · 다시 누르면 멈춰요',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.of(context).coral),
+                            ),
+                          ),
                         ]),
                       ),
                     Row(crossAxisAlignment: CrossAxisAlignment.end, children: [

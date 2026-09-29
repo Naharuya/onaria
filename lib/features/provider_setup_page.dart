@@ -41,7 +41,13 @@ class ProviderSetupPage extends StatelessWidget {
                                 child: Row(children: [
                                   Icon(Icons.error_outline, color: AppTheme.of(context).coral, size: 20),
                                   const SizedBox(width: 8),
-                                  Text(provider),
+                                  Expanded(
+                                    child: Text(
+                                      provider,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ]),
                               )),
                         ],

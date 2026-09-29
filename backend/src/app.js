@@ -67,7 +67,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     if (production && !req.secure) return res.status(426).type('text').send('HTTPS required');
     next();
   });
-  app.get(['/admin', '/admin/', ...['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system'].map(p => `/admin/${p}`)], (_req, res) => {
+  app.get(['/admin', '/admin/', ...['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system', 'privacy'].map(p => `/admin/${p}`)], (_req, res) => {
     res.set('Cache-Control', 'no-cache');
     res.sendFile(fileURLToPath(new URL('../public/admin.html', import.meta.url)));
   });

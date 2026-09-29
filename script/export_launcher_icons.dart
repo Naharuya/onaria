@@ -1,5 +1,5 @@
 // Run with: flutter test script/export_launcher_icons.dart
-// Reuses the app's vector emblem for Android launcher assets.
+// Reuses the app's vector emblem with the approved light launcher background.
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ void main() {
           child: SizedBox.square(
             dimension: 432,
             child: ColoredBox(
-              color: adaptive ? Colors.transparent : const Color(0xFF0B1023),
+              color: adaptive ? Colors.transparent : const Color(0xFFF7F2E8),
               child: Center(child: OnariaEmblem(size: adaptive ? 264 : 354)),
             ),
           ),

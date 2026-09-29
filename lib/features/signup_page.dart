@@ -130,6 +130,20 @@ class _SocialButton extends StatelessWidget {
   Widget build(BuildContext context) => FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(backgroundColor: color, foregroundColor: foreground, side: outlined ? const BorderSide(color: Color(0xFFE0E0E0)) : null),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [icon, const SizedBox(width: 10), Text(label)]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          icon,
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
       );
 }

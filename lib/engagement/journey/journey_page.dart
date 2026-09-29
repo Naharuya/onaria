@@ -116,7 +116,10 @@ class _JourneyPageState extends State<JourneyPage> with WidgetsBindingObserver {
               ? Center(child: Text(controller.error!))
               : !controller.ready
                   ? const Center(child: CircularProgressIndicator())
-                  : ListView(padding: const EdgeInsets.all(20), children: [
+                  : Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 620),
+                        child: ListView(padding: const EdgeInsets.all(20), children: [
                       const Text('하루에 한 번, 나를 돌보는 시간',
                           style: TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold)),
@@ -233,7 +236,7 @@ class _JourneyPageState extends State<JourneyPage> with WidgetsBindingObserver {
                         const Padding(
                             padding: EdgeInsets.all(16),
                             child: Center(child: CircularProgressIndicator())),
-                    ]),
+                    ]))),
         ));
   }
 }

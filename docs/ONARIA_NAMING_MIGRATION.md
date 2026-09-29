@@ -50,9 +50,9 @@ Node 설정은 `ONARIA_*`를 우선 사용한다. `backend/src/brand_env.js`가 
 
 | 대상 | 유지한 정확한 값 | 별도 확인할 서비스 |
 | --- | --- | --- |
-| Android applicationId / namespace | `com.example.bible_mind_core` | Google Play Console, Firebase Android 앱, OAuth Android 클라이언트 |
-| iOS bundle identifier | `com.example.bibleMindCore` | App Store Connect, Apple Developer App ID, Firebase iOS 앱, OAuth iOS 클라이언트 |
-| iOS 테스트 bundle | `com.example.bibleMindCore.RunnerTests` | 로컬 Xcode 테스트 대상 |
+| Android applicationId / namespace | `com.onaria.app` | Google Play Console, Firebase Android 앱, OAuth Android 클라이언트 |
+| iOS bundle identifier | `com.onaria.app` | App Store Connect, Apple Developer App ID, Firebase iOS 앱, OAuth iOS 클라이언트 |
+| iOS 테스트 bundle | `com.onaria.app.RunnerTests` | 로컬 Xcode 테스트 대상 |
 | HTTPS 앱 링크 | `https://api.onaria.ai.kr/app/open` | 기존 Android assetlinks 및 Apple association 설정 |
 | Custom URL | `onaria://app/open` | 기존 OAuth/앱 리디렉션 등록 |
 | iOS associated domain | `applinks:api.onaria.ai.kr` | Apple Developer 및 기존 도메인 association |

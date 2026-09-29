@@ -4,7 +4,7 @@
 
 앱의 공식 사용자 표시명은 `ONARIA`, 영문 기술명과 폴더명은 `onaria`입니다. Flutter 패키지는 `onaria`, 앱 진입 위젯은 `OnariaApp`이며, 공용 라이브러리는 `lib/onaria.dart`입니다.
 
-빌드 설정은 `ONARIA_API_BASE_URL`, `ONARIA_APP_TOKEN`, `ONARIA_PREMIUM_MEMBER`를 사용합니다. 기존 `SOUL_BIBLE_*` 설정도 호환되며, 두 설정이 있으면 `ONARIA_*`가 우선합니다. 기존 설치 앱과 저장 데이터를 이어 쓰도록 Android/iOS 앱 식별자, 로컬 저장 키, 관리자 세션 키는 유지합니다. 실제 원격 저장소 주소·서버 경로·SSH 별칭·서비스 및 Docker 볼륨 이름 역시 기존 운영 연결과 데이터를 보존하기 위해 유지합니다.
+빌드 설정은 `ONARIA_API_BASE_URL`, `ONARIA_APP_TOKEN`, `ONARIA_PREMIUM_MEMBER`를 사용합니다. 기존 `SOUL_BIBLE_*` 설정도 호환되며, 두 설정이 있으면 `ONARIA_*`가 우선합니다. 정식 스토어 등록용 Android/iOS 앱 식별자는 `com.onaria.app`으로 통일합니다. 로컬 저장 키와 관리자 세션 키는 데이터 호환성을 위해 유지합니다. 실제 원격 저장소 주소·서버 경로·SSH 별칭·서비스 및 Docker 볼륨 이름 역시 기존 운영 연결과 데이터를 보존하기 위해 유지합니다.
 
 감정적으로 공감하고 질문을 건네며, 사용자의 동의를 받은 뒤 마음에 맞는
 말씀과 작은 실천을 제안하는 Flutter 앱입니다. AI Router가 한국어 성경,
@@ -162,9 +162,13 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 - 실제 기록이 있는 Android 휴대폰은 [안전한 Release 설치](docs/ANDROID_RELEASE_UPDATE.md)를 사용하세요. `flutter run`이나 CI Debug APK로 정식 앱을 덮어쓰지 마세요.
 - https://api.onaria.ai.kr/ (공식 Production API)
 - 앱 환경 설정과 release 검증: [APP_PRODUCTION_API.md](docs/APP_PRODUCTION_API.md)
-- ip : 104.105.128.84
-- os : Rocky 9
-- SSH 접속: `ssh soul-bible-server` (로컬 `~/.ssh/config`와 전용 키 필요)
+- Production host: ari-prod-01
+- Public IP: 1.201.113.102
+- OS: Ubuntu
+- Web/TLS front: nginx 1.24.0
+- DNS: onaria.ai.kr / www.onaria.ai.kr / api.onaria.ai.kr → 1.201.113.102
+- TLS: Let's Encrypt SAN includes root/www/api
+- SSH user: ubuntu
 - 비밀번호와 API 키는 문서나 Git에 저장하지 말고 서버의 비밀 환경변수로 관리
 
 명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `$ARI_ROOT/projects/onaria`입니다.

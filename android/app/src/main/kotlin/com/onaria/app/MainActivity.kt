@@ -1,4 +1,4 @@
-package com.example.bible_mind_core
+package com.onaria.app
 
 import android.app.Activity
 import android.content.Intent
