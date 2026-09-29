@@ -33,6 +33,17 @@ jobs:
       - name: Verify isolated Buddhist Mock UI
         run: npx playwright test --config dev/religion-packs/playwright.config.js
       - run: npm run test:web:performance
+      - name: Package verified homepage files
+        run: |
+          mkdir -p ../build/homepage
+          printf '%s\n' "$GITHUB_SHA" > ../build/homepage/SOURCE_COMMIT.txt
+          sha256sum src/website.js src/website_content.js public/website/site.css > ../build/homepage/SHA256SUMS
+          tar -czf ../build/homepage/onaria-homepage.tar.gz src/website.js src/website_content.js public/website/site.css
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onaria-homepage
+          path: build/homepage/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:

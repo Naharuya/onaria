@@ -13,6 +13,11 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
     const hrefs = await page.locator('a').evaluateAll(links => [...new Set(links.map(a => a.getAttribute('href')))]);
     for (const href of hrefs) {
       const url = new URL(href, page.url());
+      // Flutter is served by the production nginx /webapp/ mount, not Express.
+      if (url.pathname === '/webapp/') {
+        expect(href).toBe('/webapp/');
+        continue;
+      }
       const response = await request.get(url.pathname);
       expect(response.status(), href).toBe(200);
       if (url.hash) expect(await response.text(), href).toContain(`id="${url.hash.slice(1)}"`);
@@ -32,6 +37,29 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   expect((sitemap.match(/<loc>/g) || []).length).toBe(6);
   expect(sitemap).not.toContain('/admin');
   expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /admin');
+});
+
+test('app news exposes web entry, honest platform states and keyboard installation guide', async ({ page }) => {
+  await page.goto('/#apps');
+  const news = page.locator('#apps');
+  await expect(news.getByRole('link', { name: 'ONARIA 웹앱 열기' })).toHaveAttribute('href', '/webapp/');
+  await expect(news.locator('[data-platform="android"]')).toContainText('내부 테스트 중');
+  await expect(news.locator('[data-platform="ios"]')).toContainText('App Store 공개 시 별도 안내');
+  await expect(news.locator('[data-platform="android"] a, [data-platform="ios"] a')).toHaveCount(0);
+  await expect(news.locator('.platform-icon[aria-hidden="true"]')).toHaveCount(3);
+  await expect(news.locator('.news-note')).toContainText('자동으로 동기화되지 않습니다');
+  const guide = news.locator('summary');
+  await guide.focus();
+  await page.keyboard.press('Enter');
+  await expect(news.getByText('iPhone · Safari', { exact: true })).toBeVisible();
+  await expect(news.getByText('Android · Chrome', { exact: true })).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(news.locator('.guide-columns')).toBeHidden();
+  // Verify the actual destination through navigation without pretending the
+  // backend fixture also hosts the separately deployed Flutter bundle.
+  await page.route('**/webapp/', route => route.fulfill({ body: '<h1>Webapp deployment boundary</h1>', contentType: 'text/html' }));
+  await news.getByRole('link', { name: '웹에서 시작하기' }).click();
+  await expect(page).toHaveURL(/\/webapp\/$/);
 });
 
 test('keyboard, interactive journey and reduced motion', async ({ page }) => {
