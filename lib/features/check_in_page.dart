@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../app/onaria_emblem.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
@@ -29,6 +31,8 @@ class _CheckInPageState extends State<CheckInPage> {
   int _dailyUsageCount = 0;
   bool _loadingUsage = true;
   bool _startingConversation = false;
+  String _versionLabel = '버전 확인 중';
+  String _versionOnly = '';
   final _scrollController = ScrollController();
 
   static const _icons = <EmotionType, String>{
@@ -91,9 +95,21 @@ class _CheckInPageState extends State<CheckInPage> {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CrossLightPage()));
                       } else if (value == 'reminders') {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationSettingsPage()));
+                      } else if (value == 'privacy') {
+                        _openLegalUrl('/privacy');
+                      } else if (value == 'privacy_transfer') {
+                        _openLegalUrl('/privacy');
+                      } else if (value == 'terms') {
+                        _openLegalUrl('/terms');
+                      } else if (value == 'licenses') {
+                        showLicensePage(
+                          context: context,
+                          applicationName: 'ONARIA',
+                          applicationVersion: _versionOnly,
+                        );
                       }
                     },
-                    itemBuilder: (_) => const [
+                    itemBuilder: (_) => [
                       PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
                       PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
                       PopupMenuItem(value: 'engagement', child: Text('말씀과 작은 기록')),
@@ -107,13 +123,59 @@ class _CheckInPageState extends State<CheckInPage> {
                           Text('회원가입'),
                         ]),
                       ),
-                      PopupMenuItem<String>(
+                      const PopupMenuItem<String>(
                         value: 'saved_cards',
                         child: Row(children: [
                           Icon(Icons.bookmarks_outlined),
                           SizedBox(width: 12),
                           Text('저장된 카드'),
                         ]),
+                      ),
+                      const PopupMenuDivider(),
+                      const PopupMenuItem<String>(
+                        value: 'privacy',
+                        child: Row(children: [
+                          Icon(Icons.privacy_tip_outlined),
+                          SizedBox(width: 12),
+                          Text('개인정보 처리방침'),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'privacy_transfer',
+                        child: Row(children: [
+                          Icon(Icons.public_outlined),
+                          SizedBox(width: 12),
+                          Expanded(child: Text('개인정보 수집·이용 / 국외이전 안내')),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'terms',
+                        child: Row(children: [
+                          Icon(Icons.description_outlined),
+                          SizedBox(width: 12),
+                          Text('서비스 이용약관'),
+                        ]),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'licenses',
+                        child: Row(children: [
+                          Icon(Icons.code_outlined),
+                          SizedBox(width: 12),
+                          Text('오픈소스 라이선스'),
+                        ]),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem<String>(
+                        enabled: false,
+                        value: 'version',
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            _versionLabel,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -253,6 +315,7 @@ class _CheckInPageState extends State<CheckInPage> {
   void initState() {
     super.initState();
     _loadDailyUsage();
+    _loadVersionInfo();
   }
 
   @override
@@ -275,6 +338,20 @@ class _CheckInPageState extends State<CheckInPage> {
         curve: Curves.easeOutCubic,
       );
     });
+  }
+
+  Future<void> _loadVersionInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    if (!mounted) return;
+    setState(() {
+      _versionOnly = info.version;
+      _versionLabel = 'ONARIA v${info.version} (${info.buildNumber})';
+    });
+  }
+
+  Future<void> _openLegalUrl(String path) async {
+    final uri = Uri.https('onaria.ai.kr', path);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Future<void> _loadDailyUsage() async {

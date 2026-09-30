@@ -57,7 +57,12 @@ test('serves installable admin shell and protects live data from caching', async
   try {
     const page = await fetch(`${base}/admin/`);
     assert.equal(page.status, 200);
-    assert.match(await page.text(), /rel="manifest"/);
+    const pageHtml = await page.text();
+    assert.match(pageHtml, /rel="manifest"/);
+    assert.match(pageHtml, /고객정보 보호 운영/);
+    assert.match(pageHtml, /개인정보 처리방침/);
+    assert.match(pageHtml, /서비스 이용약관/);
+    assert.match(pageHtml, /ONARIA Admin v0\.3\.0/);
     const manifest = await (await fetch(`${base}/admin/manifest.webmanifest`)).json();
     assert.equal(manifest.start_url, '/admin/');
     assert.equal(manifest.scope, '/admin/');
