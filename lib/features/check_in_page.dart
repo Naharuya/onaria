@@ -105,6 +105,7 @@ class _CheckInPageState extends State<CheckInPage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 620),
             child: ListView(
+              key: const ValueKey('check-in-scroll'),
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               children: [
@@ -256,11 +257,13 @@ class _CheckInPageState extends State<CheckInPage> {
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('지금 가장 가까운 마음을 골라주세요',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.of(context).ink)),
+                      Expanded(
+                        child: Text('지금 가장 가까운 마음을 골라주세요',
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.of(context).ink)),
+                      ),
                       if (_emotion != null ||
                           _otherEmotion ||
                           _promotedKeyword != null)
@@ -286,6 +289,8 @@ class _CheckInPageState extends State<CheckInPage> {
                               _promotedKeyword == null &&
                               card.emotion == _emotion;
                       return Semantics(
+                        key: ValueKey(
+                            'emotion-${card.emotion?.name ?? card.customKeyword}'),
                         button: true,
                         selected: selected,
                         label: '${card.label}${selected ? ' 선택됨' : ''}',
@@ -453,6 +458,7 @@ class _CheckInPageState extends State<CheckInPage> {
                 ],
                 const SizedBox(height: 16),
                 FilledButton(
+                  key: const ValueKey('start-conversation'),
                   style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52)),
                   onPressed: (_otherEmotion
