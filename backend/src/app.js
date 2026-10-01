@@ -15,11 +15,13 @@ import { appLinksRouter } from './app_links.js';
 import { adminAuth } from './admin_auth.js';
 import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
+import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
 export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
+  const feedback = createFeedbackMetrics();
   app.disable('x-powered-by');
   app.set('trust proxy', trustProxy);
   app.use(helmet());
@@ -48,6 +50,18 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     if (!adminSettings) return res.status(503).json({ message: '설정 저장소를 사용할 수 없습니다.' });
     next();
   });
+  app.post('/v1/feedback', (req, res, next) => {
+    if (appToken && req.get('authorization') !== `Bearer ${appToken}`) {
+      return res.status(401).json({ message: '인증이 필요합니다.' });
+    }
+    try {
+      feedback.add(feedbackSchema.parse(req.body));
+      return res.status(202).json({ accepted: true });
+    } catch (error) { return next(error); }
+  });
+
+  app.get('/v1/admin/feedback', (_req, res) => res.json(feedback.overview()));
+
   app.get('/v1/admin/settings', (_req, res) => {
     try { return res.json(adminSettings.status()); }
     catch { return res.status(503).json({ message: '설정을 불러오지 못했습니다.' }); }
@@ -67,7 +81,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     if (production && !req.secure) return res.status(426).type('text').send('HTTPS required');
     next();
   });
-  app.get(['/admin', '/admin/', ...['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system'].map(p => `/admin/${p}`)], (_req, res) => {
+  app.get(['/admin', '/admin/', ...['dashboard', 'users', 'ai-usage', 'safety', 'content', 'analytics', 'system', 'privacy'].map(p => `/admin/${p}`)], (_req, res) => {
     res.set('Cache-Control', 'no-cache');
     res.sendFile(fileURLToPath(new URL('../public/admin.html', import.meta.url)));
   });
@@ -88,7 +102,8 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
         startedAt: startedAt.toISOString(),
         uptimeSeconds: Math.floor(process.uptime()),
       },
-      metrics: { ...metrics, activeSessions: null },
+      metrics: { ...metrics,
+      feedback: feedback.overview(), activeSessions: null },
       members,
       aiUsage,
       modelUsage,
@@ -155,6 +170,17 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
 
   app.use((error, _req, res, _next) => {
     if (error instanceof IdentityError) return res.status(error.status).json({ message: error.message });
+    // JSON parsing fails before a route or provider runs. Keep client errors
+    // distinct from AI availability failures and never reflect parser details.
+    if (error?.type === 'entity.too.large') {
+      return res.status(413).json({ message: '요청 크기가 너무 큽니다. 내용을 줄여 다시 보내 주세요.' });
+    }
+    if (['charset.unsupported', 'encoding.unsupported'].includes(error?.type)) {
+      return res.status(415).json({ message: '지원하지 않는 요청 인코딩입니다. UTF-8 JSON으로 보내 주세요.' });
+    }
+    if (error instanceof ZodError || error instanceof SyntaxError) {
+      return res.status(400).json({ message: '요청 형식이 올바르지 않습니다.' });
+    }
     if (error instanceof ZodError || error instanceof SyntaxError) {
       return res.status(400).json({ message: '요청 형식이 올바르지 않습니다.' });
     }
