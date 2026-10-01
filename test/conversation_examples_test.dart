@@ -356,8 +356,13 @@ void main() {
         await tester.pump();
       }
       expect(tester.widget<CrossLightSky>(find.byType(CrossLightSky)).pieces, hasLength(6));
-      await tester.ensureVisible(find.widgetWithText(FilledButton, '작은 성장 기록 보기'));
+      await tester.scrollUntilVisible(
+        find.text('작은 성장 기록 보기'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
       await tester.pump(const Duration(seconds: 1));
+      expect(find.widgetWithText(FilledButton, '작은 성장 기록 보기'), findsOneWidget);
       await tester.tap(find.text('작은 성장 기록 보기'));
     }
     await tester.pumpAndSettle();

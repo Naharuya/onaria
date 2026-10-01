@@ -59,83 +59,91 @@ class _SavedCardsPageState extends State<SavedCardsPage> {
           }
 
           final cards = snapshot.data!;
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: cards.length,
-            itemBuilder: (context, index) {
-              final card = cards[index];
-              return Dismissible(
-                key: ValueKey(card.id),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 24),
-                  color: const Color(0xFF452338),
-                  child: Icon(Icons.delete_outline,
-                      color: AppTheme.of(context).coral),
-                ),
-                confirmDismiss: (_) => _confirmDelete(context, card),
-                onDismissed: (_) => _remove(cards, card.id),
-                child: Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: InkWell(
-                    onTap: () => _showDetails(context, card),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(18),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: cards.length,
+                itemBuilder: (context, index) {
+                  final card = cards[index];
+                  return Dismissible(
+                    key: ValueKey(card.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 24),
+                      color: const Color(0xFF452338),
+                      child: Icon(Icons.delete_outline,
+                          color: AppTheme.of(context).coral),
+                    ),
+                    confirmDismiss: (_) => _confirmDelete(context, card),
+                    onDismissed: (_) => _remove(cards, card.id),
+                    child: Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: InkWell(
+                        onTap: () => _showDetails(context, card),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                  child: Text(
-                                      '${card.dateLabel} · ${_agentLabel(card.agent)}',
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          color: AppTheme.of(context).green,
-                                          fontWeight: FontWeight.w700))),
-                              IconButton(
-                                  tooltip: '카드 삭제',
-                                  icon: const Icon(Icons.delete_outline),
-                                  onPressed: _deleting
-                                      ? null
-                                      : () async {
-                                          if (await _confirmDelete(
-                                              context, card)) {
-                                            _remove(cards, card.id);
-                                          }
-                                        }),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                          '${card.dateLabel} · ${_agentLabel(card.agent)}',
+                                          style: TextStyle(
+                                              fontSize: 13,
+                                              color: AppTheme.of(context).green,
+                                              fontWeight: FontWeight.w700))),
+                                  IconButton(
+                                      tooltip: '카드 삭제',
+                                      icon: const Icon(Icons.delete_outline),
+                                      onPressed: _deleting
+                                          ? null
+                                          : () async {
+                                              if (await _confirmDelete(
+                                                  context, card)) {
+                                                _remove(cards, card.id);
+                                              }
+                                            }),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text('${card.emotion} · ${card.intensity}/10',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 4),
+                              Text(card.verseReference,
+                                  style: TextStyle(
+                                      color: AppTheme.of(context).muted)),
+                              TextButton.icon(
+                                icon: const Icon(Icons.ios_share),
+                                label: const Text('공유 미리보기'),
+                                onPressed: () => Navigator.of(context)
+                                    .push(MaterialPageRoute<void>(
+                                  builder: (_) => SharePreviewPage(
+                                      content: ShareCardContent.mindCard(
+                                    card,
+                                    EngagementScope.maybeOf(context)?.catalog ??
+                                        [],
+                                  )),
+                                )),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text('${card.emotion} · ${card.intensity}/10',
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800)),
-                          const SizedBox(height: 4),
-                          Text(card.verseReference,
-                              style:
-                                  TextStyle(color: AppTheme.of(context).muted)),
-                          TextButton.icon(
-                            icon: const Icon(Icons.ios_share),
-                            label: const Text('공유 미리보기'),
-                            onPressed: () => Navigator.of(context)
-                                .push(MaterialPageRoute<void>(
-                              builder: (_) => SharePreviewPage(
-                                  content: ShareCardContent.mindCard(
-                                card,
-                                EngagementScope.maybeOf(context)?.catalog ?? [],
-                              )),
-                            )),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           );
         },
       ),

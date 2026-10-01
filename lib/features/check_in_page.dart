@@ -4,6 +4,7 @@ import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../onaria.dart';
 import '../app/mind_card_store.dart';
+import '../app/emotion_card_store.dart';
 import 'conversation_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
@@ -20,12 +21,32 @@ class CheckInPage extends StatefulWidget {
   State<CheckInPage> createState() => _CheckInPageState();
 }
 
+class _EmotionCardEntry {
+  const _EmotionCardEntry(
+      {required this.label,
+      required this.icon,
+      required this.count,
+      this.emotion,
+      this.customKeyword,
+      this.originalIndex = 0});
+  final String label;
+  final String icon;
+  final int count;
+  final EmotionType? emotion;
+  final String? customKeyword;
+  final int originalIndex;
+}
+
 class _CheckInPageState extends State<CheckInPage> {
   EmotionType? _emotion;
   bool _otherEmotion = false;
   final _customEmotion = TextEditingController();
   double _intensity = 5;
   final _dailyUsageStore = DailyUsageStore();
+  final _emotionCardStore = EmotionCardStore();
+  EmotionCardStats _emotionStats =
+      const EmotionCardStats(presetCounts: {}, customKeywordCounts: {});
+  String? _promotedKeyword;
   int _dailyUsageCount = 0;
   bool _loadingUsage = true;
   bool _startingConversation = false;
@@ -50,6 +71,32 @@ class _CheckInPageState extends State<CheckInPage> {
     EmotionType.jealousy: '🍏',
   };
 
+  List<_EmotionCardEntry> get _emotionCards {
+    final cards = <_EmotionCardEntry>[
+      for (var i = 0; i < EmotionType.values.length; i++)
+        _EmotionCardEntry(
+            label: EmotionType.values[i].label,
+            icon: _icons[EmotionType.values[i]]!,
+            count: _emotionStats.presetCount(EmotionType.values[i]),
+            emotion: EmotionType.values[i],
+            originalIndex: i),
+      for (final item in _emotionStats.popularCustomKeywords())
+        _EmotionCardEntry(
+            label: item.key,
+            icon: '✨',
+            count: item.value,
+            customKeyword: item.key,
+            originalIndex: EmotionType.values.length),
+    ];
+    cards.sort((a, b) {
+      final byCount = b.count.compareTo(a.count);
+      return byCount != 0
+          ? byCount
+          : a.originalIndex.compareTo(b.originalIndex);
+    });
+    return cards;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SpaceScaffold(
@@ -65,39 +112,55 @@ class _CheckInPageState extends State<CheckInPage> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      width: 32, height: 32,
+                      width: 32,
+                      height: 32,
                       color: AppTheme.of(context).sage,
-                      child: Icon(Icons.auto_awesome, size: 23, color: AppTheme.of(context).green),
+                      child: Icon(Icons.auto_awesome,
+                          size: 23, color: AppTheme.of(context).green),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text('onaria', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, letterSpacing: 4)),
+                  const Text('onaria',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 4)),
                   const Spacer(),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.menu, color: AppTheme.of(context).green, size: 24),
+                    icon: Icon(Icons.menu,
+                        color: AppTheme.of(context).green, size: 24),
                     tooltip: '메뉴',
                     onSelected: (value) {
                       if (value == 'growth') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const GrowthPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const GrowthPage()));
                       } else if (value == 'saved_cards') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SavedCardsPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const SavedCardsPage()));
                       } else if (value == 'signup') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SignUpPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const SignUpPage()));
                       } else if (value == 'engagement') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EngagementPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const EngagementPage()));
                       } else if (value == 'journey') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const JourneyPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const JourneyPage()));
                       } else if (value == 'cross_light') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CrossLightPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const CrossLightPage()));
                       } else if (value == 'reminders') {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const NotificationSettingsPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const NotificationSettingsPage()));
                       }
                     },
                     itemBuilder: (_) => const [
                       PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
                       PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
-                      PopupMenuItem(value: 'engagement', child: Text('말씀과 작은 기록')),
-                      PopupMenuItem(value: 'cross_light', child: Text('십자가 미니게임')),
+                      PopupMenuItem(
+                          value: 'engagement', child: Text('말씀과 작은 기록')),
+                      PopupMenuItem(
+                          value: 'cross_light', child: Text('십자가 미니게임')),
                       PopupMenuItem(value: 'reminders', child: Text('알림 설정')),
                       PopupMenuItem<String>(
                         value: 'signup',
@@ -120,38 +183,93 @@ class _CheckInPageState extends State<CheckInPage> {
                 ]),
                 const SizedBox(height: 16),
                 const Center(child: OnariaEmblem()),
-                Text('모든 마음은 저마다의 길이 있습니다', textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.of(context).ink, fontSize: 14, letterSpacing: 1.2, height: 1.6)),
+                Text('모든 마음은 저마다의 길이 있습니다',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: AppTheme.of(context).ink,
+                        fontSize: 14,
+                        letterSpacing: 1.2,
+                        height: 1.6)),
                 const SizedBox(height: 6),
-                Text('EVERY HEART HAS ITS OWN WAY', textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.of(context).green, fontSize: 9, letterSpacing: 2)),
+                Text('EVERY HEART HAS ITS OWN WAY',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: AppTheme.of(context).green,
+                        fontSize: 9,
+                        letterSpacing: 2)),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppTheme.of(context).sage, AppTheme.of(context).panel]), border: Border.all(color: AppTheme.of(context).border),
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.of(context).sage,
+                          AppTheme.of(context).panel
+                        ]),
+                    border: Border.all(color: AppTheme.of(context).border),
                     borderRadius: BorderRadius.circular(18),
-                    boxShadow: [BoxShadow(color: AppTheme.of(context).green.withValues(alpha: 0.12), blurRadius: 18, offset: Offset(0, 8))],
+                    boxShadow: [
+                      BoxShadow(
+                          color: AppTheme.of(context)
+                              .green
+                              .withValues(alpha: 0.12),
+                          blurRadius: 18,
+                          offset: Offset(0, 8))
+                    ],
                   ),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('매일 3분 마음대화', style: TextStyle(color: AppTheme.of(context).gold, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1.2)),
-                    SizedBox(height: 12),
-                    Text('오늘 마음은\n어떤가요?', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700, height: 1.15)),
-                    SizedBox(height: 12),
-                    Text('판단하지 않고, 천천히 마음을 살펴보는 시간입니다.', style: TextStyle(color: AppTheme.of(context).muted, fontSize: 14, height: 1.5)),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('매일 3분 마음대화',
+                            style: TextStyle(
+                                color: AppTheme.of(context).gold,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2)),
+                        SizedBox(height: 12),
+                        Text('오늘 마음은\n어떤가요?',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w700,
+                                height: 1.15)),
+                        SizedBox(height: 12),
+                        Text('판단하지 않고, 천천히 마음을 살펴보는 시간입니다.',
+                            style: TextStyle(
+                                color: AppTheme.of(context).muted,
+                                fontSize: 14,
+                                height: 1.5)),
+                      ]),
                 ),
                 const SizedBox(height: 24),
                 Row(children: [
                   Expanded(child: Divider(color: AppTheme.of(context).gold)),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Icon(Icons.auto_awesome, size: 14, color: AppTheme.of(context).gold)),
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(Icons.auto_awesome,
+                          size: 14, color: AppTheme.of(context).gold)),
                   Expanded(child: Divider(color: AppTheme.of(context).gold)),
                 ]),
                 const SizedBox(height: 18),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('지금 가장 가까운 마음을 골라주세요', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.of(context).ink)),
-                  if (_emotion != null || _otherEmotion) Text('선택됨', style: TextStyle(fontSize: 12, color: AppTheme.of(context).green, fontWeight: FontWeight.w700)),
-                ]),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('지금 가장 가까운 마음을 골라주세요',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.of(context).ink)),
+                      if (_emotion != null ||
+                          _otherEmotion ||
+                          _promotedKeyword != null)
+                        Text('선택됨',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.of(context).green,
+                                fontWeight: FontWeight.w700)),
+                    ]),
                 const SizedBox(height: 12),
                 GridView.count(
                   crossAxisCount: 3,
@@ -160,34 +278,123 @@ class _CheckInPageState extends State<CheckInPage> {
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
                   childAspectRatio: 1.12,
-                  children: <EmotionType?>[...EmotionType.values, null].map((emotion) {
-                    final selected = emotion == null ? _otherEmotion : !_otherEmotion && emotion == _emotion;
-                    return Semantics(
+                  children: [
+                    ..._emotionCards.map((card) {
+                      final selected = card.customKeyword != null
+                          ? _promotedKeyword == card.customKeyword
+                          : !_otherEmotion &&
+                              _promotedKeyword == null &&
+                              card.emotion == _emotion;
+                      return Semantics(
+                        button: true,
+                        selected: selected,
+                        label: '${card.label}${selected ? ' 선택됨' : ''}',
+                        child: InkWell(
+                          onTap: () => card.customKeyword != null
+                              ? _selectPromotedKeyword(card.customKeyword!)
+                              : _selectEmotion(card.emotion),
+                          borderRadius: BorderRadius.circular(16),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? AppTheme.of(context).sage
+                                  : AppTheme.of(context).panel,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                  color: selected
+                                      ? AppTheme.of(context).gold
+                                      : AppTheme.of(context).border,
+                                  width: selected ? 1.5 : 1),
+                            ),
+                            child: Stack(children: [
+                              Center(
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                    Text(card.icon,
+                                        style: const TextStyle(fontSize: 20)),
+                                    const SizedBox(height: 5),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      child: Text(card.label,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 13,
+                                              color: selected
+                                                  ? AppTheme.of(context).ink
+                                                  : AppTheme.of(context).muted,
+                                              fontWeight: selected
+                                                  ? FontWeight.w800
+                                                  : FontWeight.w600)),
+                                    ),
+                                  ])),
+                              if (selected)
+                                Positioned(
+                                    top: 7,
+                                    right: 7,
+                                    child: Icon(Icons.check_circle,
+                                        size: 17,
+                                        color: AppTheme.of(context).green)),
+                            ]),
+                          ),
+                        ),
+                      );
+                    }),
+                    Semantics(
                       button: true,
-                      selected: selected,
-                      label: '${emotion?.label ?? '기타'}${selected ? ' 선택됨' : ''}',
+                      selected: _otherEmotion,
+                      label: '기타${_otherEmotion ? ' 선택됨' : ''}',
                       child: InkWell(
-                        onTap: () => _selectEmotion(emotion),
+                        onTap: () => _selectEmotion(null),
                         borderRadius: BorderRadius.circular(16),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 180),
                           decoration: BoxDecoration(
-                            color: selected ? AppTheme.of(context).sage : AppTheme.of(context).panel,
+                            color: _otherEmotion
+                                ? AppTheme.of(context).sage
+                                : AppTheme.of(context).panel,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: selected ? AppTheme.of(context).gold : AppTheme.of(context).border, width: selected ? 1.5 : 1),
+                            border: Border.all(
+                                color: _otherEmotion
+                                    ? AppTheme.of(context).gold
+                                    : AppTheme.of(context).border,
+                                width: _otherEmotion ? 1.5 : 1),
                           ),
                           child: Stack(children: [
-                            Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                              Text(emotion == null ? '✏️' : _icons[emotion]!, style: const TextStyle(fontSize: 20)),
-                              const SizedBox(height: 5),
-                              Text(emotion?.label ?? '기타', style: TextStyle(fontSize: 13, color: selected ? AppTheme.of(context).ink : AppTheme.of(context).muted, fontWeight: selected ? FontWeight.w800 : FontWeight.w600)),
-                            ])),
-                            if (selected) Positioned(top: 7, right: 7, child: Icon(Icons.check_circle, size: 17, color: AppTheme.of(context).green)),
+                            Center(
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                  const Text('✏️',
+                                      style: TextStyle(fontSize: 20)),
+                                  const SizedBox(height: 5),
+                                  Text('기타',
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: _otherEmotion
+                                              ? AppTheme.of(context).ink
+                                              : AppTheme.of(context).muted,
+                                          fontWeight: _otherEmotion
+                                              ? FontWeight.w800
+                                              : FontWeight.w600)),
+                                ])),
+                            if (_otherEmotion)
+                              Positioned(
+                                  top: 7,
+                                  right: 7,
+                                  child: Icon(Icons.check_circle,
+                                      size: 17,
+                                      color: AppTheme.of(context).green)),
                           ]),
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                  ],
                 ),
                 if (_otherEmotion) ...[
                   const SizedBox(height: 16),
@@ -208,39 +415,68 @@ class _CheckInPageState extends State<CheckInPage> {
                     onChanged: (_) => setState(() {}),
                   ),
                 ],
-                if (_emotion != null || _otherEmotion) ...[
+                if (_emotion != null ||
+                    _otherEmotion ||
+                    _promotedKeyword != null) ...[
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
                     decoration: BoxDecoration(
                       color: AppTheme.of(context).panel,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('마음의 강도', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                        Text('${_intensity.round()} / 10', style: TextStyle(color: AppTheme.of(context).green, fontWeight: FontWeight.w800)),
-                      ]),
-                      Slider(value: _intensity, min: 1, max: 10, divisions: 9, onChanged: (value) => setState(() => _intensity = value)),
-                    ]),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('마음의 강도',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700)),
+                                Text('${_intensity.round()} / 10',
+                                    style: TextStyle(
+                                        color: AppTheme.of(context).green,
+                                        fontWeight: FontWeight.w800)),
+                              ]),
+                          Slider(
+                              value: _intensity,
+                              min: 1,
+                              max: 10,
+                              divisions: 9,
+                              onChanged: (value) =>
+                                  setState(() => _intensity = value)),
+                        ]),
                   ),
                 ],
                 const SizedBox(height: 16),
                 FilledButton(
-                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                    onPressed: (_otherEmotion ? _customEmotion.text.trim().isEmpty : _emotion == null) || _loadingUsage || _startingConversation
+                  style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52)),
+                  onPressed: (_otherEmotion
+                              ? _customEmotion.text.trim().isEmpty
+                              : (_emotion == null &&
+                                  _promotedKeyword == null)) ||
+                          _loadingUsage ||
+                          _startingConversation
                       ? null
                       : _startConversation,
-                    child: const Text('AI 마음대화 시작하기'),
+                  child: const Text('AI 마음대화 시작하기'),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                    '사용 횟수 제한 없음 · 오늘 $_dailyUsageCount회 사용',
+                  '사용 횟수 제한 없음 · 오늘 $_dailyUsageCount회 사용',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: AppTheme.of(context).subtle),
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.of(context).subtle),
                 ),
                 const SizedBox(height: 4),
-                Text('긴급한 위험이 있다면 112, 119 또는 109에 연락해 주세요.', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, color: AppTheme.of(context).subtle)),
+                Text('긴급한 위험이 있다면 112, 119 또는 109에 연락해 주세요.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 10, color: AppTheme.of(context).subtle)),
               ],
             ),
           ),
@@ -253,6 +489,7 @@ class _CheckInPageState extends State<CheckInPage> {
   void initState() {
     super.initState();
     _loadDailyUsage();
+    _loadEmotionCards();
   }
 
   @override
@@ -266,6 +503,7 @@ class _CheckInPageState extends State<CheckInPage> {
     setState(() {
       _emotion = emotion;
       _otherEmotion = emotion == null;
+      _promotedKeyword = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !_scrollController.hasClients) return;
@@ -275,6 +513,28 @@ class _CheckInPageState extends State<CheckInPage> {
         curve: Curves.easeOutCubic,
       );
     });
+  }
+
+  void _selectPromotedKeyword(String keyword) {
+    setState(() {
+      _emotion = EmotionType.complexity;
+      _otherEmotion = false;
+      _promotedKeyword = keyword;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  Future<void> _loadEmotionCards() async {
+    final stats = await _emotionCardStore.load();
+    if (!mounted) return;
+    setState(() => _emotionStats = stats);
   }
 
   Future<void> _loadDailyUsage() async {
@@ -287,12 +547,25 @@ class _CheckInPageState extends State<CheckInPage> {
   }
 
   Future<void> _startConversation() async {
-    if (_startingConversation || (_otherEmotion ? _customEmotion.text.trim().isEmpty : _emotion == null)) return;
+    if (_startingConversation ||
+        (_otherEmotion
+            ? _customEmotion.text.trim().isEmpty
+            : (_emotion == null && _promotedKeyword == null))) {
+      return;
+    }
     FocusScope.of(context).unfocus();
-    final customEmotion = _otherEmotion ? _customEmotion.text.trim() : null;
+    final customEmotion =
+        _otherEmotion ? _customEmotion.text.trim() : _promotedKeyword;
     final emotion = _emotion ?? EmotionType.complexity;
     setState(() => _startingConversation = true);
     final consumed = await _dailyUsageStore.tryConsume();
+    if (_otherEmotion) {
+      await _emotionCardStore.recordCustom(customEmotion!);
+    } else if (_promotedKeyword != null) {
+      await _emotionCardStore.recordCustom(_promotedKeyword!);
+    } else {
+      await _emotionCardStore.recordPreset(emotion);
+    }
     if (!mounted) return;
     if (!consumed) {
       setState(() => _startingConversation = false);
@@ -304,7 +577,8 @@ class _CheckInPageState extends State<CheckInPage> {
     });
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => ConversationPage(
-        emotion: emotion, customEmotion: customEmotion,
+        emotion: emotion,
+        customEmotion: customEmotion,
         intensity: _intensity.round(),
       ),
     ));
@@ -312,6 +586,7 @@ class _CheckInPageState extends State<CheckInPage> {
       setState(() {
         _emotion = null;
         _otherEmotion = false;
+        _promotedKeyword = null;
         _customEmotion.clear();
         _intensity = 5;
       });

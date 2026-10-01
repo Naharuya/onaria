@@ -21,6 +21,9 @@ class MindCardRecord {
     this.clinicalReflection,
     this.integratedInsight,
     this.verseLanguage = 'bilingual',
+    this.actionReview,
+    this.reviewedAt,
+    this.replacementAction,
   });
 
   final String id;
@@ -40,6 +43,16 @@ class MindCardRecord {
   final String? clinicalReflection;
   final String? integratedInsight;
   final String verseLanguage;
+  final String? actionReview;
+  final DateTime? reviewedAt;
+  final String? replacementAction;
+
+  String get reviewLabel => switch (actionReview) {
+        'done' => '해봤어요',
+        'later' => '아직이에요',
+        'changed' => '다른 실천을 골랐어요',
+        _ => '아직 돌아보지 않았어요',
+      };
 
   String get fullText => [
         title,
@@ -77,6 +90,9 @@ class MindCardRecord {
         clinicalReflection: json['clinicalReflection'] as String?,
         integratedInsight: json['integratedInsight'] as String?,
         verseLanguage: json['verseLanguage'] as String? ?? 'bilingual',
+        actionReview: json['actionReview'] as String?,
+        reviewedAt: DateTime.tryParse(json['reviewedAt'] as String? ?? ''),
+        replacementAction: json['replacementAction'] as String?,
       );
 
   Map<String, dynamic> toJson() => {
@@ -97,6 +113,9 @@ class MindCardRecord {
         'clinicalReflection': clinicalReflection,
         'integratedInsight': integratedInsight,
         'verseLanguage': verseLanguage,
+        if (actionReview != null) 'actionReview': actionReview,
+        if (reviewedAt != null) 'reviewedAt': reviewedAt!.toIso8601String(),
+        if (replacementAction != null) 'replacementAction': replacementAction,
       };
 }
 
@@ -136,6 +155,61 @@ class MindCardStore {
     await _preferences.setStringList(_storageKey, remaining);
   }
 
+  Future<void> reviewAction(
+    String id,
+    String review, {
+    String? replacement,
+    DateTime? now,
+  }) async {
+    if (!['done', 'later', 'changed'].contains(review) ||
+        (review == 'changed' &&
+            (replacement == null ||
+                replacement.trim().isEmpty ||
+                replacement.length > 120))) {
+      throw ArgumentError('Invalid action review');
+    }
+
+    final saved = await _preferences.getStringList(_storageKey) ?? <String>[];
+
+    var found = false;
+
+    final updated = saved.map((raw) {
+      dynamic data;
+
+      try {
+        data = jsonDecode(raw);
+      } catch (_) {
+        return raw;
+      }
+
+      if (data is! Map<String, dynamic> || data['id'] != id) {
+        return raw;
+      }
+
+      found = true;
+      data['actionReview'] = review;
+      data['reviewedAt'] = (now ?? DateTime.now()).toIso8601String();
+
+      if (review == 'changed') {
+        data['replacementAction'] = replacement!.trim();
+      } else {
+        data.remove('replacementAction');
+      }
+
+      return jsonEncode(data);
+    }).toList();
+
+    if (!found) {
+      throw StateError('Card no longer exists');
+    }
+
+    await _preferences.setStringList(_storageKey, updated);
+  }
+
+  Future<void> deleteAll() async {
+    await _preferences.remove(_storageKey);
+  }
+
   Future<List<MindCardRecord>> getAll() async {
     final saved = await _preferences.getStringList(_storageKey) ?? <String>[];
     final cards = <MindCardRecord>[];
@@ -162,13 +236,13 @@ class MembershipConfig {
 
   static const _premiumMember = String.fromEnvironment(
     'ONARIA_PREMIUM_MEMBER',
-    defaultValue: String.fromEnvironment('SOUL_BIBLE_PREMIUM_MEMBER', defaultValue: 'false'),
+    defaultValue: String.fromEnvironment('SOUL_BIBLE_PREMIUM_MEMBER',
+        defaultValue: 'false'),
   );
 
-  static MembershipTier get current =>
-      _premiumMember.toLowerCase() == 'true'
-          ? MembershipTier.premium
-          : MembershipTier.free;
+  static MembershipTier get current => _premiumMember.toLowerCase() == 'true'
+      ? MembershipTier.premium
+      : MembershipTier.free;
 }
 
 class DailyUsageStore {
