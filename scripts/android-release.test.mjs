@@ -9,7 +9,8 @@ function fixture(overrides = {}) {
   const root = mkdtempSync(join(tmpdir(), 'onaria-install-test-'));
   mkdirSync(join(root, 'android'));
   mkdirSync(join(root, 'build/app/outputs/flutter-apk'), { recursive: true });
-  for (const file of ['android/key.properties', 'android/soul-bible-release.jks', 'build/app/outputs/flutter-apk/app-release.apk']) writeFileSync(join(root, file), 'synthetic test fixture');
+  writeFileSync(join(root, 'android/key.properties'), 'keyAlias=onaria-upload\nstoreFile=onaria-upload.jks\n');
+  for (const file of ['android/onaria-upload.jks', 'build/app/outputs/flutter-apk/app-release.apk']) writeFileSync(join(root, file), 'synthetic test fixture');
   const calls = [];
   const options = { root, tools: { adb: 'adb', flutter: 'flutter', signer: 'signer', aapt: 'aapt' }, report: () => {},
     run(tool, args) {

@@ -37,14 +37,23 @@ AAPT="$SDK/build-tools/36.0.0/aapt"
 [[ -x "$AAPT" ]] || fail "aapt missing: $AAPT"
 ok "Android SDK tools"
 
+check_release_signing() {
+  [[ -f android/key.properties ]] || return 1
+  local alias store_file
+  alias="$(sed -n 's/^keyAlias=//p' android/key.properties | head -1)"
+  store_file="$(sed -n 's/^storeFile=//p' android/key.properties | head -1)"
+  [[ "$alias" == "onaria-upload" && -n "$store_file" ]] || return 1
+  [[ "$store_file" = /* ]] || store_file="$ROOT/android/$store_file"
+  [[ -f "$store_file" ]]
+}
+
 if [[ "$MODE" != "--debug" ]]; then
-  [[ -f android/key.properties ]] || fail "android/key.properties missing"
-  [[ -f android/soul-bible-release.jks ]] || fail "android/soul-bible-release.jks missing"
-  ok "Release signing files exist (contents not printed)"
-elif [[ ! -f android/key.properties || ! -f android/soul-bible-release.jks ]]; then
+  check_release_signing || fail "ONARIA release signing is not configured (key.properties must reference alias onaria-upload and an existing keystore)"
+  ok "ONARIA release signing configuration exists (secrets not printed)"
+elif ! check_release_signing; then
   warn "Release signing is not configured. Debug deployment only."
 else
-  ok "Release signing files exist (contents not printed)"
+  ok "ONARIA release signing configuration exists (secrets not printed)"
 fi
 
 DEVICE_LIST="$($ADB devices | awk '$2=="device" {print $1}')"

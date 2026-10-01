@@ -17,7 +17,7 @@ ONARIA_APPLE_APP_ID=
 
 - 설치 URL은 실제 HTTPS Play 스토어 / App Store / APK 배포 주소를 사용한다. 값이 없으면 설치 준비 중 안내만 표시한다.
 - Android SHA-256 인증서 지문은 콜론으로 구분한 32바이트 문자열이며, 여러 지문은 쉼표로 구분한다. Play App Signing을 사용하면 Play의 앱 서명 인증서 지문을 포함해야 한다.
-- Apple 앱 ID는 실제 App ID prefix와 번들 ID를 합친 값(`실제PREFIX.com.example.bibleMindCore`)이다. Xcode에서 Associated Domains가 활성화된 프로비저닝 프로파일로 서명해야 한다.
+- Apple 앱 ID는 실제 App ID prefix와 번들 ID를 합친 값(`실제PREFIX.com.onaria.app`)이다. Xcode에서 Associated Domains가 활성화된 프로비저닝 프로파일로 서명해야 한다.
 
 서버 코드를 배포하고 HTTPS로 다음 경로를 로그인이나 리다이렉트 없이 공개한다. 리버스 프록시가 `/v1`만 전달한다면 이 경로도 추가해야 한다.
 
@@ -42,6 +42,6 @@ flutter build apk --release --dart-define=ONARIA_SHARE_APP_URL=https://api.onari
 
 공유 대상 앱에 따라 이미지와 텍스트를 함께 전달하지 않을 수 있다. 카카오톡, 문자 등 실제 배포 대상에서 수신 링크를 확인해야 한다. 인앱 브라우저와 사용자 링크 열기 설정에 따라 웹 페이지가 우선 열릴 수 있다.
 
-배포 후 Android `adb shell pm verify-app-links --re-verify com.example.bible_mind_core` 및 `adb shell pm get-app-links com.example.bible_mind_core`로 인증 상태를 확인한다. 설치/미설치 기기와 앱 실행/종료 상태 각각에서 외부 앱의 공유 링크를 눌러 검증한다. iOS는 서명된 실기기 빌드로 확인한다.
+배포 후 Android `adb shell pm verify-app-links --re-verify com.onaria.app` 및 `adb shell pm get-app-links com.onaria.app`로 인증 상태를 확인한다. 설치/미설치 기기와 앱 실행/종료 상태 각각에서 외부 앱의 공유 링크를 눌러 검증한다. iOS는 서명된 실기기 빌드로 확인한다.
 
 공식 문서: [Android App Links 인증](https://developer.android.com/training/app-links/verify-applinks), [Apple Associated Domains](https://developer.apple.com/documentation/xcode/supporting-associated-domains).

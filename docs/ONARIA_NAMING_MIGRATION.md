@@ -50,14 +50,14 @@ Node 설정은 `ONARIA_*`를 우선 사용한다. `backend/src/brand_env.js`가 
 
 | 대상 | 유지한 정확한 값 | 별도 확인할 서비스 |
 | --- | --- | --- |
-| Android applicationId / namespace | `com.example.bible_mind_core` | Google Play Console, Firebase Android 앱, OAuth Android 클라이언트 |
-| iOS bundle identifier | `com.example.bibleMindCore` | App Store Connect, Apple Developer App ID, Firebase iOS 앱, OAuth iOS 클라이언트 |
-| iOS 테스트 bundle | `com.example.bibleMindCore.RunnerTests` | 로컬 Xcode 테스트 대상 |
+| Android applicationId / namespace | `com.onaria.app` | Google Play Console, Firebase Android 앱, OAuth Android 클라이언트 |
+| iOS bundle identifier | `com.onaria.app` | App Store Connect, Apple Developer App ID, Firebase iOS 앱, OAuth iOS 클라이언트 |
+| iOS 테스트 bundle | `com.onaria.app.RunnerTests` | 로컬 Xcode 테스트 대상 |
 | HTTPS 앱 링크 | `https://api.onaria.ai.kr/app/open` | 기존 Android assetlinks 및 Apple association 설정 |
 | Custom URL | `onaria://app/open` | 기존 OAuth/앱 리디렉션 등록 |
 | iOS associated domain | `applinks:api.onaria.ai.kr` | Apple Developer 및 기존 도메인 association |
-| 서명 파일 | `android/soul-bible-release.jks`, `android/key.properties` | 기존 릴리즈 서명 관리 절차 |
-| GitHub origin | `https://github.com/Naharuya/soul-bible.git` | GitHub 저장소 설정; 이번 작업에서 원격 이름은 유지 |
+| Android upload signing | `android/key.properties` → secure `onaria-upload.jks` (`keyAlias=onaria-upload`) | Google Play App Signing과 upload key를 구분해 관리 |
+| GitHub origin | `https://github.com/Naharuya/onaria.git` | ONARIA 공식 저장소 |
 
 macOS 앱 대상과 Firebase GoogleService-Info.plist/google-services.json은 조사 범위에서
 발견되지 않았다. 이는 외부 등록이 없다는 뜻이 아니다. 서명·인증서·provisioning

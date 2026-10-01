@@ -5,9 +5,23 @@ import { tmpdir } from 'node:os';
 import { join, resolve, dirname, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const packageId = 'com.example.bible_mind_core';
+export const packageId = 'com.onaria.app';
 export const productionApi = 'https://api.onaria.ai.kr';
 export const releaseCert = '692eabafe55986612f5aa3d475cea16e0e5e7db20ce2e09219a2f536f7e8f6bb';
+export const uploadKeyAlias = 'onaria-upload';
+
+export function signingConfig(root) {
+  const propertiesPath = join(root, 'android/key.properties');
+  if (!existsSync(propertiesPath)) throw Error('android/key.properties missing; release signing is not configured');
+  const values = Object.fromEntries(readFileSync(propertiesPath, 'utf8').split(/\r?\n/)
+    .filter(line => line && !line.trimStart().startsWith('#') && line.includes('='))
+    .map(line => { const index = line.indexOf('='); return [line.slice(0, index).trim(), line.slice(index + 1).trim()]; }));
+  if (values.keyAlias !== uploadKeyAlias) throw Error(`Expected ONARIA upload key alias ${uploadKeyAlias}`);
+  if (!values.storeFile) throw Error('storeFile missing from android/key.properties');
+  const storeFile = resolve(root, 'android', values.storeFile);
+  if (!existsSync(storeFile)) throw Error('Configured ONARIA upload keystore does not exist');
+  return { propertiesPath, storeFile, keyAlias: values.keyAlias };
+}
 
 export function execute(file, args, cwd) {
   try {
@@ -61,9 +75,7 @@ export function updateRelease({ root, tools, device, run = execute, report = con
     previousVersion = details.match(/\bversionCode=(\d+)/)?.[1];
     if (!previousVersion) throw Error('Installed versionCode unavailable; stopped');
   }
-  if (!existsSync(join(root, 'android/key.properties')) || !existsSync(join(root, 'android/soul-bible-release.jks'))) {
-    throw Error('Existing release keystore/key.properties required; no key will be generated');
-  }
+  signingConfig(root);
   report('Building release with the official API; signing secrets are not printed.');
   call('flutter', ['pub', 'get']);
   call('flutter', ['build', 'apk', '--release', `--dart-define=ONARIA_API_BASE_URL=${productionApi}`]);

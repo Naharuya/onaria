@@ -1,6 +1,6 @@
 # ONARIA Android 데이터 보존 업데이트
 
-정식 package는 `com.example.bible_mind_core`, API는 `https://api.onaria.ai.kr`이다. 기존 `android/soul-bible-release.jks`와 로컬 `android/key.properties`를 계속 사용한다. 키와 비밀번호를 Git 또는 CI artifact에 넣지 않는다.
+정식 package는 `com.onaria.app`, API는 `https://api.onaria.ai.kr`이다. Google Play의 실제 설치본과 동일한 package를 유지한다. 로컬 `android/key.properties`는 Git 밖 secure 영역의 `onaria-upload.jks`를 참조하며 `keyAlias=onaria-upload`를 사용한다. Upload key와 비밀번호를 Git 또는 CI artifact에 넣지 않는다. Google Play가 사용자에게 배포하는 App Signing key와 로컬 Upload key는 서로 다른 역할이다.
 
 ## 단일 업데이트 경로
 
@@ -17,7 +17,7 @@ powershell -ExecutionPolicy Bypass -File scripts/install-onaria-release.ps1 -Dev
 
 1. 기기를 선택하고 device 상태 확인. unauthorized/offline/다중 기기 모호성은 중단한다.
 2. 기존 APK 코드만 읽어 인증서와 versionCode 확인. 앱 데이터는 읽지 않는다.
-3. 기존 release 키/설정 존재 확인 후 pub get, release APK 빌드.
+3. `key.properties`가 `onaria-upload` alias와 실제 존재하는 secure Upload keystore를 가리키는지 확인 후 pub get, release APK 빌드.
 4. 공식 API define을 명시하고 새 APK의 인증서·패키지·non-debuggable·버전을 검증.
 5. 직접 `adb install -r` 한 번만 실행. 실패하면 중단한다.
 6. 성공한 경우에만 MainActivity 실행.

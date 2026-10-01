@@ -40,10 +40,10 @@ test('unconfigured or unsafe install URLs do not create broken or executable lin
 
 test('association files declare only the configured signing identities and invitation path', async () => {
   const fingerprint = Array(32).fill('AB').join(':');
-  await withServer({ ONARIA_ANDROID_SHA256: `${fingerprint},invalid`, ONARIA_APPLE_APP_ID: 'AB12345678.com.example.bibleMindCore' }, async (base) => {
+  await withServer({ ONARIA_ANDROID_SHA256: `${fingerprint},invalid`, ONARIA_APPLE_APP_ID: 'AB12345678.com.onaria.app' }, async (base) => {
     const android = await (await fetch(`${base}/.well-known/assetlinks.json`)).json();
     assert.deepEqual(android[0].target.sha256_cert_fingerprints, [fingerprint]);
-    assert.equal(android[0].target.package_name, 'com.example.bible_mind_core');
+    assert.equal(android[0].target.package_name, 'com.onaria.app');
     const ios = await (await fetch(`${base}/.well-known/apple-app-site-association`)).json();
     assert.deepEqual(ios.applinks.details[0].paths, ['/app/open']);
   });
