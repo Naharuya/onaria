@@ -15,7 +15,8 @@ async function serve(t, options = {}) {
 }
 test('public routes have unique canonical SEO and do not disclose operational data', async t => {
   const base = await serve(t);
-  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms']) {
+  const publicPaths = ['/', '/about', '/services', '/traditions', '/privacy', '/account-deletion', '/terms'];
+  for (const path of publicPaths) {
     const response = await fetch(base + path); const text = await response.text();
     assert.equal(response.status, 200); assert.match(text, /<html lang="ko">/);
     assert.ok(text.includes(`rel="canonical" href="https://onaria.ai.kr${path}"`));
@@ -27,7 +28,9 @@ test('public routes have unique canonical SEO and do not disclose operational da
     assert.ok(!text.includes('web-test-admin-credential')); assert.ok(!text.includes('memberRows'));
   }
   const sitemap = await (await fetch(base + '/sitemap.xml')).text();
-  assert.equal((sitemap.match(/<loc>/g) || []).length, 6); assert.ok(!sitemap.includes('/admin'));
+  assert.equal((sitemap.match(/<loc>/g) || []).length, publicPaths.length);
+  for (const path of publicPaths) assert.ok(sitemap.includes(`<loc>https://onaria.ai.kr${path}</loc>`));
+  assert.ok(!sitemap.includes('/admin'));
   assert.match(await (await fetch(base + '/robots.txt')).text(), /Disallow: \/admin/);
   const social = await fetch(base + '/assets/social-preview.png');
   assert.equal(social.status, 200);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../app/api_config.dart';
+import '../app/member_registration_store.dart';
 import '../src/api/member_api_client.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -87,33 +88,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             validator: _required,
                           ),
                           const SizedBox(height: 20),
-                          _SocialButton(
-                              icon: const Text('N',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900)),
-                              label: '네이버 로그인 (준비 중)',
-                              color: const Color(0xFF03C75A),
-                              onPressed: _showSocialLoginUnavailable),
-                          const SizedBox(height: 8),
-                          _SocialButton(
-                              icon: const Icon(Icons.chat_bubble, size: 20),
-                              label: '카카오 로그인 (준비 중)',
-                              color: const Color(0xFFFEE500),
-                              foreground: const Color(0xFF191919),
-                              onPressed: _showSocialLoginUnavailable),
-                          const SizedBox(height: 8),
-                          _SocialButton(
-                              icon: const Text('G',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900)),
-                              label: 'Google 로그인 (준비 중)',
-                              color: AppTheme.of(context).panel,
-                              foreground: AppTheme.of(context).ink,
-                              onPressed: _showSocialLoginUnavailable,
-                              outlined: true),
-                          const SizedBox(height: 80),
+                          const SizedBox(height: 32),
                           FilledButton.icon(
                               onPressed: _busy ? null : _submit,
                               icon: const Icon(Icons.check),
@@ -129,12 +104,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   String? _required(String? value) =>
       value == null || value.trim().isEmpty ? '입력해 주세요.' : null;
-  void _showSocialLoginUnavailable() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('소셜 로그인은 아직 준비 중이에요. 아래 회원가입을 이용해 주세요.')),
-    );
-  }
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final apiBaseUrl = ApiConfig.baseUrl;
@@ -147,10 +116,11 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() => _busy = true);
     final client = MemberApiClient(baseUrl: apiBaseUrl);
     try {
-      await client.signUp(
+      final registration = await client.signUp(
           name: _name.text.trim(),
           phone: _phone.text.trim(),
           churchName: _church.text.trim());
+      await MemberRegistrationStore().saveMemberId(registration.memberId);
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('회원가입이 완료되었어요.')));
@@ -177,43 +147,4 @@ class _SignUpPageState extends State<SignUpPage> {
     _church.dispose();
     super.dispose();
   }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton(
-      {required this.icon,
-      required this.label,
-      required this.color,
-      required this.onPressed,
-      this.foreground = Colors.white,
-      this.outlined = false});
-  final Widget icon;
-  final String label;
-  final Color color;
-  final Color foreground;
-  final VoidCallback onPressed;
-  final bool outlined;
-  @override
-  Widget build(BuildContext context) => FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-            backgroundColor: color,
-            foregroundColor: foreground,
-            side: outlined ? const BorderSide(color: Color(0xFFE0E0E0)) : null),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      );
 }

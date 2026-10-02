@@ -110,7 +110,37 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const Text('회원 정보와 계정',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const Text(
-              '현재 회원가입은 서버에 정보를 등록하는 기능이에요. 이 앱에는 본인 인증을 통한 계정 삭제 기능이 아직 없어요. 기기 기록 삭제나 앱 삭제로 탈퇴가 처리되지는 않아요. 서버 회원 정보의 삭제 요청 절차와 문의처는 정식 공개 전에 확정해야 해요.'),
+              '회원탈퇴는 서버의 회원정보를 삭제하는 별도 절차예요. 기기 기록 삭제나 앱 삭제만으로는 탈퇴되지 않아요.'),
+          const SizedBox(height: 10),
+          Semantics(
+            label: '본인인증 설정 후 회원탈퇴 가능',
+            enabled: false,
+            button: true,
+            child: FilledButton.tonalIcon(
+                key: ValueKey('account-deletion-unavailable'),
+                onPressed: null,
+                icon: Icon(Icons.person_remove_outlined),
+                label: Text('본인인증 설정 후 회원탈퇴 가능')),
+          ),
+          const SizedBox(height: 4),
+          const Text('네이버·카카오·Google 본인인증 연동이 완료되면 앱에서 본인 계정만 안전하게 삭제할 수 있어요.',
+              style: TextStyle(fontSize: 12)),
+          TextButton(
+              onPressed: () async {
+                try {
+                  if (!await launchUrl(
+                      Uri.parse('https://onaria.ai.kr/account-deletion'),
+                      mode: LaunchMode.externalApplication)) {
+                    throw StateError('unavailable');
+                  }
+                } catch (_) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('계정 삭제 안내를 열지 못했어요.')));
+                  }
+                }
+              },
+              child: const Text('웹에서 계정 삭제 안내 보기')),
           TextButton(
               onPressed: () async {
                 try {

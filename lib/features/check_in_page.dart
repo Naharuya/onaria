@@ -9,6 +9,7 @@ import 'conversation_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
 import 'signup_page.dart';
+import 'privacy_page.dart';
 import '../engagement/engagement_page.dart';
 import '../engagement/journey/journey_page.dart';
 import '../engagement/mini_games/cross_light/cross_light_page.dart';
@@ -153,6 +154,9 @@ class _CheckInPageState extends State<CheckInPage> {
                       } else if (value == 'reminders') {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const NotificationSettingsPage()));
+                      } else if (value == 'privacy') {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const PrivacyPage()));
                       }
                     },
                     itemBuilder: (_) => const [
@@ -163,6 +167,14 @@ class _CheckInPageState extends State<CheckInPage> {
                       PopupMenuItem(
                           value: 'cross_light', child: Text('십자가 미니게임')),
                       PopupMenuItem(value: 'reminders', child: Text('알림 설정')),
+                      PopupMenuItem<String>(
+                        value: 'privacy',
+                        child: Row(children: [
+                          Icon(Icons.privacy_tip_outlined),
+                          SizedBox(width: 12),
+                          Text('개인정보·회원탈퇴'),
+                        ]),
+                      ),
                       PopupMenuItem<String>(
                         value: 'signup',
                         child: Row(children: [

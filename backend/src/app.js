@@ -120,6 +120,19 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       return next(error);
     }
   });
+  app.delete('/v1/account', async (req, res, next) => {
+    try {
+      const identityToken = req.get('x-soul-identity-token');
+      if (!identityToken || !identity.verify) throw new IdentityError();
+      const trusted = await identity.verify(identityToken);
+      if (!trusted || !['naver', 'kakao', 'google'].includes(trusted.provider)
+        || typeof trusted.providerUserId !== 'string' || !trusted.providerUserId) throw new IdentityError();
+      const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
+      if (!member) return res.status(404).json({ message: '삭제할 회원 정보를 찾을 수 없습니다.' });
+      if (!memberStore.deleteById?.(member.id)) return res.status(409).json({ message: '계정 삭제를 완료하지 못했습니다.' });
+      return res.status(204).end();
+    } catch (error) { return next(error); }
+  });
   app.post('/v1/mind/chat', async (req, res, next) => {
     try {
       metrics.chats += 1;
