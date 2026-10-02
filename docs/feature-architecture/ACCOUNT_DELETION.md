@@ -1,6 +1,6 @@
 # Feature: 회원탈퇴 / 계정 삭제
 
-- Status: DB + closed self-delete API + app/web pre-auth UI implemented; provider authentication binding pending
+- Status: DB + provider verification + opaque member session + closed self-delete API + app/web pre-auth UI implemented; provider console credentials and mobile OAuth SDK binding pending
 - Last verified: 2026-10-02
 - Baseline commit: 6b01d67 (work after baseline is uncommitted)
 
@@ -69,3 +69,7 @@
 - 2026-10-02: Android 실기기에서 회원탈퇴 진입/스크롤 및 기존 마음대화 smoke PASS 후 Release 0.4.2+8 복원/독립 실행 확인.
 - 2026-10-02: iPhone 15 XCUITest는 CocoaPods plugin 때문에 `Runner.xcworkspace` 사용, Flutter Debug 직접 실행 제한 때문에 테스트 전용 `RunnerUITest` Profile scheme + test-only empty entitlement override를 사용. 회원탈퇴 진입/실제 swipe/비활성 탈퇴 영역/웹 안내 확인 PASS. 운영 Release/Archive entitlement는 변경하지 않음.
 - 2026-10-02: 최종 전체 회귀 Flutter 120/120, Backend 410/410 PASS.
+- 2026-10-02: Google/Kakao OIDC와 Naver profile API를 `{provider, providerUserId}`로 정규화하는 provider verifier 추가. Google은 Web client ID audience + `sub`, Kakao는 OIDC `sub`, Naver는 `/v1/nid/me`의 `response.id`를 식별자로 사용.
+- 2026-10-02: provider credential은 1회 서버 검증 후 폐기하고, 15분 opaque ONARIA member session을 발급. 서버에는 session token hash만 메모리 보관하며 재시작/만료/로그아웃/탈퇴 시 폐기.
+- 2026-10-02: 앱은 secure storage 도입 전까지 member session을 메모리에만 유지. 평문 SharedPreferences 저장 금지.
+- 2026-10-02: 소셜 인증 기반 추가 후 전체 회귀 Flutter 123/123, Backend 416/416 PASS. 다음 Gate는 Google/Kakao/Naver 개발자 콘솔 등록 및 모바일 OAuth SDK 연결.

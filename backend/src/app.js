@@ -17,7 +17,7 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
@@ -120,16 +120,31 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       return next(error);
     }
   });
+  app.post('/v1/auth/provider/session', async (req, res, next) => {
+    try {
+      if (!providerIdentity || !memberSessions) throw new IdentityError(503);
+      const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
+      const session = memberSessions.issue(trusted);
+      return res.status(201).json({ sessionToken: session.token, expiresInSeconds: session.expiresInSeconds });
+    } catch (error) { return next(error); }
+  });
+  app.delete('/v1/auth/provider/session', (req, res, next) => {
+    try {
+      const sessionToken = req.get('x-onaria-member-session');
+      if (!sessionToken || !memberSessions) throw new IdentityError();
+      memberSessions.revoke(sessionToken);
+      return res.status(204).end();
+    } catch (error) { return next(error); }
+  });
   app.delete('/v1/account', async (req, res, next) => {
     try {
-      const identityToken = req.get('x-soul-identity-token');
-      if (!identityToken || !identity.verify) throw new IdentityError();
-      const trusted = await identity.verify(identityToken);
-      if (!trusted || !['naver', 'kakao', 'google'].includes(trusted.provider)
-        || typeof trusted.providerUserId !== 'string' || !trusted.providerUserId) throw new IdentityError();
+      const sessionToken = req.get('x-onaria-member-session');
+      if (!sessionToken || !memberSessions) throw new IdentityError();
+      const trusted = memberSessions.verify(sessionToken);
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
       if (!member) return res.status(404).json({ message: '삭제할 회원 정보를 찾을 수 없습니다.' });
       if (!memberStore.deleteById?.(member.id)) return res.status(409).json({ message: '계정 삭제를 완료하지 못했습니다.' });
+      memberSessions.revoke(sessionToken);
       return res.status(204).end();
     } catch (error) { return next(error); }
   });
