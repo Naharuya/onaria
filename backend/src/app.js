@@ -146,6 +146,8 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     try {
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
       const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
+      const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
+      if (!member) return res.status(404).json({ message: '가입된 회원 정보를 찾을 수 없습니다.' });
       const session = memberSessions.issue(trusted);
       return res.status(201).json({ sessionToken: session.token, expiresInSeconds: session.expiresInSeconds });
     } catch (error) { return next(error); }
