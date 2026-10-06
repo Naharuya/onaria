@@ -120,6 +120,28 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       return next(error);
     }
   });
+  app.post('/v1/auth/provider/signup', async (req, res, next) => {
+    try {
+      if (!providerIdentity || !memberSessions) throw new IdentityError(503);
+      const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
+      const member = memberStore.create(memberSchema.parse({
+        name: req.body?.name,
+        phone: req.body?.phone,
+        churchName: req.body?.churchName,
+        loginProvider: trusted.provider,
+        providerUserId: trusted.providerUserId,
+      }));
+      const session = memberSessions.issue(trusted);
+      return res.status(201).json({
+        member: publicMember(member),
+        sessionToken: session.token,
+        expiresInSeconds: session.expiresInSeconds,
+      });
+    } catch (error) {
+      if (error.code === 'PHONE_EXISTS') return res.status(409).json({ message: error.message });
+      return next(error);
+    }
+  });
   app.post('/v1/auth/provider/session', async (req, res, next) => {
     try {
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
