@@ -12,8 +12,10 @@ test('provider identity resolves only the matching social member', () => {
   try {
     const google = store.create({ name: '구글회원', phone: '01055556666', churchName: '테스트교회', loginProvider: 'google', providerUserId: 'google-sub-1' });
     store.create({ name: '카카오회원', phone: '01077778888', churchName: '테스트교회', loginProvider: 'kakao', providerUserId: 'kakao-sub-1' });
+    const apple = store.create({ name: '애플회원', phone: '01099990000', churchName: '테스트교회', loginProvider: 'apple', providerUserId: 'apple-sub-1' });
     assert.equal(store.findByProviderIdentity('google', 'google-sub-1').id, google.id);
     assert.equal(store.findByProviderIdentity('kakao', 'google-sub-1'), null);
+    assert.equal(store.findByProviderIdentity('apple', 'apple-sub-1').id, apple.id);
     assert.equal(store.findByProviderIdentity('phone', 'google-sub-1'), null);
     assert.equal(store.findByProviderIdentity('google', ''), null);
   } finally {
