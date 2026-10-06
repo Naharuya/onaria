@@ -12,6 +12,13 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+val naverClientSecret = localProperties.getProperty("naver.client_secret") ?: ""
+
 android {
     namespace = "com.onaria.app"
     compileSdk = flutter.compileSdkVersion
@@ -35,6 +42,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        resValue("string", "naver_client_secret", naverClientSecret)
     }
 
     signingConfigs {
