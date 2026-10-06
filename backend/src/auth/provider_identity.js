@@ -67,7 +67,7 @@ export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = g
   } : null;
   const kakao = kakaoClientId ? {
     issuer: 'https://kauth.kakao.com', audience: kakaoClientId,
-    jwksUrl: 'https://kauth.kakao.com/.well-known/jwks.json',
+    jwksUrl: 'https://kauth.kakao.com/.well-known/jwks.json', maxTokenAgeSeconds: 43200,
   } : null;
   return createProviderIdentityVerifier({ apple, google, kakao, naver: env.ONARIA_NAVER_ENABLED === 'true' ? {} : null, fetchImpl, now, logger });
 }
