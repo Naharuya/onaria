@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../app/api_config.dart';
 import '../app/member_registration_store.dart';
+import '../app/member_session_store.dart';
 import '../src/api/member_api_client.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -17,6 +20,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final _phone = TextEditingController();
   final _church = TextEditingController();
   bool _busy = false;
+  String? _pendingAppleIdentityToken;
 
   @override
   Widget build(BuildContext context) => SpaceScaffold(
@@ -41,7 +45,20 @@ class _SignUpPageState extends State<SignUpPage> {
                   Text(
                       '회원 정보를 등록할 수 있어요. 마음 기록은 현재 휴대폰에 저장되며 다른 기기로 자동 동기화되지 않아요.',
                       style: TextStyle(color: AppTheme.of(context).muted)),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 24),
+                  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) ...[
+                    SignInWithAppleButton(
+                      onPressed: _busy ? null : _continueWithApple,
+                      text: 'Apple로 계속하기',
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '처음 이용하는 경우 Apple 인증 후 아래 회원 정보를 입력해 가입을 완료합니다.',
+                      style: TextStyle(
+                          fontSize: 12, color: AppTheme.of(context).subtle),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   Form(
                     key: _formKey,
                     child: Column(
@@ -90,9 +107,17 @@ class _SignUpPageState extends State<SignUpPage> {
                           const SizedBox(height: 20),
                           const SizedBox(height: 32),
                           FilledButton.icon(
-                              onPressed: _busy ? null : _submit,
+                              onPressed: _busy
+                                  ? null
+                                  : _pendingAppleIdentityToken == null
+                                      ? _submit
+                                      : _completeAppleSignUp,
                               icon: const Icon(Icons.check),
-                              label: Text(_busy ? '가입 중...' : '회원가입')),
+                              label: Text(_busy
+                                  ? '처리 중...'
+                                  : _pendingAppleIdentityToken == null
+                                      ? '회원가입'
+                                      : 'Apple로 가입 완료')),
                         ]),
                   ),
                 ],
@@ -101,6 +126,92 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         ),
       );
+
+  Future<void> _continueWithApple() async {
+    final apiBaseUrl = ApiConfig.baseUrl;
+    if (apiBaseUrl == null) {
+      _showMessage('서버 설정이 필요해요. ${ApiConfig.setupHint}');
+      return;
+    }
+    setState(() => _busy = true);
+    final client = MemberApiClient(baseUrl: apiBaseUrl);
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: const [],
+      );
+      final identityToken = credential.identityToken;
+      if (identityToken == null || identityToken.isEmpty) {
+        throw const FormatException('Apple identity token missing');
+      }
+      try {
+        final session = await client.providerSession(
+          provider: 'apple',
+          credential: identityToken,
+        );
+        MemberSessionStore.instance.set(
+          token: session.token,
+          expiresInSeconds: session.expiresInSeconds,
+        );
+        if (!mounted) return;
+        _showMessage('Apple 로그인이 완료되었어요.');
+        Navigator.of(context).pop();
+        return;
+      } on MemberApiException catch (error) {
+        if (error.statusCode != 404) rethrow;
+      }
+      if (!mounted) return;
+      setState(() => _pendingAppleIdentityToken = identityToken);
+      _showMessage('처음 이용하시는 계정이에요. 아래 회원 정보를 입력해 가입을 완료해 주세요.');
+    } on SignInWithAppleAuthorizationException catch (error) {
+      if (error.code != AuthorizationErrorCode.canceled && mounted) {
+        _showMessage('Apple 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
+      }
+    } catch (_) {
+      if (mounted) _showMessage('Apple 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
+    } finally {
+      client.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _completeAppleSignUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    final identityToken = _pendingAppleIdentityToken;
+    final apiBaseUrl = ApiConfig.baseUrl;
+    if (identityToken == null || apiBaseUrl == null) return;
+    setState(() => _busy = true);
+    final client = MemberApiClient(baseUrl: apiBaseUrl);
+    try {
+      final registration = await client.providerSignUp(
+        provider: 'apple',
+        credential: identityToken,
+        name: _name.text.trim(),
+        phone: _phone.text.trim(),
+        churchName: _church.text.trim(),
+      );
+      await MemberRegistrationStore().saveMemberId(registration.memberId);
+      MemberSessionStore.instance.set(
+        token: registration.session.token,
+        expiresInSeconds: registration.session.expiresInSeconds,
+      );
+      if (!mounted) return;
+      _showMessage('Apple 계정으로 회원가입이 완료되었어요.');
+      Navigator.of(context).pop();
+    } on MemberApiException catch (error) {
+      if (mounted) _showMessage(error.message);
+    } catch (_) {
+      if (mounted) _showMessage('회원가입을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      client.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
 
   String? _required(String? value) =>
       value == null || value.trim().isEmpty ? '입력해 주세요.' : null;
