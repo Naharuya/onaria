@@ -51,7 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'onaria 시작하기',
+                    '로그인 또는 시작하기',
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
@@ -59,7 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '계정을 연결하면 회원 확인과 회원탈퇴 같은 계정 기능을 안전하게 사용할 수 있어요.',
+                    '이미 가입했다면 연결된 계정으로 바로 로그인할 수 있어요. 처음 이용하는 경우에만 인증 후 회원 정보를 입력합니다.',
                     style: TextStyle(color: AppTheme.of(context).muted),
                   ),
                   const SizedBox(height: 24),
@@ -103,7 +103,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      '처음 이용하는 계정은 인증 후 아래 회원 정보를 입력해 가입을 완료합니다.',
+                      '기존 회원은 바로 로그인되고, 처음 이용하는 계정만 아래 회원 정보로 가입을 완료합니다.',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppTheme.of(context).subtle,

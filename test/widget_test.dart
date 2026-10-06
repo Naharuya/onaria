@@ -15,29 +15,35 @@ import 'package:onaria/app/social_auth_config.dart';
 
 void main() {
   setUp(() {
-    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
   });
 
   tearDown(() {
     SharedPreferencesAsyncPlatform.instance = null;
   });
 
-  testWidgets('check-in page is available without social provider setup', (WidgetTester tester) async {
+  testWidgets('check-in page is available without social provider setup',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const OnariaApp());
 
     expect(find.text('오늘 마음은\n어떤가요?'), findsOneWidget);
-    expect(find.text('onaria 시작하기'), findsNothing);
+    expect(find.text('로그인 또는 시작하기'), findsNothing);
   });
 
-  testWidgets('signup opens from the menu and back returns to check-in', (tester) async {
+  testWidgets('signup opens from the menu and back returns to check-in',
+      (tester) async {
     await tester.pumpWidget(const OnariaApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('메뉴'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('회원가입'));
+    await tester.tap(find.text('로그인·계정 연결'));
     await tester.pumpAndSettle();
-    expect(find.text('onaria 시작하기'), findsOneWidget);
-    for (final link in ['https://api.onaria.ai.kr/app/open', 'onaria://app/open']) {
+    expect(find.text('로그인 또는 시작하기'), findsOneWidget);
+    for (final link in [
+      'https://api.onaria.ai.kr/app/open',
+      'onaria://app/open'
+    ]) {
       await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
         'flutter/navigation',
         const JSONMethodCodec().encodeMethodCall(
@@ -45,7 +51,7 @@ void main() {
         (_) {},
       );
       await tester.pumpAndSettle();
-      expect(find.text('onaria 시작하기'), findsOneWidget);
+      expect(find.text('로그인 또는 시작하기'), findsOneWidget);
       expect(tester.takeException(), isNull);
     }
     await tester.pageBack();
@@ -53,7 +59,9 @@ void main() {
     expect(find.text('오늘 마음은\n어떤가요?'), findsOneWidget);
   });
 
-  testWidgets('check-in page remains the first screen when providers are configured', (WidgetTester tester) async {
+  testWidgets(
+      'check-in page remains the first screen when providers are configured',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const OnariaApp(
       authConfig: SocialAuthConfig(
         naverClientId: 'test-naver',
@@ -65,7 +73,8 @@ void main() {
     expect(find.text('오늘 마음은\n어떤가요?'), findsOneWidget);
   });
 
-  testWidgets('development override opens the main check-in page', (WidgetTester tester) async {
+  testWidgets('development override opens the main check-in page',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const OnariaApp(
       authConfig: SocialAuthConfig(
         naverClientId: 'test-naver',

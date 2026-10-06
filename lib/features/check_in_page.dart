@@ -178,9 +178,9 @@ class _CheckInPageState extends State<CheckInPage> {
                       PopupMenuItem<String>(
                         value: 'signup',
                         child: Row(children: [
-                          Icon(Icons.person_add_outlined),
+                          Icon(Icons.login_outlined),
                           SizedBox(width: 12),
-                          Text('회원가입'),
+                          Text('로그인·계정 연결'),
                         ]),
                       ),
                       PopupMenuItem<String>(
