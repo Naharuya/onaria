@@ -9,6 +9,23 @@ export class IdentityError extends Error {
 }
 const allowedAlgorithms = ['RS256', 'ES256'];
 const maxJwksBytes = 65536;
+
+function verificationFailureCode(error) {
+  if (error?.code === 'ERR_JWT_EXPIRED') return 'EXPIRED';
+  if (error?.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') return 'SIGNATURE_INVALID';
+  if (error?.code === 'ERR_JWKS_NO_MATCHING_KEY') return 'NO_MATCHING_KEY';
+  if (error?.code === 'ERR_JWT_CLAIM_VALIDATION_FAILED') {
+    if (error.claim === 'aud') return 'AUD_MISMATCH';
+    if (error.claim === 'iss') return 'ISSUER_MISMATCH';
+    if (error.claim === 'iat') return 'IAT_INVALID';
+    if (error.claim === 'exp') return 'EXP_INVALID';
+    if (error.claim === 'sub') return 'SUB_INVALID';
+    return 'CLAIM_INVALID';
+  }
+  if (error?.code === 'ERR_JWS_INVALID') return 'JWS_INVALID';
+  if (error?.code === 'ERR_JWT_INVALID') return 'JWT_INVALID';
+  return 'VERIFY_FAILED';
+}
 function httpsUrl(value) {
   const url = new URL(value);
   if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.hash) throw new IdentityError(503);
@@ -23,7 +40,7 @@ function publicJwks(value) {
 }
 
 export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms = ['RS256'], typ,
-  maxTokenAgeSeconds = 3600, requiredClaims = {}, fetchImpl = globalThis.fetch, now = () => new Date() } = {}) {
+  maxTokenAgeSeconds = 3600, requiredClaims = {}, fetchImpl = globalThis.fetch, now = () => new Date(), onFailure } = {}) {
   const issuerUrl = httpsUrl(issuer);
   if (issuerUrl.search || typeof audience !== 'string' || !audience.trim() || audience.length > 256
     || !Array.isArray(algorithms) || !algorithms.length || algorithms.some(alg => !allowedAlgorithms.includes(alg))
@@ -86,6 +103,9 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
       // Stable, issuer-qualified identity; never return the token or full claims.
       return Object.freeze({ userId: JSON.stringify([issuer, payload.sub]), subject: payload.sub });
     } catch (error) {
+      if (!(error instanceof IdentityError)) {
+        try { onFailure?.(verificationFailureCode(error)); } catch { /* Diagnostics must never affect auth. */ }
+      }
       if (error instanceof IdentityError) throw error;
       // Signature/claim errors and upstream details share a fixed public error.
       throw new IdentityError();

@@ -8,9 +8,9 @@ function normalized(provider, providerUserId) {
   return Object.freeze({ provider, providerUserId });
 }
 
-export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now } = {}) {
+export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now, onFailure } = {}) {
   if (!['apple', 'google', 'kakao'].includes(provider)) throw new IdentityError(503);
-  const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now });
+  const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now, onFailure });
   return async idToken => {
     const identity = await verifyJwt(idToken);
     return normalized(provider, identity.subject);
@@ -40,11 +40,11 @@ export function createNaverProviderVerifier({ fetchImpl = globalThis.fetch } = {
   };
 }
 
-export function createProviderIdentityVerifier({ apple, google, kakao, naver, fetchImpl, now } = {}) {
+export function createProviderIdentityVerifier({ apple, google, kakao, naver, fetchImpl, now, logger = console } = {}) {
   const verifiers = {
-    apple: apple ? createOidcProviderVerifier({ provider: 'apple', ...apple, fetchImpl, now }) : null,
-    google: google ? createOidcProviderVerifier({ provider: 'google', ...google, fetchImpl, now }) : null,
-    kakao: kakao ? createOidcProviderVerifier({ provider: 'kakao', ...kakao, fetchImpl, now }) : null,
+    apple: apple ? createOidcProviderVerifier({ provider: 'apple', ...apple, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'apple', reason }) }) : null,
+    google: google ? createOidcProviderVerifier({ provider: 'google', ...google, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'google', reason }) }) : null,
+    kakao: kakao ? createOidcProviderVerifier({ provider: 'kakao', ...kakao, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'kakao', reason }) }) : null,
     naver: naver ? createNaverProviderVerifier({ fetchImpl }) : null,
   };
   return async ({ provider, credential } = {}) => {
@@ -53,7 +53,7 @@ export function createProviderIdentityVerifier({ apple, google, kakao, naver, fe
   };
 }
 
-export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = globalThis.fetch, now } = {}) {
+export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = globalThis.fetch, now, logger = console } = {}) {
   const appleClientId = env.ONARIA_APPLE_CLIENT_ID?.trim();
   const googleClientId = env.ONARIA_GOOGLE_CLIENT_ID?.trim();
   const kakaoClientId = env.ONARIA_KAKAO_CLIENT_ID?.trim();
@@ -69,5 +69,5 @@ export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = g
     issuer: 'https://kauth.kakao.com', audience: kakaoClientId,
     jwksUrl: 'https://kauth.kakao.com/.well-known/jwks.json',
   } : null;
-  return createProviderIdentityVerifier({ apple, google, kakao, naver: env.ONARIA_NAVER_ENABLED === 'true' ? {} : null, fetchImpl, now });
+  return createProviderIdentityVerifier({ apple, google, kakao, naver: env.ONARIA_NAVER_ENABLED === 'true' ? {} : null, fetchImpl, now, logger });
 }
