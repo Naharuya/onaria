@@ -6,6 +6,8 @@ import { createRuntimeUsageLedger } from './cost/runtime_ledger.js';
 import { createRuntimeIdentity } from './auth/identity_verifier.js';
 import { createWebMetrics } from './web_metrics.js';
 import { createMemberStore } from './member_store.js';
+import { createRuntimeProviderIdentity } from './auth/provider_identity.js';
+import { createMemberSessions } from './auth/member_session.js';
 
 const port = Number(process.env.PORT || 8787);
 // Defaults to local; only all three explicit OpenAI settings enable the provider.
@@ -21,6 +23,8 @@ const app = createApp({
   appToken: process.env.APP_BEARER_TOKEN || '',
   adminToken: process.env.ADMIN_TOKEN || '',
   identity: createRuntimeIdentity(),
+  providerIdentity: createRuntimeProviderIdentity(),
+  memberSessions: createMemberSessions(),
   webMetrics,
   memberStore,
   production: process.env.NODE_ENV === 'production',

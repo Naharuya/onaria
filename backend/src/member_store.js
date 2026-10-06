@@ -23,11 +23,15 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       WHERE provider_user_id IS NOT NULL;
   `);
   const findByPhone = db.prepare('SELECT * FROM members WHERE phone = ?');
+  const findByProviderIdentity = db.prepare(
+    'SELECT * FROM members WHERE login_provider = ? AND provider_user_id = ?',
+  );
   const countMembers = db.prepare('SELECT COUNT(*) AS count FROM members');
   const recentMembers = db.prepare(`SELECT id, name, phone, church_name, login_provider, created_at
     FROM members ORDER BY id DESC LIMIT ?`);
   const insert = db.prepare(`INSERT INTO members (name, phone, church_name, login_provider, provider_user_id)
     VALUES (@name, @phone, @churchName, @loginProvider, @providerUserId)`);
+  const deleteById = db.prepare('DELETE FROM members WHERE id = ?');
   return {
     create(member) {
       if (findByPhone.get(member.phone)) {
@@ -37,6 +41,15 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       }
       const result = insert.run({ ...member, providerUserId: member.providerUserId ?? null });
       return db.prepare('SELECT * FROM members WHERE id = ?').get(result.lastInsertRowid);
+    },
+    findByProviderIdentity(loginProvider, providerUserId) {
+      if (!['apple', 'naver', 'kakao', 'google'].includes(loginProvider)
+        || typeof providerUserId !== 'string' || !providerUserId || providerUserId.length > 200) return null;
+      return findByProviderIdentity.get(loginProvider, providerUserId) ?? null;
+    },
+    deleteById(memberId) {
+      if (!Number.isSafeInteger(memberId) || memberId < 1) return false;
+      return deleteById.run(memberId).changes === 1;
     },
     getAdminOverview({ limit = 8 } = {}) {
       return {
