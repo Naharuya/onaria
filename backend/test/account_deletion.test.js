@@ -30,7 +30,7 @@ const remove = (base, token) => fetch(`${base}/v1/account`, { method: 'DELETE', 
 test('provider login issues opaque session and deletes only verified own member', async () => {
   const { app, deleted, memberSessions } = fixture();
   await withServer(app, async base => { const { response, body } = await login(base, 'google', 'alice'); assert.equal(response.status, 201);
-    assert.match(body.sessionToken, /^[A-Za-z0-9_-]{43}$/); assert.equal(body.expiresInSeconds, 900); assert.equal(memberSessions.size(), 1);
+    assert.match(body.sessionToken, /^[A-Za-z0-9_-]{43}$/); assert.equal(body.expiresInSeconds, 30 * 24 * 60 * 60); assert.equal(memberSessions.size(), 1);
     assert.equal((await remove(base, body.sessionToken)).status, 204); assert.deepEqual(deleted, [7]); assert.equal(memberSessions.size(), 0);
     assert.equal((await remove(base, body.sessionToken)).status, 401); });
 });

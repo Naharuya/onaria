@@ -7,8 +7,8 @@ import { IdentityError } from './identity_verifier.js';
 const digestHex = value => createHash('sha256').update(value).digest('hex');
 const allowedProviders = new Set(['apple', 'google', 'kakao', 'naver']);
 
-export function createMemberSessions({ ttlMs = 15 * 60_000, maxSessions = 5000, now = () => Date.now(), filename } = {}) {
-  if (!Number.isSafeInteger(ttlMs) || ttlMs < 60_000 || ttlMs > 24 * 60 * 60_000
+export function createMemberSessions({ ttlMs = 30 * 24 * 60 * 60_000, maxSessions = 5000, now = () => Date.now(), filename } = {}) {
+  if (!Number.isSafeInteger(ttlMs) || ttlMs < 60_000 || ttlMs > 90 * 24 * 60 * 60_000
     || !Number.isSafeInteger(maxSessions) || maxSessions < 1 || maxSessions > 100_000) throw new IdentityError(503);
 
   if (!filename) {

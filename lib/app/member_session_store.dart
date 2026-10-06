@@ -82,7 +82,7 @@ class MemberSessionStore {
   void set({required String token, required int expiresInSeconds}) {
     if (!_validToken(token) ||
         expiresInSeconds < 60 ||
-        expiresInSeconds > 86400) {
+        expiresInSeconds > 90 * 24 * 60 * 60) {
       throw const FormatException('Invalid member session');
     }
     _token = token;
