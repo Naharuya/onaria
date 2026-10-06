@@ -12,6 +12,12 @@
 @import flutter_local_notifications;
 #endif
 
+#if __has_include(<flutter_secure_storage_darwin/FlutterSecureStorageDarwinPlugin.h>)
+#import <flutter_secure_storage_darwin/FlutterSecureStorageDarwinPlugin.h>
+#else
+@import flutter_secure_storage_darwin;
+#endif
+
 #if __has_include(<flutter_timezone/FlutterTimezonePlugin.h>)
 #import <flutter_timezone/FlutterTimezonePlugin.h>
 #else
@@ -88,6 +94,7 @@
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
   [FlutterLocalNotificationsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterLocalNotificationsPlugin"]];
+  [FlutterSecureStorageDarwinPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterSecureStorageDarwinPlugin"]];
   [FlutterTimezonePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterTimezonePlugin"]];
   [FlutterTtsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterTtsPlugin"]];
   [GoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"GoogleSignInPlugin"]];
