@@ -31,7 +31,7 @@ class ProviderSetupPage extends StatelessWidget {
                           .headlineSmall
                           ?.copyWith(fontWeight: FontWeight.w800)),
                   const SizedBox(height: 10),
-                  Text('네이버, 카카오, 구글 클라이언트 ID를 등록한 뒤 회원가입을 시작할 수 있어요.',
+                  Text('Apple, 네이버, 카카오, 구글 클라이언트 ID를 등록한 뒤 회원가입을 시작할 수 있어요.',
                       style: TextStyle(
                           color: AppTheme.of(context).muted, height: 1.5)),
                   const SizedBox(height: 24),
