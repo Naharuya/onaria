@@ -278,6 +278,23 @@ class _SignUpPageState extends State<SignUpPage> {
       if (error.statusCode != 404) rethrow;
     }
 
+    final currentSession = MemberSessionStore.instance.token;
+    if (currentSession != null) {
+      final linked = await client.linkProvider(
+        provider: provider,
+        credential: credential,
+        sessionToken: currentSession,
+      );
+      MemberSessionStore.instance.set(
+        token: linked.session.token,
+        expiresInSeconds: linked.session.expiresInSeconds,
+      );
+      if (!mounted) return;
+      _showMessage(_providerLabel(provider) + ' 계정이 현재 ONARIA 계정에 연결되었어요.');
+      Navigator.of(context).pop();
+      return;
+    }
+
     if (!mounted) return;
     setState(() {
       _pendingProvider = provider;
@@ -303,6 +320,7 @@ class _SignUpPageState extends State<SignUpPage> {
         name: _name.text.trim(),
         phone: _phone.text.trim(),
         churchName: _church.text.trim(),
+        sessionToken: MemberSessionStore.instance.token,
       );
       await MemberRegistrationStore().saveMemberId(registration.memberId);
       MemberSessionStore.instance.set(

@@ -124,6 +124,34 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     try {
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
       const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
+      const existingIdentity = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
+      if (existingIdentity) {
+        const session = memberSessions.issue(trusted);
+        return res.status(200).json({
+          member: publicMember(existingIdentity),
+          sessionToken: session.token,
+          expiresInSeconds: session.expiresInSeconds,
+          linked: false,
+        });
+      }
+
+      const sessionToken = req.get('x-onaria-member-session');
+      if (sessionToken) {
+        const currentIdentity = memberSessions.verify(sessionToken);
+        const currentMember = memberStore.findByProviderIdentity?.(currentIdentity.provider, currentIdentity.providerUserId);
+        if (!currentMember) throw new IdentityError();
+        const member = memberStore.attachIdentity?.(currentMember.id, trusted.provider, trusted.providerUserId);
+        if (!member) throw new IdentityError();
+        const session = memberSessions.issue(trusted);
+        memberSessions.revoke(sessionToken);
+        return res.status(200).json({
+          member: publicMember(member),
+          sessionToken: session.token,
+          expiresInSeconds: session.expiresInSeconds,
+          linked: true,
+        });
+      }
+
       const member = memberStore.create(memberSchema.parse({
         name: req.body?.name,
         phone: req.body?.phone,
@@ -136,9 +164,12 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
         member: publicMember(member),
         sessionToken: session.token,
         expiresInSeconds: session.expiresInSeconds,
+        linked: false,
       });
     } catch (error) {
-      if (error.code === 'PHONE_EXISTS') return res.status(409).json({ message: error.message });
+      if (error.code === 'PHONE_EXISTS' || error.code === 'IDENTITY_EXISTS') {
+        return res.status(409).json({ message: error.message });
+      }
       return next(error);
     }
   });

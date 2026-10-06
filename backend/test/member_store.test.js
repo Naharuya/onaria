@@ -66,3 +66,40 @@ test('native SQLite persists members and rejects duplicate phone after reopening
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('one member can safely own multiple verified provider identities', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'onaria-member-link-test-'));
+  const filename = join(directory, 'fixture.sqlite');
+  const store = createMemberStore({ filename });
+  try {
+    const member = store.create({
+      name: '연결회원',
+      phone: '01024681357',
+      churchName: '테스트교회',
+      loginProvider: 'apple',
+      providerUserId: 'apple-sub-linked',
+    });
+    assert.equal(store.attachIdentity(member.id, 'kakao', 'kakao-sub-linked').id, member.id);
+    assert.equal(store.findByProviderIdentity('apple', 'apple-sub-linked').id, member.id);
+    assert.equal(store.findByProviderIdentity('kakao', 'kakao-sub-linked').id, member.id);
+
+    const other = store.create({
+      name: '다른회원',
+      phone: '01013572468',
+      churchName: '테스트교회',
+      loginProvider: 'google',
+      providerUserId: 'google-sub-other',
+    });
+    assert.throws(
+      () => store.attachIdentity(other.id, 'kakao', 'kakao-sub-linked'),
+      { code: 'IDENTITY_EXISTS' },
+    );
+
+    assert.equal(store.deleteById(member.id), true);
+    assert.equal(store.findByProviderIdentity('apple', 'apple-sub-linked'), null);
+    assert.equal(store.findByProviderIdentity('kakao', 'kakao-sub-linked'), null);
+  } finally {
+    store.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

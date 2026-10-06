@@ -60,9 +60,33 @@ class MemberApiClient {
       'credential': credential,
     });
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw MemberApiException(_readError(response.body), statusCode: response.statusCode);
+      throw MemberApiException(_readError(response.body),
+          statusCode: response.statusCode);
     }
     return _readSession(response.body);
+  }
+
+  Future<AuthenticatedMemberRegistration> linkProvider({
+    required String provider,
+    required String credential,
+    required String sessionToken,
+  }) async {
+    ApiConfig.requireSecureEndpoint(baseUrl);
+    final response = await _postJson(
+      '/v1/auth/provider/signup',
+      {
+        'provider': provider,
+        'credential': credential,
+      },
+      sessionToken: sessionToken,
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw MemberApiException(
+        _readError(response.body),
+        statusCode: response.statusCode,
+      );
+    }
+    return _readAuthenticatedRegistration(response.body);
   }
 
   Future<AuthenticatedMemberRegistration> providerSignUp({
@@ -71,35 +95,32 @@ class MemberApiClient {
     required String name,
     required String phone,
     required String churchName,
+    String? sessionToken,
   }) async {
     ApiConfig.requireSecureEndpoint(baseUrl);
-    final response = await _postJson('/v1/auth/provider/signup', {
-      'provider': provider,
-      'credential': credential,
-      'name': name,
-      'phone': phone,
-      'churchName': churchName,
-    });
+    final response = await _postJson(
+      '/v1/auth/provider/signup',
+      {
+        'provider': provider,
+        'credential': credential,
+        'name': name,
+        'phone': phone,
+        'churchName': churchName,
+      },
+      sessionToken: sessionToken,
+    );
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw MemberApiException(_readError(response.body), statusCode: response.statusCode);
+      throw MemberApiException(_readError(response.body),
+          statusCode: response.statusCode);
     }
-    try {
-      final decoded = jsonDecode(response.body);
-      final member = decoded is Map<String, dynamic> ? decoded['member'] : null;
-      if (member is! Map || member['id'] is! int || member['id'] < 1) {
-        throw const FormatException('Invalid member response');
-      }
-      return AuthenticatedMemberRegistration(
-        memberId: member['id'] as int,
-        session: _readSession(response.body),
-      );
-    } catch (error) {
-      if (error is FormatException) rethrow;
-      throw const FormatException('Invalid member response');
-    }
+    return _readAuthenticatedRegistration(response.body);
   }
 
-  Future<http.Response> _postJson(String path, Map<String, Object?> body) {
+  Future<http.Response> _postJson(
+    String path,
+    Map<String, Object?> body, {
+    String? sessionToken,
+  }) {
     final request = http.Request('POST', baseUrl.resolve(path))
       ..followRedirects = false
       ..headers.addAll(const {
@@ -107,10 +128,32 @@ class MemberApiClient {
         'Accept': 'application/json'
       })
       ..body = jsonEncode(body);
+    if (sessionToken != null && sessionToken.isNotEmpty) {
+      request.headers['X-Onaria-Member-Session'] = sessionToken;
+    }
     return _httpClient
         .send(request)
         .then(http.Response.fromStream)
         .timeout(timeout);
+  }
+
+  static AuthenticatedMemberRegistration _readAuthenticatedRegistration(
+    String body,
+  ) {
+    try {
+      final decoded = jsonDecode(body);
+      final member = decoded is Map<String, dynamic> ? decoded['member'] : null;
+      if (member is! Map || member['id'] is! int || member['id'] < 1) {
+        throw const FormatException('Invalid member response');
+      }
+      return AuthenticatedMemberRegistration(
+        memberId: member['id'] as int,
+        session: _readSession(body),
+      );
+    } catch (error) {
+      if (error is FormatException) rethrow;
+      throw const FormatException('Invalid member response');
+    }
   }
 
   static MemberSession _readSession(String body) {

@@ -35,11 +35,22 @@ test('provider login issues opaque session and deletes only verified own member'
     assert.equal((await remove(base, body.sessionToken)).status, 401); });
 });
 
-test('unknown identity cannot delete another member and logout revokes session', async () => {
+test('unknown identity cannot obtain a member session and logout revokes a valid session', async () => {
   const { app, deleted } = fixture();
-  await withServer(app, async base => { const { body } = await login(base, 'google', 'mallory'); assert.equal((await remove(base, body.sessionToken)).status, 404); assert.deepEqual(deleted, []);
-    const bob = (await login(base, 'kakao', 'bob')).body; const logout = await fetch(`${base}/v1/auth/provider/session`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': bob.sessionToken } });
-    assert.equal(logout.status, 204); assert.equal((await remove(base, bob.sessionToken)).status, 401); assert.deepEqual(deleted, []); });
+  await withServer(app, async base => {
+    const unknown = await login(base, 'google', 'mallory');
+    assert.equal(unknown.response.status, 404);
+    assert.equal(unknown.body, null);
+    assert.deepEqual(deleted, []);
+    const bob = (await login(base, 'kakao', 'bob')).body;
+    const logout = await fetch(`${base}/v1/auth/provider/session`, {
+      method: 'DELETE',
+      headers: { 'X-Onaria-Member-Session': bob.sessionToken },
+    });
+    assert.equal(logout.status, 204);
+    assert.equal((await remove(base, bob.sessionToken)).status, 401);
+    assert.deepEqual(deleted, []);
+  });
 });
 
 test('provider/session boundary fails closed and never accepts old AI identity header', async () => {
@@ -47,4 +58,51 @@ test('provider/session boundary fails closed and never accepts old AI identity h
   await withServer(app, async base => { assert.equal((await remove(base, null)).status, 401);
     assert.equal((await fetch(`${base}/v1/account`, { method: 'DELETE', headers: { 'X-Soul-Identity-Token': 'legacy' } })).status, 401);
     const { response } = await login(base, 'google', 'bad'); assert.equal(response.status, 401); assert.deepEqual(deleted, []); });
+});
+
+test('authenticated member can link a second verified provider without creating a duplicate member', async () => {
+  const identities = new Map([
+    ['apple:owner', { id: 11, name: '연결회원', phone: '01011112222', church_name: '테스트교회', login_provider: 'apple', created_at: '2026-10-06' }],
+  ]);
+  const memberSessions = createMemberSessions();
+  const memberStore = {
+    getAdminOverview: () => ({ total: 1, recent: [] }),
+    findByProviderIdentity(provider, providerUserId) {
+      return identities.get(`${provider}:${providerUserId}`) ?? null;
+    },
+    attachIdentity(memberId, provider, providerUserId) {
+      const member = identities.get('apple:owner');
+      if (!member || member.id !== memberId) return null;
+      identities.set(`${provider}:${providerUserId}`, member);
+      return member;
+    },
+    create() { throw new Error('must not create duplicate member'); },
+  };
+  const app = createApp({
+    generate: Object.assign(async () => ({}), { mode: 'test' }),
+    memberStore,
+    providerIdentity: async ({ provider, credential }) => ({ provider, providerUserId: credential }),
+    memberSessions,
+    identity: { required: false, verify: null },
+    logger: { error() {} },
+  });
+
+  await withServer(app, async base => {
+    const appleSession = memberSessions.issue({ provider: 'apple', providerUserId: 'owner' });
+    const response = await fetch(`${base}/v1/auth/provider/signup`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'X-Onaria-Member-Session': appleSession.token,
+      },
+      body: JSON.stringify({ provider: 'kakao', credential: 'kakao-owner' }),
+    });
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.member.id, 11);
+    assert.equal(body.linked, true);
+    assert.equal(identities.get('kakao:kakao-owner').id, 11);
+    assert.equal(memberSessions.verify(body.sessionToken).provider, 'kakao');
+    assert.throws(() => memberSessions.verify(appleSession.token));
+  });
 });
