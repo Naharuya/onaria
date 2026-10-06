@@ -114,109 +114,104 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 24),
                   ],
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          '회원 정보',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.of(context).ink,
+                  if (_pendingProvider != null) ...[
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            '회원 정보',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.of(context).ink,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _name,
-                          maxLength: 40,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: '이름',
-                            prefixIcon: Icon(Icons.person_outline),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _name,
+                            maxLength: 40,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: '이름',
+                              prefixIcon: Icon(Icons.person_outline),
+                            ),
+                            validator: _required,
                           ),
-                          validator: _required,
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _phone,
-                          keyboardType: TextInputType.phone,
-                          textInputAction: TextInputAction.next,
-                          decoration: const InputDecoration(
-                            labelText: '전화번호',
-                            hintText: '010-0000-0000',
-                            prefixIcon: Icon(Icons.phone_outlined),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _phone,
+                            keyboardType: TextInputType.phone,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: '전화번호',
+                              hintText: '010-0000-0000',
+                              prefixIcon: Icon(Icons.phone_outlined),
+                            ),
+                            validator: (value) =>
+                                RegExp(r'^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$')
+                                        .hasMatch(value?.trim() ?? '')
+                                    ? null
+                                    : '휴대폰 번호를 확인해 주세요.',
                           ),
-                          validator: (value) =>
-                              RegExp(r'^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$')
-                                      .hasMatch(value?.trim() ?? '')
-                                  ? null
-                                  : '휴대폰 번호를 확인해 주세요.',
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _church,
-                          maxLength: 100,
-                          textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                            labelText: '교회명 (선택)',
-                            prefixIcon: Icon(Icons.church_outlined),
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _church,
+                            maxLength: 100,
+                            textInputAction: TextInputAction.done,
+                            decoration: const InputDecoration(
+                              labelText: '교회명 (선택)',
+                              prefixIcon: Icon(Icons.church_outlined),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          value: _termsAccepted,
-                          onChanged: _busy
-                              ? null
-                              : (value) => setState(
-                                  () => _termsAccepted = value ?? false),
-                          title: const Text('이용약관에 동의합니다. (필수)'),
-                          controlAffinity: ListTileControlAffinity.leading,
-                        ),
-                        TextButton(
-                          onPressed: () => launchUrl(
-                              Uri.parse('https://onaria.ai.kr/terms'),
-                              mode: LaunchMode.externalApplication),
-                          child: const Text('이용약관 보기'),
-                        ),
-                        CheckboxListTile(
-                          contentPadding: EdgeInsets.zero,
-                          value: _privacyAccepted,
-                          onChanged: _busy
-                              ? null
-                              : (value) => setState(
-                                  () => _privacyAccepted = value ?? false),
-                          title: const Text('개인정보 처리 안내에 동의합니다. (필수)'),
-                          controlAffinity: ListTileControlAffinity.leading,
-                        ),
-                        TextButton(
-                          onPressed: () => launchUrl(
-                              Uri.parse('https://onaria.ai.kr/privacy'),
-                              mode: LaunchMode.externalApplication),
-                          child: const Text('개인정보 처리 안내 보기'),
-                        ),
-                        const SizedBox(height: 20),
-                        FilledButton.icon(
-                          onPressed: _busy
-                              ? null
-                              : _pendingProviderCredential == null
-                                  ? _submit
-                                  : _completeProviderSignUp,
-                          icon: const Icon(Icons.check),
-                          label: Text(
-                            _busy
-                                ? '처리 중...'
-                                : _pendingProviderCredential == null
-                                    ? '회원가입'
-                                    : _providerLabel(_pendingProvider) +
-                                        '로 가입 완료',
+                          const SizedBox(height: 12),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: _termsAccepted,
+                            onChanged: _busy
+                                ? null
+                                : (value) => setState(
+                                    () => _termsAccepted = value ?? false),
+                            title: const Text('이용약관에 동의합니다. (필수)'),
+                            controlAffinity: ListTileControlAffinity.leading,
                           ),
-                        ),
-                      ],
+                          TextButton(
+                            onPressed: () => launchUrl(
+                                Uri.parse('https://onaria.ai.kr/terms'),
+                                mode: LaunchMode.externalApplication),
+                            child: const Text('이용약관 보기'),
+                          ),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: _privacyAccepted,
+                            onChanged: _busy
+                                ? null
+                                : (value) => setState(
+                                    () => _privacyAccepted = value ?? false),
+                            title: const Text('개인정보 처리 안내에 동의합니다. (필수)'),
+                            controlAffinity: ListTileControlAffinity.leading,
+                          ),
+                          TextButton(
+                            onPressed: () => launchUrl(
+                                Uri.parse('https://onaria.ai.kr/privacy'),
+                                mode: LaunchMode.externalApplication),
+                            child: const Text('개인정보 처리 안내 보기'),
+                          ),
+                          const SizedBox(height: 20),
+                          FilledButton.icon(
+                            onPressed: _busy ? null : _completeProviderSignUp,
+                            icon: const Icon(Icons.check),
+                            label: Text(
+                              _busy
+                                  ? '처리 중...'
+                                  : '${_providerLabel(_pendingProvider)}로 가입 완료',
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ]
                 ],
               ),
             ),
@@ -419,44 +414,6 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (_) {
       if (mounted) {
         _showMessage('회원가입을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.');
-      }
-    } finally {
-      client.close();
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _submit() async {
-    if (!_termsAccepted || !_privacyAccepted) {
-      _showMessage('이용약관과 개인정보 처리 안내에 동의해 주세요.');
-      return;
-    }
-    if (!_formKey.currentState!.validate()) return;
-    final apiBaseUrl = ApiConfig.baseUrl;
-    if (apiBaseUrl == null) {
-      _showMessage('서버 설정이 필요해요. ' + ApiConfig.setupHint);
-      return;
-    }
-
-    setState(() => _busy = true);
-    final client = MemberApiClient(baseUrl: apiBaseUrl);
-    try {
-      final registration = await client.signUp(
-        name: _name.text.trim(),
-        phone: _phone.text.trim(),
-        churchName: _church.text.trim(),
-      );
-      await MemberRegistrationStore().saveMemberId(registration.memberId);
-      if (!mounted) return;
-      _showMessage('회원가입이 완료되었어요.');
-      Navigator.of(context).pop();
-    } catch (error) {
-      if (mounted) {
-        _showMessage(
-          error is MemberApiException
-              ? error.message
-              : '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.',
-        );
       }
     } finally {
       client.close();

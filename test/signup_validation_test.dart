@@ -3,26 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onaria/features/signup_page.dart';
 
 void main() {
-  testWidgets('invalid phone is rejected before signup is sent',
+  testWidgets(
+      'signup details stay hidden until a new social identity is verified',
       (tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignUpPage()));
-    await tester.enterText(find.byType(TextFormField).at(0), '테스트');
-    await tester.enterText(find.byType(TextFormField).at(1), '123');
-    await tester.enterText(find.byType(TextFormField).at(2), '테스트 교회');
-    tester.testTextInput.hide();
-    await tester.ensureVisible(find.byType(CheckboxListTile).at(0));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(CheckboxListTile).at(0));
-    await tester.ensureVisible(find.byType(CheckboxListTile).at(1));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byType(CheckboxListTile).at(1));
-    await tester.pumpAndSettle();
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('회원가입'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('회원가입'));
-    await tester.pumpAndSettle();
-    expect(find.text('휴대폰 번호를 확인해 주세요.'), findsOneWidget);
-    expect(find.text('가입 중...'), findsNothing);
+    expect(find.byType(TextFormField), findsNothing);
+    expect(find.text('회원 정보'), findsNothing);
+    expect(find.text('기존 회원은 바로 로그인되고, 처음 이용하는 계정만 아래 회원 정보로 가입을 완료합니다.'),
+        findsOneWidget);
   });
 }
