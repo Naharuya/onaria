@@ -13,14 +13,19 @@ class ProviderAuthApiClient {
   final Duration timeout;
 
   Future<MemberSession> exchange(
-      {required String provider, required String credential}) async {
+      {required String provider,
+      required String credential,
+      String? nonce}) async {
     if (!const {'google', 'kakao', 'naver'}.contains(provider) ||
         credential.isEmpty ||
         credential.length > 8192) {
       throw const FormatException('Invalid provider credential');
     }
-    final response = await _send('POST', '/v1/auth/provider/session',
-        body: {'provider': provider, 'credential': credential});
+    final response = await _send('POST', '/v1/auth/provider/session', body: {
+      'provider': provider,
+      'credential': credential,
+      if (nonce != null) 'nonce': nonce
+    });
     if (response.statusCode != 201) {
       throw ProviderAuthApiException(_readError(response.body));
     }
