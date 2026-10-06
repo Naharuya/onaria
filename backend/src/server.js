@@ -6,6 +6,8 @@ import { createRuntimeUsageLedger } from './cost/runtime_ledger.js';
 import { createRuntimeIdentity } from './auth/identity_verifier.js';
 import { createWebMetrics } from './web_metrics.js';
 import { createMemberStore } from './member_store.js';
+import { createRuntimeProviderIdentity } from './auth/provider_identity.js';
+import { createMemberSessions } from './auth/member_session.js';
 
 const port = Number(process.env.PORT || 8787);
 // Defaults to local; only all three explicit OpenAI settings enable the provider.
@@ -14,6 +16,7 @@ const webMetrics = createWebMetrics();
 const adminSettings = createAdminSettings({ directory: fileURLToPath(new URL('../data/admin-secrets/', import.meta.url)), usageLedger, onResult: event => webMetrics.result(event) });
 const generate = adminSettings.generate;
 const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
+const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
 const app = createApp({
   generate,
   adminSettings,
@@ -21,6 +24,8 @@ const app = createApp({
   appToken: process.env.APP_BEARER_TOKEN || '',
   adminToken: process.env.ADMIN_TOKEN || '',
   identity: createRuntimeIdentity(),
+  providerIdentity: createRuntimeProviderIdentity(),
+  memberSessions,
   webMetrics,
   memberStore,
   production: process.env.NODE_ENV === 'production',
@@ -30,5 +35,5 @@ const app = createApp({
 });
 const host = process.env.HOST || '0.0.0.0';
 const server = app.listen(port, host, () => console.log(`onaria backend listening on ${host}:${port} (${generate.mode})`));
-server.on('close', () => { usageLedger.close?.(); memberStore.close(); });
+server.on('close', () => { usageLedger.close?.(); memberStore.close(); memberSessions.close?.(); });
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close());

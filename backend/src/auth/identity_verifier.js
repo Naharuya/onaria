@@ -9,6 +9,23 @@ export class IdentityError extends Error {
 }
 const allowedAlgorithms = ['RS256', 'ES256'];
 const maxJwksBytes = 65536;
+
+function verificationFailureCode(error) {
+  if (error?.code === 'ERR_JWT_EXPIRED') return 'EXPIRED';
+  if (error?.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED') return 'SIGNATURE_INVALID';
+  if (error?.code === 'ERR_JWKS_NO_MATCHING_KEY') return 'NO_MATCHING_KEY';
+  if (error?.code === 'ERR_JWT_CLAIM_VALIDATION_FAILED') {
+    if (error.claim === 'aud') return 'AUD_MISMATCH';
+    if (error.claim === 'iss') return 'ISSUER_MISMATCH';
+    if (error.claim === 'iat') return 'IAT_INVALID';
+    if (error.claim === 'exp') return 'EXP_INVALID';
+    if (error.claim === 'sub') return 'SUB_INVALID';
+    return 'CLAIM_INVALID';
+  }
+  if (error?.code === 'ERR_JWS_INVALID') return 'JWS_INVALID';
+  if (error?.code === 'ERR_JWT_INVALID') return 'JWT_INVALID';
+  return 'VERIFY_FAILED';
+}
 function httpsUrl(value) {
   const url = new URL(value);
   if (url.protocol !== 'https:' || !url.hostname || url.username || url.password || url.hash) throw new IdentityError(503);
@@ -22,12 +39,12 @@ function publicJwks(value) {
   return value;
 }
 
-export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms = ['RS256'], typ = 'JWT',
-  maxTokenAgeSeconds = 3600, requiredClaims = {}, fetchImpl = globalThis.fetch, now = () => new Date() } = {}) {
+export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms = ['RS256'], typ,
+  maxTokenAgeSeconds = 3600, requiredClaims = {}, fetchImpl = globalThis.fetch, now = () => new Date(), onFailure } = {}) {
   const issuerUrl = httpsUrl(issuer);
   if (issuerUrl.search || typeof audience !== 'string' || !audience.trim() || audience.length > 256
     || !Array.isArray(algorithms) || !algorithms.length || algorithms.some(alg => !allowedAlgorithms.includes(alg))
-    || !['JWT', 'at+jwt'].includes(typ)
+    || (typ !== undefined && !['JWT', 'at+jwt'].includes(typ))
     || !Number.isSafeInteger(maxTokenAgeSeconds) || maxTokenAgeSeconds < 60 || maxTokenAgeSeconds > 86400
     || Boolean(jwksUrl) === Boolean(jwks)
     || !requiredClaims || typeof requiredClaims !== 'object' || Array.isArray(requiredClaims)) throw new IdentityError(503);
@@ -67,20 +84,37 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
   }
   return async token => {
     try {
-      if (typeof token !== 'string' || token.length > 8192 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) throw new IdentityError();
+      if (typeof token !== 'string' || token.length > 8192 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) {
+        try { onFailure?.('TOKEN_FORMAT_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       const header = decodeProtectedHeader(token);
       if (typeof header.kid !== 'string' || !header.kid || header.kid.length > 128
-        || Object.keys(header).some(key => !['alg', 'typ', 'kid'].includes(key))) throw new IdentityError();
+        || Object.keys(header).some(key => !['alg', 'typ', 'kid'].includes(key))) {
+        try { onFailure?.('HEADER_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       const currentDate = now();
-      const { payload } = await jwtVerify(token, keys, { issuer, audience, algorithms, typ, currentDate,
-        requiredClaims: ['iss', 'aud', 'sub', 'iat', 'exp'], maxTokenAge: maxTokenAgeSeconds, clockTolerance: 5 });
+      const verifyOptions = {
+        issuer, audience, algorithms, currentDate,
+        requiredClaims: ['iss', 'aud', 'sub', 'iat', 'exp'],
+        maxTokenAge: maxTokenAgeSeconds, clockTolerance: 5,
+      };
+      if (typ !== undefined) verifyOptions.typ = typ;
+      const { payload } = await jwtVerify(token, keys, verifyOptions);
       if (typeof payload.sub !== 'string' || !payload.sub || payload.sub.length > 256
         || !Number.isSafeInteger(payload.iat) || !Number.isSafeInteger(payload.exp) || payload.iat < 0
         || payload.exp <= payload.iat || payload.exp - payload.iat > maxTokenAgeSeconds
-        || claims.some(([key, value]) => !Object.hasOwn(payload, key) || payload[key] !== value)) throw new IdentityError();
+        || claims.some(([key, value]) => !Object.hasOwn(payload, key) || payload[key] !== value)) {
+        try { onFailure?.('CLAIM_SHAPE_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       // Stable, issuer-qualified identity; never return the token or full claims.
       return Object.freeze({ userId: JSON.stringify([issuer, payload.sub]), subject: payload.sub });
     } catch (error) {
+      if (!(error instanceof IdentityError)) {
+        try { onFailure?.(verificationFailureCode(error)); } catch { /* Diagnostics must never affect auth. */ }
+      }
       if (error instanceof IdentityError) throw error;
       // Signature/claim errors and upstream details share a fixed public error.
       throw new IdentityError();
