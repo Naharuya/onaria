@@ -18,6 +18,7 @@ class PrivacyPage extends StatefulWidget {
 
 class _PrivacyPageState extends State<PrivacyPage> {
   bool _busy = false;
+  bool _hasSession = MemberSessionStore.instance.token != null;
   List<String> _providers = const [];
   String? _currentProvider;
 
@@ -33,6 +34,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     if (token == null || base == null) {
       if (mounted)
         setState(() {
+          _hasSession = false;
           _providers = const [];
           _currentProvider = null;
         });
@@ -43,12 +45,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
       final account = await client.account(token);
       if (mounted)
         setState(() {
+          _hasSession = true;
           _providers = account.providers;
           _currentProvider = account.currentProvider;
         });
     } catch (_) {
       if (mounted)
         setState(() {
+          _hasSession = MemberSessionStore.instance.token != null;
           _providers = const [];
           _currentProvider = null;
         });
@@ -75,7 +79,11 @@ class _PrivacyPageState extends State<PrivacyPage> {
       await client.logout(token);
       MemberSessionStore.instance.clear();
       if (mounted) {
-        setState(() => _providers = const []);
+        setState(() {
+          _hasSession = false;
+          _providers = const [];
+          _currentProvider = null;
+        });
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('로그아웃했어요.')));
       }
@@ -250,23 +258,28 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const Text(
               '회원탈퇴는 서버의 회원정보를 삭제하는 별도 절차예요. 기기 기록 삭제나 앱 삭제만으로는 탈퇴되지 않아요.'),
           const SizedBox(height: 10),
-          if (_providers.isNotEmpty) ...[
+          if (_hasSession) ...[
             const SizedBox(height: 8),
-            const Text('연결된 로그인 계정',
-                style: TextStyle(fontWeight: FontWeight.w700)),
-            ..._providers.map((provider) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(_providerLabel(provider)),
-                  trailing: provider == _currentProvider
-                      ? const Text('현재 로그인', style: TextStyle(fontSize: 12))
-                      : _providers.length > 1
-                          ? TextButton(
-                              onPressed: _busy
-                                  ? null
-                                  : () => _unlinkProvider(provider),
-                              child: const Text('연결 해제'))
-                          : const Text('유지 필요', style: TextStyle(fontSize: 12)),
-                )),
+            if (_providers.isEmpty)
+              const Text('로그인 상태입니다. 연결된 계정 정보를 불러오지 못해도 로그아웃할 수 있어요.'),
+            if (_providers.isNotEmpty)
+              const Text('연결된 로그인 계정',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
+            if (_providers.isNotEmpty)
+              ..._providers.map((provider) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(_providerLabel(provider)),
+                    trailing: provider == _currentProvider
+                        ? const Text('현재 로그인', style: TextStyle(fontSize: 12))
+                        : _providers.length > 1
+                            ? TextButton(
+                                onPressed: _busy
+                                    ? null
+                                    : () => _unlinkProvider(provider),
+                                child: const Text('연결 해제'))
+                            : const Text('유지 필요',
+                                style: TextStyle(fontSize: 12)),
+                  )),
             OutlinedButton.icon(
                 onPressed: _busy ? null : _logout,
                 icon: const Icon(Icons.logout),
