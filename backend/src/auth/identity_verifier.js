@@ -22,12 +22,12 @@ function publicJwks(value) {
   return value;
 }
 
-export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms = ['RS256'], typ = 'JWT',
+export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms = ['RS256'], typ,
   maxTokenAgeSeconds = 3600, requiredClaims = {}, fetchImpl = globalThis.fetch, now = () => new Date() } = {}) {
   const issuerUrl = httpsUrl(issuer);
   if (issuerUrl.search || typeof audience !== 'string' || !audience.trim() || audience.length > 256
     || !Array.isArray(algorithms) || !algorithms.length || algorithms.some(alg => !allowedAlgorithms.includes(alg))
-    || !['JWT', 'at+jwt'].includes(typ)
+    || (typ !== undefined && !['JWT', 'at+jwt'].includes(typ))
     || !Number.isSafeInteger(maxTokenAgeSeconds) || maxTokenAgeSeconds < 60 || maxTokenAgeSeconds > 86400
     || Boolean(jwksUrl) === Boolean(jwks)
     || !requiredClaims || typeof requiredClaims !== 'object' || Array.isArray(requiredClaims)) throw new IdentityError(503);
@@ -72,8 +72,13 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
       if (typeof header.kid !== 'string' || !header.kid || header.kid.length > 128
         || Object.keys(header).some(key => !['alg', 'typ', 'kid'].includes(key))) throw new IdentityError();
       const currentDate = now();
-      const { payload } = await jwtVerify(token, keys, { issuer, audience, algorithms, typ, currentDate,
-        requiredClaims: ['iss', 'aud', 'sub', 'iat', 'exp'], maxTokenAge: maxTokenAgeSeconds, clockTolerance: 5 });
+      const verifyOptions = {
+        issuer, audience, algorithms, currentDate,
+        requiredClaims: ['iss', 'aud', 'sub', 'iat', 'exp'],
+        maxTokenAge: maxTokenAgeSeconds, clockTolerance: 5,
+      };
+      if (typ !== undefined) verifyOptions.typ = typ;
+      const { payload } = await jwtVerify(token, keys, verifyOptions);
       if (typeof payload.sub !== 'string' || !payload.sub || payload.sub.length > 256
         || !Number.isSafeInteger(payload.iat) || !Number.isSafeInteger(payload.exp) || payload.iat < 0
         || payload.exp <= payload.iat || payload.exp - payload.iat > maxTokenAgeSeconds
