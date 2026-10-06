@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app/conversation_draft.dart';
+import '../app/api_config.dart';
+import '../app/member_session_store.dart';
+import '../src/api/provider_auth_api_client.dart';
 import '../app/mind_card_store.dart';
 import '../app/space_scaffold.dart';
 import '../app/verse_history.dart';
@@ -15,6 +18,141 @@ class PrivacyPage extends StatefulWidget {
 
 class _PrivacyPageState extends State<PrivacyPage> {
   bool _busy = false;
+  List<String> _providers = const [];
+  String? _currentProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshAccount();
+  }
+
+  Future<void> _refreshAccount() async {
+    final token = MemberSessionStore.instance.token;
+    final base = ApiConfig.baseUrl;
+    if (token == null || base == null) {
+      if (mounted)
+        setState(() {
+          _providers = const [];
+          _currentProvider = null;
+        });
+      return;
+    }
+    final client = ProviderAuthApiClient(baseUrl: base);
+    try {
+      final account = await client.account(token);
+      if (mounted)
+        setState(() {
+          _providers = account.providers;
+          _currentProvider = account.currentProvider;
+        });
+    } catch (_) {
+      if (mounted)
+        setState(() {
+          _providers = const [];
+          _currentProvider = null;
+        });
+    } finally {
+      client.close();
+    }
+  }
+
+  String _providerLabel(String provider) => switch (provider) {
+        'apple' => 'Apple',
+        'kakao' => '카카오',
+        'google' => 'Google',
+        'naver' => '네이버',
+        _ => provider,
+      };
+
+  Future<void> _logout() async {
+    final token = MemberSessionStore.instance.token;
+    final base = ApiConfig.baseUrl;
+    if (token == null || base == null) return;
+    setState(() => _busy = true);
+    final client = ProviderAuthApiClient(baseUrl: base);
+    try {
+      await client.logout(token);
+      MemberSessionStore.instance.clear();
+      if (mounted) {
+        setState(() => _providers = const []);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('로그아웃했어요.')));
+      }
+    } catch (_) {
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('로그아웃을 완료하지 못했어요.')));
+    } finally {
+      client.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _deleteAccount() async {
+    final token = MemberSessionStore.instance.token;
+    final base = ApiConfig.baseUrl;
+    if (token == null || base == null) return;
+    final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('ONARIA 회원탈퇴'),
+              content:
+                  const Text('서버 회원정보와 연결된 소셜 계정을 삭제합니다. 이 작업은 되돌릴 수 없습니다.'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('취소')),
+                FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('회원탈퇴')),
+              ],
+            ));
+    if (confirmed != true || !mounted) return;
+    setState(() => _busy = true);
+    final client = ProviderAuthApiClient(baseUrl: base);
+    try {
+      await client.deleteAccount(token);
+      MemberSessionStore.instance.clear();
+      if (mounted) {
+        setState(() => _providers = const []);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('회원탈퇴가 완료되었어요.')));
+      }
+    } catch (_) {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('회원탈퇴를 완료하지 못했어요. 다시 시도해 주세요.')));
+    } finally {
+      client.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _unlinkProvider(String provider) async {
+    final token = MemberSessionStore.instance.token;
+    final base = ApiConfig.baseUrl;
+    if (token == null || base == null) return;
+    final client = ProviderAuthApiClient(baseUrl: base);
+    setState(() => _busy = true);
+    try {
+      await client.unlinkProvider(token, provider);
+      await _refreshAccount();
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${_providerLabel(provider)} 연결을 해제했어요.')));
+    } catch (error) {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(error is ProviderAuthApiException
+                ? error.message
+                : '계정 연결 해제를 완료하지 못했어요.')));
+    } finally {
+      client.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _delete(String name, Future<void> Function() action) async {
     if (_busy) return;
     final confirmed = await showDialog<bool>(
@@ -112,19 +250,37 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const Text(
               '회원탈퇴는 서버의 회원정보를 삭제하는 별도 절차예요. 기기 기록 삭제나 앱 삭제만으로는 탈퇴되지 않아요.'),
           const SizedBox(height: 10),
-          Semantics(
-            label: '본인인증 설정 후 회원탈퇴 가능',
-            enabled: false,
-            button: true,
-            child: FilledButton.tonalIcon(
-                key: ValueKey('account-deletion-unavailable'),
-                onPressed: null,
-                icon: Icon(Icons.person_remove_outlined),
-                label: Text('본인인증 설정 후 회원탈퇴 가능')),
-          ),
-          const SizedBox(height: 4),
-          const Text('네이버·카카오·Google 본인인증 연동이 완료되면 앱에서 본인 계정만 안전하게 삭제할 수 있어요.',
-              style: TextStyle(fontSize: 12)),
+          if (_providers.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const Text('연결된 로그인 계정',
+                style: TextStyle(fontWeight: FontWeight.w700)),
+            ..._providers.map((provider) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(_providerLabel(provider)),
+                  trailing: provider == _currentProvider
+                      ? const Text('현재 로그인', style: TextStyle(fontSize: 12))
+                      : _providers.length > 1
+                          ? TextButton(
+                              onPressed: _busy
+                                  ? null
+                                  : () => _unlinkProvider(provider),
+                              child: const Text('연결 해제'))
+                          : const Text('유지 필요', style: TextStyle(fontSize: 12)),
+                )),
+            OutlinedButton.icon(
+                onPressed: _busy ? null : _logout,
+                icon: const Icon(Icons.logout),
+                label: const Text('로그아웃')),
+            const SizedBox(height: 8),
+            FilledButton.tonalIcon(
+              key: const ValueKey('account-deletion'),
+              onPressed: _busy ? null : _deleteAccount,
+              icon: const Icon(Icons.person_remove_outlined),
+              label: const Text('회원탈퇴'),
+            ),
+          ] else ...[
+            const Text('로그인하면 연결된 계정 관리와 회원탈퇴를 사용할 수 있어요.'),
+          ],
           TextButton(
               onPressed: () async {
                 try {

@@ -51,7 +51,7 @@ test('does not allow arbitrary browser origins by default', async () => {
   assert.equal(res.headers.get('access-control-allow-origin'), null);
 });
 test('normalizes phone numbers before persistence', () => {
-  assert.equal(memberSchema.parse({ name: '홍길동', phone: '010-1234-5678', churchName: '소망교회' }).phone, '01012345678');
+  assert.equal(memberSchema.parse({ name: '홍길동', phone: '010-1234-5678', churchName: '', termsAccepted: true, privacyAccepted: true }).phone, '01012345678');
 });
 test('routes explicit clinical reflection requests', async () => {
   const payload = body('불안한 생각을 임상심리 관점에서 성찰하고 싶어요');

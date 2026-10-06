@@ -28,7 +28,9 @@ class MemberApiClient {
         'name': name,
         'phone': phone,
         'churchName': churchName,
-        'loginProvider': loginProvider
+        'loginProvider': loginProvider,
+        'termsAccepted': true,
+        'privacyAccepted': true
       });
     final response = await _httpClient
         .send(request)
@@ -106,6 +108,8 @@ class MemberApiClient {
         'name': name,
         'phone': phone,
         'churchName': churchName,
+        'termsAccepted': true,
+        'privacyAccepted': true,
       },
       sessionToken: sessionToken,
     );

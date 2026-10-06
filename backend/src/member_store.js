@@ -33,6 +33,11 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       ON member_identities(member_id);
   `);
 
+  const memberColumns = new Set(db.prepare('PRAGMA table_info(members)').all().map(row => row.name));
+  if (!memberColumns.has('terms_version')) db.exec("ALTER TABLE members ADD COLUMN terms_version TEXT");
+  if (!memberColumns.has('privacy_version')) db.exec("ALTER TABLE members ADD COLUMN privacy_version TEXT");
+  if (!memberColumns.has('consented_at')) db.exec("ALTER TABLE members ADD COLUMN consented_at TEXT");
+
   db.exec(`
     INSERT OR IGNORE INTO member_identities (member_id, provider, provider_user_id)
     SELECT id, login_provider, provider_user_id
@@ -62,10 +67,12 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     FROM members ORDER BY id DESC LIMIT ?
   `);
   const insert = db.prepare(`
-    INSERT INTO members (name, phone, church_name, login_provider, provider_user_id)
-    VALUES (@name, @phone, @churchName, @loginProvider, @providerUserId)
+    INSERT INTO members (name, phone, church_name, login_provider, provider_user_id, terms_version, privacy_version, consented_at)
+    VALUES (@name, @phone, @churchName, @loginProvider, @providerUserId, @termsVersion, @privacyVersion, @consentedAt)
   `);
   const deleteById = db.prepare('DELETE FROM members WHERE id = ?');
+  const listIdentitiesByMember = db.prepare('SELECT provider FROM member_identities WHERE member_id = ? ORDER BY provider');
+  const deleteIdentity = db.prepare('DELETE FROM member_identities WHERE member_id = ? AND provider = ?');
   const findById = db.prepare('SELECT * FROM members WHERE id = ?');
 
   const transactionCreate = db.transaction(member => {
@@ -74,7 +81,7 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       error.code = 'PHONE_EXISTS';
       throw error;
     }
-    const result = insert.run({ ...member, providerUserId: member.providerUserId ?? null });
+    const result = insert.run({ ...member, providerUserId: member.providerUserId ?? null, churchName: member.churchName ?? '', termsVersion: '2026-10-06', privacyVersion: '2026-10-06', consentedAt: new Date().toISOString() });
     const created = findById.get(result.lastInsertRowid);
     if (member.providerUserId && socialProviders.has(member.loginProvider)) {
       insertIdentity.run(created.id, member.loginProvider, member.providerUserId);
@@ -113,6 +120,20 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     deleteById(memberId) {
       if (!Number.isSafeInteger(memberId) || memberId < 1) return false;
       return deleteById.run(memberId).changes === 1;
+    },
+    listIdentities(memberId) {
+      if (!Number.isSafeInteger(memberId) || memberId < 1) return [];
+      return listIdentitiesByMember.all(memberId).map(row => row.provider);
+    },
+    detachIdentity(memberId, provider) {
+      if (!Number.isSafeInteger(memberId) || memberId < 1 || !socialProviders.has(provider)) return false;
+      const providers = listIdentitiesByMember.all(memberId);
+      if (providers.length <= 1) {
+        const error = new Error('마지막 로그인 수단은 연결 해제할 수 없습니다.');
+        error.code = 'LAST_IDENTITY';
+        throw error;
+      }
+      return deleteIdentity.run(memberId, provider).changes === 1;
     },
     getAdminOverview({ limit = 8 } = {}) {
       return {

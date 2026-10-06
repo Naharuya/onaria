@@ -40,6 +40,34 @@ class ProviderAuthApiClient {
         expiresInSeconds: decoded['expiresInSeconds'] as int);
   }
 
+  Future<AccountOverview> account(String sessionToken) async {
+    final response =
+        await _send('GET', '/v1/account', sessionToken: sessionToken);
+    if (response.statusCode != 200) {
+      throw ProviderAuthApiException(_readError(response.body));
+    }
+    final decoded = jsonDecode(response.body);
+    if (decoded is! Map<String, dynamic> || decoded['providers'] is! List) {
+      throw const FormatException('Invalid account response');
+    }
+    return AccountOverview(
+      providers: (decoded['providers'] as List)
+          .whereType<String>()
+          .toList(growable: false),
+      currentProvider: decoded['currentProvider'] is String
+          ? decoded['currentProvider'] as String
+          : null,
+    );
+  }
+
+  Future<void> unlinkProvider(String sessionToken, String provider) async {
+    final response = await _send('DELETE', '/v1/account/providers/$provider',
+        sessionToken: sessionToken);
+    if (response.statusCode != 204) {
+      throw ProviderAuthApiException(_readError(response.body));
+    }
+  }
+
   Future<void> logout(String sessionToken) async {
     final response = await _send('DELETE', '/v1/auth/provider/session',
         sessionToken: sessionToken);
@@ -99,4 +127,11 @@ class ProviderAuthApiException implements Exception {
   final String message;
   @override
   String toString() => message;
+}
+
+class AccountOverview {
+  const AccountOverview(
+      {required this.providers, required this.currentProvider});
+  final List<String> providers;
+  final String? currentProvider;
 }

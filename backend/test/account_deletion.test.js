@@ -106,3 +106,32 @@ test('authenticated member can link a second verified provider without creating 
     assert.throws(() => memberSessions.verify(appleSession.token));
   });
 });
+
+test('account overview exposes providers and current provider; unlink blocks current provider', async () => {
+  const identities = new Map([
+    ['apple:owner', { id: 21, name: '계정관리회원', phone: '01099991111', church_name: '', login_provider: 'apple', created_at: '2026-10-06' }],
+    ['google:g-owner', { id: 21, name: '계정관리회원', phone: '01099991111', church_name: '', login_provider: 'apple', created_at: '2026-10-06' }],
+  ]);
+  const memberSessions = createMemberSessions();
+  const memberStore = {
+    getAdminOverview: () => ({ total: 1, recent: [] }),
+    findByProviderIdentity(provider, providerUserId) { return identities.get(`${provider}:${providerUserId}`) ?? null; },
+    listIdentities: () => ['apple', 'google'],
+    detachIdentity(_memberId, provider) { identities.delete(`${provider}:g-owner`); return true; },
+  };
+  const app = createApp({ generate: Object.assign(async () => ({}), { mode: 'test' }), memberStore,
+    providerIdentity: async ({ provider, credential }) => ({ provider, providerUserId: credential }), memberSessions,
+    identity: { required: false, verify: null }, logger: { error() {} } });
+  await withServer(app, async base => {
+    const apple = memberSessions.issue({ provider: 'apple', providerUserId: 'owner' });
+    const overview = await fetch(`${base}/v1/account`, { headers: { 'X-Onaria-Member-Session': apple.token } });
+    assert.equal(overview.status, 200);
+    const body = await overview.json();
+    assert.deepEqual(body.providers, ['apple', 'google']);
+    assert.equal(body.currentProvider, 'apple');
+    const current = await fetch(`${base}/v1/account/providers/apple`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': apple.token } });
+    assert.equal(current.status, 409);
+    const other = await fetch(`${base}/v1/account/providers/google`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': apple.token } });
+    assert.equal(other.status, 204);
+  });
+});

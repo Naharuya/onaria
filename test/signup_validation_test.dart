@@ -3,12 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onaria/features/signup_page.dart';
 
 void main() {
-  testWidgets('invalid phone is rejected before signup is sent', (tester) async {
+  testWidgets('invalid phone is rejected before signup is sent',
+      (tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignUpPage()));
     await tester.enterText(find.byType(TextFormField).at(0), '테스트');
     await tester.enterText(find.byType(TextFormField).at(1), '123');
     await tester.enterText(find.byType(TextFormField).at(2), '테스트 교회');
     tester.testTextInput.hide();
+    await tester.ensureVisible(find.byType(CheckboxListTile).at(0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(CheckboxListTile).at(0));
+    await tester.ensureVisible(find.byType(CheckboxListTile).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(CheckboxListTile).at(1));
+    await tester.pumpAndSettle();
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('회원가입'));
     await tester.pumpAndSettle();

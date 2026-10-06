@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app/api_config.dart';
 import '../app/app_theme.dart';
@@ -28,6 +29,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final _church = TextEditingController();
 
   bool _busy = false;
+  bool _termsAccepted = false;
+  bool _privacyAccepted = false;
   String? _pendingProvider;
   String? _pendingProviderCredential;
 
@@ -157,12 +160,44 @@ class _SignUpPageState extends State<SignUpPage> {
                           maxLength: 100,
                           textInputAction: TextInputAction.done,
                           decoration: const InputDecoration(
-                            labelText: '교회명',
+                            labelText: '교회명 (선택)',
                             prefixIcon: Icon(Icons.church_outlined),
                           ),
-                          validator: _required,
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 12),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          value: _termsAccepted,
+                          onChanged: _busy
+                              ? null
+                              : (value) => setState(
+                                  () => _termsAccepted = value ?? false),
+                          title: const Text('이용약관에 동의합니다. (필수)'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        TextButton(
+                          onPressed: () => launchUrl(
+                              Uri.parse('https://onaria.ai.kr/terms'),
+                              mode: LaunchMode.externalApplication),
+                          child: const Text('이용약관 보기'),
+                        ),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          value: _privacyAccepted,
+                          onChanged: _busy
+                              ? null
+                              : (value) => setState(
+                                  () => _privacyAccepted = value ?? false),
+                          title: const Text('개인정보 처리 안내에 동의합니다. (필수)'),
+                          controlAffinity: ListTileControlAffinity.leading,
+                        ),
+                        TextButton(
+                          onPressed: () => launchUrl(
+                              Uri.parse('https://onaria.ai.kr/privacy'),
+                              mode: LaunchMode.externalApplication),
+                          child: const Text('개인정보 처리 안내 보기'),
+                        ),
+                        const SizedBox(height: 20),
                         FilledButton.icon(
                           onPressed: _busy
                               ? null
@@ -347,6 +382,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<void> _completeProviderSignUp() async {
+    if (!_termsAccepted || !_privacyAccepted) {
+      _showMessage('이용약관과 개인정보 처리 안내에 동의해 주세요.');
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
 
     final provider = _pendingProvider;
@@ -388,6 +427,10 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<void> _submit() async {
+    if (!_termsAccepted || !_privacyAccepted) {
+      _showMessage('이용약관과 개인정보 처리 안내에 동의해 주세요.');
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
     final apiBaseUrl = ApiConfig.baseUrl;
     if (apiBaseUrl == null) {

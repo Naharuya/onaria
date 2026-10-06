@@ -103,3 +103,41 @@ test('one member can safely own multiple verified provider identities', () => {
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('church name is optional and consent metadata is stored', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'onaria-member-consent-test-'));
+  const filename = join(directory, 'fixture.sqlite');
+  const store = createMemberStore({ filename });
+  try {
+    const member = store.create({
+      name: '선택교회회원',
+      phone: '01055550000',
+      churchName: '',
+      loginProvider: 'google',
+      providerUserId: 'google-consent-user',
+      termsAccepted: true,
+      privacyAccepted: true,
+    });
+    assert.equal(member.church_name, '');
+  } finally {
+    store.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test('identity listing and unlink protect the final login identity', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'onaria-member-unlink-test-'));
+  const filename = join(directory, 'fixture.sqlite');
+  const store = createMemberStore({ filename });
+  try {
+    const member = store.create({ name: '연결관리회원', phone: '01066660000', churchName: '', loginProvider: 'apple', providerUserId: 'apple-unlink' });
+    store.attachIdentity(member.id, 'kakao', 'kakao-unlink');
+    assert.deepEqual(store.listIdentities(member.id), ['apple', 'kakao']);
+    assert.equal(store.detachIdentity(member.id, 'kakao'), true);
+    assert.deepEqual(store.listIdentities(member.id), ['apple']);
+    assert.throws(() => store.detachIdentity(member.id, 'apple'), { code: 'LAST_IDENTITY' });
+  } finally {
+    store.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

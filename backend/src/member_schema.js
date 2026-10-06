@@ -6,7 +6,9 @@ const phone = z.string().trim()
 export const memberSchema = z.object({
   name: z.string().trim().min(1).max(40),
   phone,
-  churchName: z.string().trim().min(1).max(100),
+  churchName: z.string().trim().max(100).default(''),
+  termsAccepted: z.literal(true),
+  privacyAccepted: z.literal(true),
   loginProvider: z.enum(['phone', 'apple', 'naver', 'kakao', 'google']).default('phone'),
   providerUserId: z.string().trim().min(1).max(200).optional(),
 });

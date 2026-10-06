@@ -183,6 +183,32 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       return res.status(201).json({ sessionToken: session.token, expiresInSeconds: session.expiresInSeconds });
     } catch (error) { return next(error); }
   });
+  app.get('/v1/account', (req, res, next) => {
+    try {
+      const sessionToken = req.get('x-onaria-member-session');
+      if (!sessionToken || !memberSessions) throw new IdentityError();
+      const trusted = memberSessions.verify(sessionToken);
+      const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
+      if (!member) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
+      return res.json({ member: publicMember(member), providers: memberStore.listIdentities?.(member.id) ?? [], currentProvider: trusted.provider });
+    } catch (error) { return next(error); }
+  });
+  app.delete('/v1/account/providers/:provider', (req, res, next) => {
+    try {
+      const sessionToken = req.get('x-onaria-member-session');
+      if (!sessionToken || !memberSessions) throw new IdentityError();
+      const trusted = memberSessions.verify(sessionToken);
+      const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
+      if (!member) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
+      const provider = req.params.provider;
+      if (provider === trusted.provider) return res.status(409).json({ message: '현재 로그인에 사용 중인 계정은 연결 해제할 수 없습니다. 다른 계정으로 로그인한 뒤 다시 시도해 주세요.' });
+      if (!memberStore.detachIdentity?.(member.id, provider)) return res.status(404).json({ message: '연결된 계정을 찾을 수 없습니다.' });
+      return res.status(204).end();
+    } catch (error) {
+      if (error.code === 'LAST_IDENTITY') return res.status(409).json({ message: error.message });
+      return next(error);
+    }
+  });
   app.delete('/v1/auth/provider/session', (req, res, next) => {
     try {
       const sessionToken = req.get('x-onaria-member-session');
