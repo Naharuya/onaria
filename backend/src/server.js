@@ -16,6 +16,7 @@ const webMetrics = createWebMetrics();
 const adminSettings = createAdminSettings({ directory: fileURLToPath(new URL('../data/admin-secrets/', import.meta.url)), usageLedger, onResult: event => webMetrics.result(event) });
 const generate = adminSettings.generate;
 const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
+const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
 const app = createApp({
   generate,
   adminSettings,
@@ -24,7 +25,7 @@ const app = createApp({
   adminToken: process.env.ADMIN_TOKEN || '',
   identity: createRuntimeIdentity(),
   providerIdentity: createRuntimeProviderIdentity(),
-  memberSessions: createMemberSessions(),
+  memberSessions,
   webMetrics,
   memberStore,
   production: process.env.NODE_ENV === 'production',
@@ -34,5 +35,5 @@ const app = createApp({
 });
 const host = process.env.HOST || '0.0.0.0';
 const server = app.listen(port, host, () => console.log(`onaria backend listening on ${host}:${port} (${generate.mode})`));
-server.on('close', () => { usageLedger.close?.(); memberStore.close(); });
+server.on('close', () => { usageLedger.close?.(); memberStore.close(); memberSessions.close?.(); });
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close());
