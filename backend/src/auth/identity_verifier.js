@@ -84,10 +84,16 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
   }
   return async token => {
     try {
-      if (typeof token !== 'string' || token.length > 8192 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) throw new IdentityError();
+      if (typeof token !== 'string' || token.length > 8192 || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) {
+        try { onFailure?.('TOKEN_FORMAT_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       const header = decodeProtectedHeader(token);
       if (typeof header.kid !== 'string' || !header.kid || header.kid.length > 128
-        || Object.keys(header).some(key => !['alg', 'typ', 'kid'].includes(key))) throw new IdentityError();
+        || Object.keys(header).some(key => !['alg', 'typ', 'kid'].includes(key))) {
+        try { onFailure?.('HEADER_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       const currentDate = now();
       const verifyOptions = {
         issuer, audience, algorithms, currentDate,
@@ -99,7 +105,10 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
       if (typeof payload.sub !== 'string' || !payload.sub || payload.sub.length > 256
         || !Number.isSafeInteger(payload.iat) || !Number.isSafeInteger(payload.exp) || payload.iat < 0
         || payload.exp <= payload.iat || payload.exp - payload.iat > maxTokenAgeSeconds
-        || claims.some(([key, value]) => !Object.hasOwn(payload, key) || payload[key] !== value)) throw new IdentityError();
+        || claims.some(([key, value]) => !Object.hasOwn(payload, key) || payload[key] !== value)) {
+        try { onFailure?.('CLAIM_SHAPE_INVALID'); } catch {}
+        throw new IdentityError();
+      }
       // Stable, issuer-qualified identity; never return the token or full claims.
       return Object.freeze({ userId: JSON.stringify([issuer, payload.sub]), subject: payload.sub });
     } catch (error) {
