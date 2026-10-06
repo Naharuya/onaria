@@ -45,3 +45,14 @@ PUSH: 기존 검토용 PR에 후속 커밋 게시
 REMAINING RISKS: 실제 Apple Services ID 등록·설정; 사용자 Apple 로그인 E2E와 iOS 실기기 검증 NOT RUN
 NEXT ACTION: 릴리스 설치 확인 후 Apple Developer 실제 Services ID 설정
 ```
+
+
+## Services ID 적용 완료 — 2026-10-06 18:33 KST
+
+사용자가 Apple Developer에서 `com.onaria.web.login`과 ONARIA 기본 앱, 도메인 및 Return URL 설정 저장을 완료했다고 확인했다. 운영 서버의 해당 Services ID와 HTTPS redirect만 적용하고 기존 iOS/client 및 다른 환경 설정을 보존했다. 환경 파일 백업은 접근이 제한된 기존 배포 백업 폴더에 보관했다.
+
+- 공개 HTTPS health: 200.
+- POST challenge: 200, no-store; clientId/redirectUri 및 state/nonce 형식 확인 PASS.
+- 발급한 테스트 state의 access_denied form callback: 303, 고정 ONARIA package 앱 복귀 확인 PASS.
+- Android 0.4.3+9 재설치 불필요: 서버 설정을 동적으로 받아 사용한다.
+- 실제 사용자 Apple 로그인, 앱 내 세션 복원/로그아웃/재로그인 및 iOS 실기기 테스트는 아직 NOT RUN. 사용자 계정 인증으로 최종 확인 필요.
