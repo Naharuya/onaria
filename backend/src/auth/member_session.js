@@ -13,7 +13,7 @@ export function createMemberSessions({ ttlMs = 15 * 60_000, maxSessions = 5000, 
   }
   return {
     issue(identity) {
-      if (!identity || !['google', 'kakao', 'naver'].includes(identity.provider)
+      if (!identity || !['apple', 'google', 'kakao', 'naver'].includes(identity.provider)
         || typeof identity.providerUserId !== 'string' || !identity.providerUserId) throw new IdentityError();
       prune();
       const token = randomBytes(32).toString('base64url');
