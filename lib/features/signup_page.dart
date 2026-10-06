@@ -63,57 +63,57 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '이미 가입했다면 연결된 계정으로 바로 로그인할 수 있어요. 처음 이용하는 경우에만 인증 후 회원 정보를 입력합니다.',
+                    '사용하던 계정으로 마음의 기록을 이어가세요.',
                     style: TextStyle(color: AppTheme.of(context).muted),
                   ),
                   const SizedBox(height: 24),
-                  if (!kIsWeb &&
-                      defaultTargetPlatform == TargetPlatform.iOS) ...[
-                    SignInWithAppleButton(
-                      onPressed: _busy ? null : _continueWithApple,
-                      text: 'Apple로 계속하기',
-                    ),
-                    const SizedBox(height: 10),
-                  ],
                   if (!kIsWeb) ...[
-                    SizedBox(
-                      height: 50,
-                      child: FilledButton(
-                        key: const ValueKey('kakao-signup'),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFFFEE500),
-                          foregroundColor: const Color(0xD9000000),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: _busy ? null : _continueWithKakao,
-                        child: const Text(
-                          '카카오로 계속하기',
-                          style: TextStyle(fontWeight: FontWeight.w700),
-                        ),
-                      ),
+                    _providerButton(
+                      key: const ValueKey('apple-signup'),
+                      label: 'Apple로 계속하기',
+                      background: Colors.black,
+                      foreground: Colors.white,
+                      icon: Icons.apple,
+                      onPressed: _continueWithApple,
                     ),
-                    const SizedBox(height: 10),
-                    OutlinedButton(
+                    const SizedBox(height: 12),
+                    _providerButton(
                       key: const ValueKey('google-signup'),
-                      onPressed: _busy ? null : _continueWithGoogle,
-                      child: const Text('Google로 계속하기'),
+                      label: 'Google로 계속하기',
+                      background: Colors.white,
+                      foreground: const Color(0xFF1F1F1F),
+                      outlined: true,
+                      onPressed: _continueWithGoogle,
                     ),
-                    const SizedBox(height: 10),
-                    OutlinedButton(
+                    const SizedBox(height: 12),
+                    _providerButton(
                       key: const ValueKey('naver-signup'),
-                      onPressed: _busy ? null : _continueWithNaver,
-                      child: const Text('네이버로 계속하기'),
+                      label: '네이버로 계속하기',
+                      background: const Color(0xFF03C75A),
+                      foreground: Colors.black,
+                      onPressed: _continueWithNaver,
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '기존 회원은 바로 로그인되고, 처음 이용하는 계정만 아래 회원 정보로 가입을 완료합니다.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.of(context).subtle,
+                    const SizedBox(height: 12),
+                    _providerButton(
+                      key: const ValueKey('kakao-signup'),
+                      label: '카카오로 계속하기',
+                      background: const Color(0xFFFEE500),
+                      foreground: const Color(0xD9000000),
+                      onPressed: _continueWithKakao,
+                    ),
+                    const SizedBox(height: 16),
+                    if (_busy) ...[
+                      Semantics(
+                        liveRegion: true,
+                        child: const Text('인증을 진행하고 있어요. 잠시 기다려 주세요.'),
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      const LinearProgressIndicator(),
+                    ] else
+                      Text(
+                        '가입할 때 사용한 계정을 선택해 주세요. 처음이라면 인증 후 가입을 이어갑니다.',
+                        style: TextStyle(color: AppTheme.of(context).muted),
+                      ),
                     const SizedBox(height: 24),
                   ],
                   if (_pendingProvider != null) ...[
@@ -221,7 +221,49 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       );
 
+  Widget _providerButton({
+    required Key key,
+    required String label,
+    required Color background,
+    required Color foreground,
+    required VoidCallback onPressed,
+    bool outlined = false,
+    IconData? icon,
+  }) => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: 52),
+    child: FilledButton(
+      key: key,
+      style: FilledButton.styleFrom(
+        backgroundColor: background,
+        foregroundColor: foreground,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        side: outlined ? const BorderSide(color: Color(0xFFDADCE0)) : null,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: _busy ? null : onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 24),
+            const SizedBox(width: 10),
+          ],
+          Flexible(
+            child: Text(label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    ),
+  );
+
   Future<void> _continueWithApple() async {
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      _showMessage('이 기기의 Apple 로그인 연결을 준비 중이에요. 다른 로그인 방법을 선택해 주세요.');
+      return;
+    }
     final apiBaseUrl = ApiConfig.baseUrl;
     if (apiBaseUrl == null) {
       _showMessage('서버 설정이 필요해요. ' + ApiConfig.setupHint);

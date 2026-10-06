@@ -52,8 +52,8 @@ class RecordsPage extends StatelessWidget {
               const GrowthPage()
             ),
             (
-              '개인정보와 기록 관리',
-              '보관 범위 확인·기기 기록 삭제',
+              '계정과 기록 관리',
+              '로그아웃·회원탈퇴·기기 기록 삭제',
               Icons.privacy_tip_outlined,
               const PrivacyPage()
             ),

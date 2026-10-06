@@ -172,7 +172,7 @@ class _CheckInPageState extends State<CheckInPage> {
                         child: Row(children: [
                           Icon(Icons.privacy_tip_outlined),
                           SizedBox(width: 12),
-                          Text('개인정보·회원탈퇴'),
+                          Text('계정·로그아웃·회원탈퇴'),
                         ]),
                       ),
                       PopupMenuItem<String>(
