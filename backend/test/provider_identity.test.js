@@ -13,8 +13,8 @@ async function oidcFixture({ issuer, audience, subject = 'provider-user-123' }) 
   return { token, jwks: { keys: [publicJwk] } };
 }
 
-test('Google and Kakao OIDC normalize verified sub only', async () => {
-  for (const [provider, issuer] of [['google','https://accounts.google.com'], ['kakao','https://kauth.kakao.com']]) {
+test('Apple, Google and Kakao OIDC normalize verified sub only', async () => {
+  for (const [provider, issuer] of [['apple','https://appleid.apple.com'], ['google','https://accounts.google.com'], ['kakao','https://kauth.kakao.com']]) {
     const audience = `${provider}-client`; const { token, jwks } = await oidcFixture({ issuer, audience });
     const verify = createOidcProviderVerifier({ provider, issuer, audience, jwks, now: () => now });
     assert.deepEqual(await verify(token), { provider, providerUserId: 'provider-user-123' });
@@ -42,6 +42,7 @@ test('Naver rejects malformed/upstream responses and provider router fails close
     await assert.rejects(() => verify('abcdefghijklmnopqrstuvwxyz'), /회원 인증/);
   }
   const router = createProviderIdentityVerifier();
+  await assert.rejects(() => router({ provider: 'apple', credential: 'x' }), /확인할 수 없습니다/);
   await assert.rejects(() => router({ provider: 'google', credential: 'x' }), /확인할 수 없습니다/);
   await assert.rejects(() => router({ provider: 'evil', credential: 'x' }), /확인할 수 없습니다/);
 });
