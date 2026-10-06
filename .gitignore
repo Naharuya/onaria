@@ -48,3 +48,5 @@ ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
 # Local social auth secrets
 ios/Flutter/Kakao.local.xcconfig
+
+ios/Flutter/NaverKeys.xcconfig

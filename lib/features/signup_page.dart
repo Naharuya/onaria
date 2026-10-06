@@ -14,6 +14,7 @@ import '../src/api/member_api_client.dart';
 import '../src/api/provider_auth_api_client.dart';
 import '../src/auth/google_login_service.dart';
 import '../src/auth/kakao_login_service.dart';
+import '../src/auth/naver_login_service.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -100,9 +101,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: const Text('Google로 계속하기'),
                     ),
                     const SizedBox(height: 10),
-                    const OutlinedButton(
-                      onPressed: null,
-                      child: Text('네이버로 계속하기 · 연결 준비 중'),
+                    OutlinedButton(
+                      key: const ValueKey('naver-signup'),
+                      onPressed: _busy ? null : _continueWithNaver,
+                      child: const Text('네이버로 계속하기'),
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -289,6 +291,36 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     } catch (_) {
       if (mounted) _showMessage('Google 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
+    } finally {
+      memberApi.close();
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _continueWithNaver() async {
+    final apiBaseUrl = ApiConfig.baseUrl;
+    if (apiBaseUrl == null) {
+      _showMessage('서버 설정이 필요해요. ${ApiConfig.setupHint}');
+      return;
+    }
+    setState(() => _busy = true);
+    final memberApi = MemberApiClient(baseUrl: apiBaseUrl);
+    try {
+      final accessToken = await NaverLoginService().authenticate();
+      await _finishProviderAuthentication(
+        provider: 'naver',
+        credential: accessToken,
+        client: memberApi,
+      );
+    } on NaverLoginException catch (error) {
+      if (mounted) _showMessage(error.message);
+    } on MemberApiException catch (error) {
+      if (mounted) {
+        final suffix = error.statusCode == null ? '' : ' (${error.statusCode})';
+        _showMessage('네이버 서버 인증 실패$suffix: ${error.message}');
+      }
+    } catch (_) {
+      if (mounted) _showMessage('네이버 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
     } finally {
       memberApi.close();
       if (mounted) setState(() => _busy = false);

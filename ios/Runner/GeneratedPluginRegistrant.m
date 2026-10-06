@@ -54,6 +54,12 @@
 @import kakao_flutter_sdk_common;
 #endif
 
+#if __has_include(<naver_login_flutter/FlutterNaverLoginPlugin.h>)
+#import <naver_login_flutter/FlutterNaverLoginPlugin.h>
+#else
+@import naver_login_flutter;
+#endif
+
 #if __has_include(<package_info_plus/FPPPackageInfoPlusPlugin.h>)
 #import <package_info_plus/FPPPackageInfoPlusPlugin.h>
 #else
@@ -101,6 +107,7 @@
   [IntegrationTestPlugin registerWithRegistrar:[registry registrarForPlugin:@"IntegrationTestPlugin"]];
   [KakaoFlutterSdkAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"KakaoFlutterSdkAuthPlugin"]];
   [KakaoFlutterSdkCommonPlugin registerWithRegistrar:[registry registrarForPlugin:@"KakaoFlutterSdkCommonPlugin"]];
+  [FlutterNaverLoginPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterNaverLoginPlugin"]];
   [FPPPackageInfoPlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"FPPPackageInfoPlusPlugin"]];
   [FPPSharePlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"FPPSharePlusPlugin"]];
   [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];

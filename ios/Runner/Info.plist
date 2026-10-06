@@ -37,6 +37,14 @@
 			</array>
 		</dict>
 		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.onaria.app.naver</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>onaria-naver</string>
+			</array>
+		</dict>
+		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
@@ -51,9 +59,19 @@
 	<array>
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
+		<string>naversearchapp</string>
+		<string>naversearchthirdlogin</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NidClientID</key>
+	<string>oYwDAzWTMxv_UI5IvKCN</string>
+	<key>NidClientSecret</key>
+	<string>$(NAVER_CLIENT_SECRET)</string>
+	<key>NidAppName</key>
+	<string>ONARIA</string>
+	<key>NidUrlScheme</key>
+	<string>onaria-naver</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>마음 이야기를 음성으로 입력하기 위해 마이크를 사용합니다.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
