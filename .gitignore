@@ -53,3 +53,5 @@ ios/Flutter/NaverKeys.xcconfig
 
 # Local social login build values; never commit.
 .onaria.local.env
+android/naver.properties
+android/local.properties.before-*

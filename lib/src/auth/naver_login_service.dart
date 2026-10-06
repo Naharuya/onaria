@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:naver_login_flutter/naver_login_flutter.dart';
 
 class NaverLoginService {
   Future<String> authenticate() async {
     try {
-      final result = await FlutterNaverLogin.logIn();
+      final result =
+          await FlutterNaverLogin.logIn().timeout(const Duration(seconds: 90));
       if (result.status != NaverLoginStatus.loggedIn) {
         final detail = (result.errorMessage ?? '').trim();
         throw NaverLoginException(
@@ -14,6 +16,9 @@ class NaverLoginService {
         throw const NaverLoginException('네이버 인증 정보를 확인하지 못했습니다.');
       }
       return token;
+    } on TimeoutException {
+      throw const NaverLoginException(
+          '네이버 인증 응답이 지연되고 있어요. 로그인 창을 닫고 다시 시도해 주세요.');
     } on NaverLoginException {
       rethrow;
     } catch (error) {

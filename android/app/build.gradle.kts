@@ -17,7 +17,15 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
-val naverClientSecret = localProperties.getProperty("naver.client_secret") ?: ""
+// Keep provider credentials separate from Flutter-managed SDK settings.
+// The ignored file persists across SDK setup and release updates.
+val naverProperties = Properties()
+val naverPropertiesFile = rootProject.file("naver.properties")
+if (naverPropertiesFile.exists()) {
+    naverPropertiesFile.inputStream().use { naverProperties.load(it) }
+}
+val naverClientSecret = naverProperties.getProperty("naver.client_secret")
+    ?: localProperties.getProperty("naver.client_secret") ?: ""
 
 android {
     namespace = "com.onaria.app"
