@@ -5,7 +5,9 @@ class NaverLoginService {
     try {
       final result = await FlutterNaverLogin.logIn();
       if (result.status != NaverLoginStatus.loggedIn) {
-        throw const NaverLoginException('네이버 로그인을 완료하지 못했어요.');
+        final detail = (result.errorMessage ?? '').trim();
+        throw NaverLoginException(
+            detail.isEmpty ? '네이버 로그인을 완료하지 못했어요.' : '네이버 로그인 오류: $detail');
       }
       final token = result.accessToken?.accessToken ?? '';
       if (token.isEmpty) {
@@ -14,8 +16,8 @@ class NaverLoginService {
       return token;
     } on NaverLoginException {
       rethrow;
-    } catch (_) {
-      throw const NaverLoginException('네이버 로그인을 완료하지 못했어요.');
+    } catch (error) {
+      throw NaverLoginException('네이버 로그인 오류: ${error.runtimeType}');
     }
   }
 }
