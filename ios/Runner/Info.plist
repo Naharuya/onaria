@@ -3,7 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleURLTypes</key>
-    <array><dict><key>CFBundleURLSchemes</key><array><string>onaria</string></array></dict></array>
+    <array>
+        <dict><key>CFBundleURLSchemes</key><array><string>onaria</string></array></dict>
+        <dict><key>CFBundleURLSchemes</key><array><string>kakao$(ONARIA_KAKAO_NATIVE_APP_KEY)</string></array></dict>
+    </array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

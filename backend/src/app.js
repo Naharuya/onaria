@@ -123,7 +123,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   app.post('/v1/auth/provider/session', async (req, res, next) => {
     try {
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
-      const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
+      const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential, nonce: req.body?.nonce });
       const session = memberSessions.issue(trusted);
       return res.status(201).json({ sessionToken: session.token, expiresInSeconds: session.expiresInSeconds });
     } catch (error) { return next(error); }

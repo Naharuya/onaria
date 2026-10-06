@@ -11,8 +11,11 @@ function normalized(provider, providerUserId) {
 export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now } = {}) {
   if (!['google', 'kakao'].includes(provider)) throw new IdentityError(503);
   const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now });
-  return async idToken => {
+  return async (idToken, { nonce } = {}) => {
     const identity = await verifyJwt(idToken);
+    if (provider === 'kakao') {
+      if (typeof nonce !== 'string' || nonce.length < 16 || nonce.length > 128 || identity.nonce !== nonce) throw new IdentityError();
+    }
     return normalized(provider, identity.subject);
   };
 }
@@ -46,9 +49,9 @@ export function createProviderIdentityVerifier({ google, kakao, naver, fetchImpl
     kakao: kakao ? createOidcProviderVerifier({ provider: 'kakao', ...kakao, fetchImpl, now }) : null,
     naver: naver ? createNaverProviderVerifier({ fetchImpl }) : null,
   };
-  return async ({ provider, credential } = {}) => {
+  return async ({ provider, credential, nonce } = {}) => {
     if (!Object.hasOwn(verifiers, provider) || !verifiers[provider]) throw new IdentityError(503);
-    return verifiers[provider](credential);
+    return verifiers[provider](credential, { nonce });
   };
 }
 

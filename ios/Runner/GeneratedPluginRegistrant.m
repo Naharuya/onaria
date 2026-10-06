@@ -30,6 +30,24 @@
 @import integration_test;
 #endif
 
+#if __has_include(<kakao_flutter_sdk_auth/KakaoFlutterSdkAuthPlugin.h>)
+#import <kakao_flutter_sdk_auth/KakaoFlutterSdkAuthPlugin.h>
+#else
+@import kakao_flutter_sdk_auth;
+#endif
+
+#if __has_include(<kakao_flutter_sdk_common/KakaoFlutterSdkCommonPlugin.h>)
+#import <kakao_flutter_sdk_common/KakaoFlutterSdkCommonPlugin.h>
+#else
+@import kakao_flutter_sdk_common;
+#endif
+
+#if __has_include(<package_info_plus/FPPPackageInfoPlusPlugin.h>)
+#import <package_info_plus/FPPPackageInfoPlusPlugin.h>
+#else
+@import package_info_plus;
+#endif
+
 #if __has_include(<share_plus/FPPSharePlusPlugin.h>)
 #import <share_plus/FPPSharePlusPlugin.h>
 #else
@@ -61,6 +79,9 @@
   [FlutterTimezonePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterTimezonePlugin"]];
   [FlutterTtsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterTtsPlugin"]];
   [IntegrationTestPlugin registerWithRegistrar:[registry registrarForPlugin:@"IntegrationTestPlugin"]];
+  [KakaoFlutterSdkAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"KakaoFlutterSdkAuthPlugin"]];
+  [KakaoFlutterSdkCommonPlugin registerWithRegistrar:[registry registrarForPlugin:@"KakaoFlutterSdkCommonPlugin"]];
+  [FPPPackageInfoPlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"FPPPackageInfoPlusPlugin"]];
   [FPPSharePlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"FPPSharePlusPlugin"]];
   [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];
   [SpeechToTextPlugin registerWithRegistrar:[registry registrarForPlugin:@"SpeechToTextPlugin"]];

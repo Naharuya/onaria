@@ -8,7 +8,8 @@ import '../app/emotion_card_store.dart';
 import 'conversation_page.dart';
 import 'saved_cards_page.dart';
 import 'growth_page.dart';
-import 'signup_page.dart';
+import 'account_page.dart';
+import 'app_info_page.dart';
 import 'privacy_page.dart';
 import '../engagement/engagement_page.dart';
 import '../engagement/journey/journey_page.dart';
@@ -139,9 +140,9 @@ class _CheckInPageState extends State<CheckInPage> {
                       } else if (value == 'saved_cards') {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const SavedCardsPage()));
-                      } else if (value == 'signup') {
+                      } else if (value == 'account') {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const SignUpPage()));
+                            builder: (_) => const AccountPage()));
                       } else if (value == 'engagement') {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const EngagementPage()));
@@ -157,6 +158,9 @@ class _CheckInPageState extends State<CheckInPage> {
                       } else if (value == 'privacy') {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const PrivacyPage()));
+                      } else if (value == 'app_info') {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const AppInfoPage()));
                       }
                     },
                     itemBuilder: (_) => const [
@@ -176,11 +180,11 @@ class _CheckInPageState extends State<CheckInPage> {
                         ]),
                       ),
                       PopupMenuItem<String>(
-                        value: 'signup',
+                        value: 'account',
                         child: Row(children: [
-                          Icon(Icons.person_add_outlined),
+                          Icon(Icons.person_outline),
                           SizedBox(width: 12),
-                          Text('회원가입'),
+                          Text('계정'),
                         ]),
                       ),
                       PopupMenuItem<String>(
@@ -189,6 +193,14 @@ class _CheckInPageState extends State<CheckInPage> {
                           Icon(Icons.bookmarks_outlined),
                           SizedBox(width: 12),
                           Text('저장된 카드'),
+                        ]),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'app_info',
+                        child: Row(children: [
+                          Icon(Icons.info_outline),
+                          SizedBox(width: 12),
+                          Text('앱 정보'),
                         ]),
                       ),
                     ],

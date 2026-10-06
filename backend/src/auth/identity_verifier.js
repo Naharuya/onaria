@@ -79,7 +79,8 @@ export function createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algori
         || payload.exp <= payload.iat || payload.exp - payload.iat > maxTokenAgeSeconds
         || claims.some(([key, value]) => !Object.hasOwn(payload, key) || payload[key] !== value)) throw new IdentityError();
       // Stable, issuer-qualified identity; never return the token or full claims.
-      return Object.freeze({ userId: JSON.stringify([issuer, payload.sub]), subject: payload.sub });
+      return Object.freeze({ userId: JSON.stringify([issuer, payload.sub]), subject: payload.sub,
+        ...(typeof payload.nonce === 'string' ? { nonce: payload.nonce } : {}) });
     } catch (error) {
       if (error instanceof IdentityError) throw error;
       // Signature/claim errors and upstream details share a fixed public error.
