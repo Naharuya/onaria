@@ -3,13 +3,13 @@ import { createIdentityVerifier, IdentityError } from './identity_verifier.js';
 const NAVER_PROFILE_URL = 'https://openapi.naver.com/v1/nid/me';
 
 function normalized(provider, providerUserId) {
-  if (!['google', 'kakao', 'naver'].includes(provider)
+  if (!['apple', 'google', 'kakao', 'naver'].includes(provider)
     || typeof providerUserId !== 'string' || !providerUserId || providerUserId.length > 200) throw new IdentityError();
   return Object.freeze({ provider, providerUserId });
 }
 
 export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now } = {}) {
-  if (!['google', 'kakao'].includes(provider)) throw new IdentityError(503);
+  if (!['apple', 'google', 'kakao'].includes(provider)) throw new IdentityError(503);
   const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now });
   return async idToken => {
     const identity = await verifyJwt(idToken);
@@ -40,8 +40,9 @@ export function createNaverProviderVerifier({ fetchImpl = globalThis.fetch } = {
   };
 }
 
-export function createProviderIdentityVerifier({ google, kakao, naver, fetchImpl, now } = {}) {
+export function createProviderIdentityVerifier({ apple, google, kakao, naver, fetchImpl, now } = {}) {
   const verifiers = {
+    apple: apple ? createOidcProviderVerifier({ provider: 'apple', ...apple, fetchImpl, now }) : null,
     google: google ? createOidcProviderVerifier({ provider: 'google', ...google, fetchImpl, now }) : null,
     kakao: kakao ? createOidcProviderVerifier({ provider: 'kakao', ...kakao, fetchImpl, now }) : null,
     naver: naver ? createNaverProviderVerifier({ fetchImpl }) : null,
@@ -53,8 +54,13 @@ export function createProviderIdentityVerifier({ google, kakao, naver, fetchImpl
 }
 
 export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = globalThis.fetch, now } = {}) {
+  const appleClientId = env.ONARIA_APPLE_CLIENT_ID?.trim();
   const googleClientId = env.ONARIA_GOOGLE_CLIENT_ID?.trim();
   const kakaoClientId = env.ONARIA_KAKAO_CLIENT_ID?.trim();
+  const apple = appleClientId ? {
+    issuer: 'https://appleid.apple.com', audience: appleClientId,
+    jwksUrl: 'https://appleid.apple.com/auth/keys',
+  } : null;
   const google = googleClientId ? {
     issuer: 'https://accounts.google.com', audience: googleClientId,
     jwksUrl: 'https://www.googleapis.com/oauth2/v3/certs',
@@ -63,5 +69,5 @@ export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = g
     issuer: 'https://kauth.kakao.com', audience: kakaoClientId,
     jwksUrl: 'https://kauth.kakao.com/.well-known/jwks.json',
   } : null;
-  return createProviderIdentityVerifier({ google, kakao, naver: env.ONARIA_NAVER_ENABLED === 'true' ? {} : null, fetchImpl, now });
+  return createProviderIdentityVerifier({ apple, google, kakao, naver: env.ONARIA_NAVER_ENABLED === 'true' ? {} : null, fetchImpl, now });
 }
