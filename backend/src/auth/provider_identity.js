@@ -8,9 +8,9 @@ function normalized(provider, providerUserId) {
   return Object.freeze({ provider, providerUserId });
 }
 
-export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now, onFailure } = {}) {
+export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl, jwks, fetchImpl, now, onFailure, maxTokenAgeSeconds = 3600 } = {}) {
   if (!['apple', 'google', 'kakao'].includes(provider)) throw new IdentityError(503);
-  const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now, onFailure });
+  const verifyJwt = createIdentityVerifier({ issuer, audience, jwksUrl, jwks, algorithms: ['RS256'], fetchImpl, now, onFailure, maxTokenAgeSeconds });
   return async idToken => {
     const identity = await verifyJwt(idToken);
     return normalized(provider, identity.subject);
@@ -59,7 +59,7 @@ export function createRuntimeProviderIdentity({ env = process.env, fetchImpl = g
   const kakaoClientId = env.ONARIA_KAKAO_CLIENT_ID?.trim();
   const apple = appleClientId ? {
     issuer: 'https://appleid.apple.com', audience: appleClientId,
-    jwksUrl: 'https://appleid.apple.com/auth/keys',
+    jwksUrl: 'https://appleid.apple.com/auth/keys', maxTokenAgeSeconds: 86400,
   } : null;
   const google = googleClientId ? {
     issuer: 'https://accounts.google.com', audience: googleClientId,
