@@ -4,12 +4,12 @@ import { test } from 'node:test';
 import { createNaverProviderVerifier, createOidcProviderVerifier, createProviderIdentityVerifier } from '../src/auth/provider_identity.js';
 
 const now = new Date('2026-10-02T00:00:00Z');
-async function oidcFixture({ issuer, audience, subject = 'provider-user-123' }) {
+async function oidcFixture({ issuer, audience, subject = 'provider-user-123', includeTyp = true, lifetimeSeconds = 600 }) {
   const { privateKey, publicKey } = await generateKeyPair('RS256');
   const publicJwk = await exportJWK(publicKey); publicJwk.kid = 'kid-1'; publicJwk.use = 'sig'; publicJwk.alg = 'RS256';
-  const token = await new SignJWT({}).setProtectedHeader({ alg: 'RS256', typ: 'JWT', kid: 'kid-1' })
+  const token = await new SignJWT({}).setProtectedHeader({ alg: 'RS256', kid: 'kid-1', ...(includeTyp ? { typ: 'JWT' } : {}) })
     .setIssuer(issuer).setAudience(audience).setSubject(subject).setIssuedAt(Math.floor(now.getTime()/1000))
-    .setExpirationTime(Math.floor(now.getTime()/1000)+600).sign(privateKey);
+    .setExpirationTime(Math.floor(now.getTime()/1000)+lifetimeSeconds).sign(privateKey);
   return { token, jwks: { keys: [publicJwk] } };
 }
 
@@ -21,6 +21,35 @@ test('Apple, Google and Kakao OIDC normalize verified sub only', async () => {
     const wrong = createOidcProviderVerifier({ provider, issuer, audience: 'wrong-client', jwks, now: () => now });
     await assert.rejects(() => wrong(token), /회원 인증/);
   }
+});
+
+
+test('Apple OIDC accepts the standard ID token header without typ', async () => {
+  const issuer = 'https://appleid.apple.com';
+  const audience = 'com.onaria.app';
+  const { token, jwks } = await oidcFixture({ issuer, audience, includeTyp: false });
+  const verify = createOidcProviderVerifier({ provider: 'apple', issuer, audience, jwks, now: () => now });
+  assert.deepEqual(await verify(token), { provider: 'apple', providerUserId: 'provider-user-123' });
+});
+
+test('Apple OIDC accepts Apple-style day-long ID token lifetime', async () => {
+  const issuer = 'https://appleid.apple.com';
+  const audience = 'com.onaria.app';
+  const { token, jwks } = await oidcFixture({ issuer, audience, includeTyp: false, lifetimeSeconds: 86400 });
+  const verify = createOidcProviderVerifier({
+    provider: 'apple', issuer, audience, jwks, now: () => now, maxTokenAgeSeconds: 86400,
+  });
+  assert.deepEqual(await verify(token), { provider: 'apple', providerUserId: 'provider-user-123' });
+});
+
+test('Kakao OIDC accepts iOS SDK token lifetime of 12 hours', async () => {
+  const issuer = 'https://kauth.kakao.com';
+  const audience = 'kakao-native-key';
+  const { token, jwks } = await oidcFixture({ issuer, audience, lifetimeSeconds: 43200 });
+  const verify = createOidcProviderVerifier({
+    provider: 'kakao', issuer, audience, jwks, now: () => now, maxTokenAgeSeconds: 43200,
+  });
+  assert.deepEqual(await verify(token), { provider: 'kakao', providerUserId: 'provider-user-123' });
 });
 
 test('Naver verifier calls only fixed profile endpoint and returns response.id', async () => {

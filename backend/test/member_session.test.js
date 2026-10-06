@@ -18,3 +18,23 @@ test('member session rejects forged identity and supports revocation', () => {
   assert.equal(sessions.revoke(token), true); assert.throws(() => sessions.verify(token), /회원 인증/);
   assert.equal(sessions.revoke(token), false); assert.equal(sessions.revoke('bad'), false);
 });
+
+test('persistent member session survives store reopen and supports revocation', async t => {
+  const { mkdtemp, rm } = await import('node:fs/promises');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const directory = await mkdtemp(join(tmpdir(), 'onaria-member-session-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const filename = join(directory, 'sessions.sqlite');
+  let time = 10_000;
+  const first = createMemberSessions({ filename, ttlMs: 60_000, now: () => time });
+  const issued = first.issue({ provider: 'apple', providerUserId: 'persistent-user' });
+  assert.equal(first.size(), 1);
+  first.close();
+
+  const reopened = createMemberSessions({ filename, ttlMs: 60_000, now: () => time });
+  assert.deepEqual(reopened.verify(issued.token), { provider: 'apple', providerUserId: 'persistent-user' });
+  assert.equal(reopened.revoke(issued.token), true);
+  assert.throws(() => reopened.verify(issued.token), /회원 인증/);
+  reopened.close();
+});

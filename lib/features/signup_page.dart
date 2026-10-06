@@ -210,11 +210,16 @@ class _SignUpPageState extends State<SignUpPage> {
       );
     } on SignInWithAppleAuthorizationException catch (error) {
       if (error.code != AuthorizationErrorCode.canceled && mounted) {
-        _showMessage('Apple 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
+        _showMessage('Apple 인증 오류: ${error.code.name}');
       }
-    } catch (_) {
+    } on MemberApiException catch (error) {
       if (mounted) {
-        _showMessage('Apple 로그인을 완료하지 못했어요. 다시 시도해 주세요.');
+        final suffix = error.statusCode == null ? '' : ' (${error.statusCode})';
+        _showMessage('Apple 서버 인증 실패$suffix: ${error.message}');
+      }
+    } catch (error) {
+      if (mounted) {
+        _showMessage('Apple 로그인 처리 오류: ${error.runtimeType}');
       }
     } finally {
       client.close();
