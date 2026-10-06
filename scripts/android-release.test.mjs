@@ -83,3 +83,14 @@ test('Windows BAT paths and arguments with spaces are passed safely', { skip: pr
   writeFileSync(file, '@echo off\r\necho synthetic-sensitive-output 1>&2\r\nexit /b 7\r\n');
   assert.throws(() => execute(file, [], root), error => !error.message.includes('synthetic-sensitive-output'));
 });
+
+test('release update retains local social defines without exposing values or overriding production API', () => {
+  const { options, calls } = fixture();
+  writeFileSync(join(options.root, '.onaria.local.env'), 'ONARIA_KAKAO_NATIVE_APP_KEY=synthetic-local-value\n');
+  updateRelease(options);
+  const build = calls.find(c => c[0] === 'flutter' && c[1] === 'build');
+  assert.ok(build.includes(`--dart-define-from-file=${join(options.root, '.onaria.local.env')}`));
+  assert.equal(build.at(-1), `--dart-define=ONARIA_API_BASE_URL=${productionApi}`);
+  assert.ok(!build.some(arg => arg.includes('synthetic-local-value')));
+  noDeletion(calls);
+});

@@ -37,14 +37,14 @@ void main() {
     });
   }
 
-  testWidgets('unconfigured Android Apple login preserves signup state',
+  testWidgets('unavailable Android Apple server preserves signup state',
       (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     await tester.pumpWidget(const MaterialApp(home: SignUpPage()));
     await tester.ensureVisible(find.byKey(const ValueKey('apple-signup')));
     await tester.tap(find.byKey(const ValueKey('apple-signup')));
     await tester.pump();
-    expect(find.text('이 기기의 Apple 로그인 연결을 준비 중이에요. 다른 로그인 방법을 선택해 주세요.'),
+    expect(find.text('안드로이드 Apple 로그인 서버 연결을 준비 중이에요. 다른 방법으로 로그인해 주세요.'),
         findsOneWidget);
     expect(find.text('회원 정보'), findsNothing);
     expect(tester.takeException(), isNull);

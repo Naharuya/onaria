@@ -9,6 +9,8 @@
 
 ## 남은 검증
 
+후속 Android 콜백 구현·배포·설치 결과는 [APPLE_ANDROID_SETUP_20261006.md](APPLE_ANDROID_SETUP_20261006.md)를 따른다. 아래 준비사항과 최초 작업 결과는 UX 변경 시점의 기록이다.
+
 Android Apple 인증은 저장소에 웹 인증 Service ID/redirect 연결이 없다. 버튼은 표시하되 준비 안내를 제공하며, 실제 Android Apple 인증은 완료되지 않았다. iOS는 기존 인증 경로를 유지한다. 웹 로그인 UI는 이번 변경 범위에 포함하지 않는다.
 
 Mac의 최신 미커밋 코드와 먼저 비교하고 이 파일과 signup_page.dart 변경만 적용한다. Flutter 분석/테스트 후 두 기기에서 순서, 큰 글자, 인증 취소/실패, 로그인·로그아웃·재로그인 검증이 필요하다.

@@ -12,6 +12,7 @@ import '../app/member_session_store.dart';
 import '../app/space_scaffold.dart';
 import '../src/api/member_api_client.dart';
 import '../src/api/provider_auth_api_client.dart';
+import '../src/auth/apple_android_auth_client.dart';
 import '../src/auth/google_login_service.dart';
 import '../src/auth/kakao_login_service.dart';
 import '../src/auth/naver_login_service.dart';
@@ -259,11 +260,6 @@ class _SignUpPageState extends State<SignUpPage> {
   );
 
   Future<void> _continueWithApple() async {
-    if (defaultTargetPlatform != TargetPlatform.iOS &&
-        defaultTargetPlatform != TargetPlatform.macOS) {
-      _showMessage('이 기기의 Apple 로그인 연결을 준비 중이에요. 다른 로그인 방법을 선택해 주세요.');
-      return;
-    }
     final apiBaseUrl = ApiConfig.baseUrl;
     if (apiBaseUrl == null) {
       _showMessage('서버 설정이 필요해요. ' + ApiConfig.setupHint);
@@ -272,11 +268,20 @@ class _SignUpPageState extends State<SignUpPage> {
 
     setState(() => _busy = true);
     final client = MemberApiClient(baseUrl: apiBaseUrl);
+    final appleAndroid = AppleAndroidAuthClient(baseUrl: apiBaseUrl);
     try {
+      final challenge = defaultTargetPlatform == TargetPlatform.android
+          ? await appleAndroid.challenge()
+          : null;
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: const [],
+        state: challenge?.state,
+        nonce: challenge?.nonce,
+        webAuthenticationOptions: challenge == null ? null : WebAuthenticationOptions(
+          clientId: challenge.clientId, redirectUri: challenge.redirectUri),
       );
-      final identityToken = credential.identityToken;
+      final identityToken = challenge == null ? credential.identityToken :
+          challenge.checkedProof(returnedState: credential.state, token: credential.identityToken);
       if (identityToken == null || identityToken.isEmpty) {
         throw const FormatException('Apple identity token missing');
       }
@@ -294,11 +299,14 @@ class _SignUpPageState extends State<SignUpPage> {
         final suffix = error.statusCode == null ? '' : ' (${error.statusCode})';
         _showMessage('Apple 서버 인증 실패$suffix: ${error.message}');
       }
+    } on FormatException catch (error) {
+      if (mounted) _showMessage(error.message);
     } catch (error) {
       if (mounted) {
         _showMessage('Apple 로그인 처리 오류: ${error.runtimeType}');
       }
     } finally {
+      appleAndroid.close();
       client.close();
       if (mounted) setState(() => _busy = false);
     }

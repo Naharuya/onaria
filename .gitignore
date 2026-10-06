@@ -50,3 +50,6 @@ ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 ios/Flutter/Kakao.local.xcconfig
 
 ios/Flutter/NaverKeys.xcconfig
+
+# Local social login build values; never commit.
+.onaria.local.env

@@ -7,6 +7,7 @@ import { createRuntimeIdentity } from './auth/identity_verifier.js';
 import { createWebMetrics } from './web_metrics.js';
 import { createMemberStore } from './member_store.js';
 import { createRuntimeProviderIdentity } from './auth/provider_identity.js';
+import { createRuntimeAppleAndroidAuth, withAppleAndroidProofs } from './auth/apple_android.js';
 import { createMemberSessions } from './auth/member_session.js';
 
 const port = Number(process.env.PORT || 8787);
@@ -17,14 +18,16 @@ const adminSettings = createAdminSettings({ directory: fileURLToPath(new URL('..
 const generate = adminSettings.generate;
 const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
 const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
+const appleAndroidAuth = createRuntimeAppleAndroidAuth();
 const app = createApp({
+  appleAndroidAuth,
   generate,
   adminSettings,
   allowedOrigins: (process.env.ALLOWED_ORIGINS || '').split(',').map((x) => x.trim()).filter(Boolean),
   appToken: process.env.APP_BEARER_TOKEN || '',
   adminToken: process.env.ADMIN_TOKEN || '',
   identity: createRuntimeIdentity(),
-  providerIdentity: createRuntimeProviderIdentity(),
+  providerIdentity: withAppleAndroidProofs(createRuntimeProviderIdentity(), appleAndroidAuth),
   memberSessions,
   webMetrics,
   memberStore,
