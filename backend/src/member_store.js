@@ -43,7 +43,7 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       return db.prepare('SELECT * FROM members WHERE id = ?').get(result.lastInsertRowid);
     },
     findByProviderIdentity(loginProvider, providerUserId) {
-      if (!['naver', 'kakao', 'google'].includes(loginProvider)
+      if (!['apple', 'naver', 'kakao', 'google'].includes(loginProvider)
         || typeof providerUserId !== 'string' || !providerUserId || providerUserId.length > 200) return null;
       return findByProviderIdentity.get(loginProvider, providerUserId) ?? null;
     },
