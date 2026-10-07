@@ -17,7 +17,7 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleAndroidAuth = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
@@ -33,6 +33,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
   app.use(express.json({ limit: '16kb' }));
   app.use('/v1', rateLimit({ windowMs: 60_000, limit: 20, skip: req => /^\/admin(?:\/|$)/.test(req.path), standardHeaders: 'draft-8', legacyHeaders: false }));
+  if (appleAndroidAuth) app.use('/v1/auth/apple/android', appleAndroidAuth.router());
   app.use('/v1/admin', rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: 'draft-8', legacyHeaders: false }));
   app.use((req, res, next) => {
     metrics.requests += 1;

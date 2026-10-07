@@ -46,6 +46,9 @@ class Deployment(unittest.TestCase):
                 # Windows validation uses Git Bash; real flock is exercised on Linux CI.
                 commands['flock'] = '#!/bin/bash\nexit 0\n'
                 commands['python3'] = '#!/bin/bash\n"' + shell_path(sys.executable) + '" "$@"\n'
+            if sys.platform == 'darwin':
+                # Linux CI exercises real flock; macOS fixtures stay isolated.
+                commands['flock'] = '#!/bin/bash\nexit 0\n'
             for name, contents in commands.items():
                 p = mocks / name
                 p.write_text(contents)

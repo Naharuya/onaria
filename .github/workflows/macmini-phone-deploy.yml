@@ -1,103 +1,53 @@
 name: Mac mini phone manual deploy
 
-# Device installation requires an explicit manual dispatch.
+# Public repository: only trusted main may run on this private device runner.
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-# Security: intentionally never runs on pull_request events.
-# This repository is public, so the self-hosted runner must only accept trusted
-# main pushes/manual dispatches and must not be exposed to untrusted PR code.
 concurrency:
   group: onaria-macmini-phone-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-android-phone:
+    if: github.ref == 'refs/heads/main'
     runs-on: [self-hosted, macOS, ARM64, onaria-deploy]
     timeout-minutes: 45
     env:
       ONARIA_AI_MODE: local
       ONARIA_EXTERNAL_API_DISABLED: 'true'
       OPENAI_API_KEY: ''
-      ANDROID_HOME: ${{ env.HOME }}/Library/Android/sdk
-      ANDROID_SDK_ROOT: ${{ env.HOME }}/Library/Android/sdk
-      ONARIA_ANDROID_PACKAGE: com.onaria.app
-      PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${{ env.HOME }}/Library/Android/sdk/platform-tools
-
     steps:
       - name: Checkout trusted main source
         uses: actions/checkout@v4
         with:
           ref: main
+          persist-credentials: false
           clean: true
           fetch-depth: 1
-
-      - name: Debug deployment preflight
+      - name: Configure local tools
         shell: bash
-        run: bash scripts/macmini-deploy-preflight.sh --debug
-
+        run: |
+          echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
+          echo "$HOME/Library/Android/sdk/platform-tools" >> "$GITHUB_PATH"
+          echo "ANDROID_HOME=$HOME/Library/Android/sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$HOME/Library/Android/sdk" >> "$GITHUB_ENV"
+          echo "JAVA_HOME=/Applications/Android Studio.app/Contents/jbr/Contents/Home" >> "$GITHUB_ENV"
       - name: Run Flutter regression tests
-        shell: bash
         run: flutter test
-
       - name: Analyze ONARIA app
-        shell: bash
         run: flutter analyze lib test example --no-fatal-infos
-
-      - name: Build debug APK
-        shell: bash
-        run: |
-          set -euo pipefail
-          flutter pub get
-          flutter build apk --debug
-          test -f build/app/outputs/flutter-apk/app-debug.apk
-
-      - name: Verify exactly one authorized Android phone
-        id: phone
-        shell: bash
-        run: |
-          set -euo pipefail
-          ADB="$ANDROID_HOME/platform-tools/adb"
-          "$ADB" start-server
-          DEVICE_LIST="$($ADB devices | awk '$2=="device" {print $1}')"
-          DEVICE_COUNT="$(printf '%s\n' "$DEVICE_LIST" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [[ "$DEVICE_COUNT" != "1" ]]; then
-            echo "Expected exactly one authorized Android device, found $DEVICE_COUNT." >&2
-            "$ADB" devices -l
-            exit 1
-          fi
-          DEVICE_SERIAL="$(printf '%s\n' "$DEVICE_LIST" | head -1)"
-          echo "serial=$DEVICE_SERIAL" >> "$GITHUB_OUTPUT"
-          echo "Authorized Android device: $DEVICE_SERIAL"
-
-      - name: Update ONARIA on connected phone without deleting app data
-        shell: bash
-        env:
-          DEVICE_SERIAL: ${{ steps.phone.outputs.serial }}
-        run: |
-          set -euo pipefail
-          ADB="$ANDROID_HOME/platform-tools/adb"
-          APK="build/app/outputs/flutter-apk/app-debug.apk"
-          "$ADB" -s "$DEVICE_SERIAL" install -r "$APK"
-
-      - name: Launch ONARIA
-        shell: bash
-        env:
-          DEVICE_SERIAL: ${{ steps.phone.outputs.serial }}
-        run: |
-          set -euo pipefail
-          ADB="$ANDROID_HOME/platform-tools/adb"
-          "$ADB" -s "$DEVICE_SERIAL" shell monkey \
-            -p "$ONARIA_ANDROID_PACKAGE" \
-            -c android.intent.category.LAUNCHER 1
-
+      - name: Prepare ignored local release configuration
+        run: node scripts/prepare-local-release-config.mjs /Users/ari/ARI/projects/onaria
+      - name: Verify safe release installer
+        run: node --test scripts/android-release.test.mjs scripts/sync-naver-config.test.mjs scripts/prepare-local-release-config.test.mjs
+      - name: Verify and install Release without deleting app data
+        run: node scripts/android-release.mjs
       - name: Deployment summary
         if: always()
-        shell: bash
         run: |
-          echo "ONARIA Mac mini debug deployment finished."
-          echo "Package: $ONARIA_ANDROID_PACKAGE"
-          echo "Commit: $GITHUB_SHA"
+          echo "ONARIA Release update result: ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Trusted main commit: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

@@ -17,6 +17,7 @@ function logout() {
   $('logoutButton').classList.add('hidden');
   $('loginPanel').classList.remove('hidden');
   $('memberRows').replaceChildren();
+  if ($('feedbackCounts')) $('feedbackCounts').textContent = '';
   $('loginError').textContent = '';
   $('dashboardError').textContent = '';
   $('lastUpdated').textContent = '로그아웃됨';
@@ -206,6 +207,16 @@ async function resumeSession() {
 }
 function renderOperations(data) {
   const ops = data.operations;
+  const feedbackRatings = { helpful: '도움됐어요', not_helpful: '도움되지 않았어요' };
+  const feedbackReasons = { empathy: '공감', relevance: '관련성', scripture: '말씀', voice: '음성', usability: '사용성', other: '기타' };
+  if ($('feedbackCounts')) {
+    const rows = Object.entries(data.metrics?.feedback?.counts ?? {}).flatMap(([key, count]) => {
+      const [rating, reason] = key.split(':');
+      return feedbackRatings[rating] && feedbackReasons[reason] && Number.isSafeInteger(count) && count >= 0
+        ? [`${feedbackRatings[rating]} · ${feedbackReasons[reason]} · ${formatNumber(count)}건`] : [];
+    });
+    $('feedbackCounts').textContent = rows.join('\n') || '서버 시작 이후 접수된 익명 피드백이 없습니다.';
+  }
   $('fallbackRate').textContent = typeof ops?.fallbackRate === 'number' ? `${(ops.fallbackRate * 100).toFixed(1)}%` : '데이터 없음';
   $('opsScope').textContent = ops ? `서버 시작 이후 · ${formatDate(ops.startedAt)} · 재시작 시 초기화` : '측정 준비 중';
   $('safetyRows').innerHTML = ops?.safety?.length ? ops.safety.map(row => `<tr><td>${escapeHtml(row.category)}</td><td>${formatNumber(row.riskLevel)}</td><td>${row.crisisTriggered ? '감지' : '없음'}</td><td>${formatNumber(row.count)}</td><td>${formatDate(row.timestamp)}</td></tr>`).join('') : '<tr><td colspan="5" class="empty">서버 시작 이후 감지된 안전 이벤트가 없습니다.</td></tr>';

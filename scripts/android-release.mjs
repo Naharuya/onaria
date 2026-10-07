@@ -4,10 +4,11 @@ import { existsSync, readFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { syncNaverConfig } from './sync-naver-config.mjs';
 
 export const packageId = 'com.onaria.app';
 export const productionApi = 'https://api.onaria.ai.kr';
-export const releaseCert = '692eabafe55986612f5aa3d475cea16e0e5e7db20ce2e09219a2f536f7e8f6bb';
+export const releaseCert = '972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07';
 export const uploadKeyAlias = 'onaria-upload';
 
 export function signingConfig(root) {
@@ -78,7 +79,10 @@ export function updateRelease({ root, tools, device, run = execute, report = con
   signingConfig(root);
   report('Building release with the official API; signing secrets are not printed.');
   call('flutter', ['pub', 'get']);
-  call('flutter', ['build', 'apk', '--release', `--dart-define=ONARIA_API_BASE_URL=${productionApi}`]);
+  const localDefines = join(root, '.onaria.local.env');
+  call('flutter', ['build', 'apk', '--release',
+    ...(existsSync(localDefines) ? [`--dart-define-from-file=${localDefines}`] : []),
+    `--dart-define=ONARIA_API_BASE_URL=${productionApi}`]);
   const apk = join(root, 'build/app/outputs/flutter-apk/app-release.apk');
   if (!existsSync(apk)) throw Error('Release APK missing');
   if (certificate(call('signer', ['verify', '--print-certs', apk])) !== releaseCert) throw Error('Built APK certificate mismatch; stopped');
@@ -129,6 +133,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
   try {
     if (process.argv.length > 3) throw Error('Only an optional device serial is accepted');
+    syncNaverConfig(root);
     updateRelease({ root, tools: discoverTools(root), device: process.argv[2] });
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

@@ -5,6 +5,7 @@ import '../app/conversation_draft.dart';
 import '../app/api_config.dart';
 import '../app/member_session_store.dart';
 import '../src/api/provider_auth_api_client.dart';
+import '../src/auth/naver_login_service.dart';
 import '../app/mind_card_store.dart';
 import '../app/space_scaffold.dart';
 import '../app/verse_history.dart';
@@ -78,6 +79,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
     try {
       await client.logout(token);
       MemberSessionStore.instance.clear();
+      var providerCleared = true;
+      try {
+        await NaverLoginService().signOut();
+      } on NaverLoginException {
+        // The server session is already revoked. Keep the app logged out;
+        // the next Naver login retries SDK cleanup before authenticating.
+        providerCleared = false;
+      }
       if (mounted) {
         setState(() {
           _hasSession = false;
@@ -85,7 +94,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
           _currentProvider = null;
         });
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('로그아웃했어요.')));
+            .showSnackBar(SnackBar(content: Text(providerCleared
+                ? '로그아웃했어요.'
+                : 'ONARIA에서 로그아웃했어요. 네이버 인증 상태는 다음 로그인 때 다시 정리합니다.')));
       }
     } catch (_) {
       if (mounted)
@@ -199,7 +210,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
   Widget build(BuildContext context) {
     final engagement = EngagementScope.maybeOf(context);
     return SpaceScaffold(
-        appBar: AppBar(title: const Text('개인정보와 기록 관리')),
+        appBar: AppBar(title: const Text('계정과 기록 관리')),
         body: ListView(padding: const EdgeInsets.all(20), children: [
           const Text('어디에 저장되나요?',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -218,41 +229,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
           const Text(
               '공유 기기에서는 임시 저장을 끄고 사용 후 필요한 기록을 삭제해 주세요. 공유한 이미지와 다른 곳에 보관한 사본은 여기서 삭제되지 않아요.'),
           const SizedBox(height: 16),
-          OutlinedButton(
-              onPressed: _busy
-                  ? null
-                  : () => _delete('임시 문장을', () async {
-                        await SharedPreferencesAsync()
-                            .setBool(ConversationDraft.autoSaveKey, false);
-                        await ConversationDraft.delete();
-                      }),
-              child: const Text('자동 복구 끄고 임시 문장 삭제')),
-          OutlinedButton(
-              onPressed: _busy
-                  ? null
-                  : () => _delete('마음카드와 관련 실천 기록을', MindCardStore().deleteAll),
-              child: const Text('마음카드·실천 기록 전체 삭제')),
-          if (engagement != null) ...[
-            OutlinedButton(
-                onPressed: _busy
-                    ? null
-                    : () => _delete('저장한 말씀을', engagement.clearSavedVerses),
-                child: const Text('저장한 말씀 삭제')),
-            OutlinedButton(
-                onPressed: _busy
-                    ? null
-                    : () => _delete('7일 여정을', engagement.deleteJourney),
-                child: const Text('7일 여정 기록 삭제')),
-          ],
-          OutlinedButton(
-              onPressed: _busy
-                  ? null
-                  : () => _delete(
-                      '최근 말씀 선택 기록을',
-                      () => SharedPreferencesAsync()
-                          .remove(VerseHistory.storageKey)),
-              child: const Text('최근 말씀 선택 기록 삭제')),
-          const SizedBox(height: 20),
           const Text('회원 정보와 계정',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const Text(
@@ -294,6 +270,43 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ] else ...[
             const Text('로그인하면 연결된 계정 관리와 회원탈퇴를 사용할 수 있어요.'),
           ],
+          const SizedBox(height: 24),
+          OutlinedButton(
+              onPressed: _busy
+                  ? null
+                  : () => _delete('임시 문장을', () async {
+                        await SharedPreferencesAsync()
+                            .setBool(ConversationDraft.autoSaveKey, false);
+                        await ConversationDraft.delete();
+                      }),
+              child: const Text('자동 복구 끄고 임시 문장 삭제')),
+          OutlinedButton(
+              onPressed: _busy
+                  ? null
+                  : () => _delete('마음카드와 관련 실천 기록을', MindCardStore().deleteAll),
+              child: const Text('마음카드·실천 기록 전체 삭제')),
+          if (engagement != null) ...[
+            OutlinedButton(
+                onPressed: _busy
+                    ? null
+                    : () => _delete('저장한 말씀을', engagement.clearSavedVerses),
+                child: const Text('저장한 말씀 삭제')),
+            OutlinedButton(
+                onPressed: _busy
+                    ? null
+                    : () => _delete('7일 여정을', engagement.deleteJourney),
+                child: const Text('7일 여정 기록 삭제')),
+          ],
+          OutlinedButton(
+              onPressed: _busy
+                  ? null
+                  : () => _delete(
+                      '최근 말씀 선택 기록을',
+                      () => SharedPreferencesAsync()
+                          .remove(VerseHistory.storageKey)),
+              child: const Text('최근 말씀 선택 기록 삭제')),
+          const SizedBox(height: 20),
+
           TextButton(
               onPressed: () async {
                 try {
