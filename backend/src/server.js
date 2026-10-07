@@ -8,6 +8,8 @@ import { createWebMetrics } from './web_metrics.js';
 import { createMemberStore } from './member_store.js';
 import { createRuntimeProviderIdentity } from './auth/provider_identity.js';
 import { createRuntimeAppleAndroidAuth, withAppleAndroidProofs } from './auth/apple_android.js';
+import { createOidcProviderVerifier } from './auth/provider_identity.js';
+import { createRuntimeAppleRevocation } from './auth/apple_revocation.js';
 import { createMemberSessions } from './auth/member_session.js';
 
 const port = Number(process.env.PORT || 8787);
@@ -19,7 +21,14 @@ const generate = adminSettings.generate;
 const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
 const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
 const appleAndroidAuth = createRuntimeAppleAndroidAuth();
+const providerIdentity = createRuntimeProviderIdentity();
 const app = createApp({
+  appleRevocation: createRuntimeAppleRevocation({ verify: providerIdentity, androidAuth: appleAndroidAuth,
+    androidVerify: process.env.ONARIA_APPLE_SERVICE_ID ? (() => {
+      const verify = createOidcProviderVerifier({ provider: 'apple', issuer: 'https://appleid.apple.com',
+        audience: process.env.ONARIA_APPLE_SERVICE_ID.trim(), jwksUrl: 'https://appleid.apple.com/auth/keys', maxTokenAgeSeconds: 86400 });
+      return ({ credential }) => verify(credential);
+    })() : null }),
   appleAndroidAuth,
   generate,
   adminSettings,
@@ -27,7 +36,7 @@ const app = createApp({
   appToken: process.env.APP_BEARER_TOKEN || '',
   adminToken: process.env.ADMIN_TOKEN || '',
   identity: createRuntimeIdentity(),
-  providerIdentity: withAppleAndroidProofs(createRuntimeProviderIdentity(), appleAndroidAuth),
+  providerIdentity: withAppleAndroidProofs(providerIdentity, appleAndroidAuth),
   memberSessions,
   webMetrics,
   memberStore,

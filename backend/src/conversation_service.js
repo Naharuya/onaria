@@ -162,6 +162,13 @@ export function createConversationService({ env = process.env, logger = console,
       return responseSchema.parse(safety);
     }
     const agent = suppliedAgent ?? routeAgent({ requestedAgent: body.agentMode, userMessage: body.userMessage, verseLanguage: body.verseLanguage });
+    // Missing, withdrawn or obsolete consent cannot activate an external model
+    // or embedding provider. Legacy clients continue with local safe responses.
+    if (body.externalAiConsentVersion !== 'openai-chat-v1') {
+      const result = await fallback(body, agent, memorySummary);
+      record('local', 'external_ai_consent_required');
+      return result;
+    }
     costRoute = v1 ? routeCostRequest(body, env) : null;
     if (v1) {
       let session;

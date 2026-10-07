@@ -6,7 +6,7 @@ import { responseSchema } from '../src/schema.js';
 import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 
 const body = () => ({ session: { sessionId: 'fallback-test', selectedEmotion: '불안', emotionIntensity: 7, turnCount: 2 },
-  userMessage: '내일 발표가 걱정돼요', systemPromptVersion: 'ko-v1', allowedVerseIds: ['PHP_4_6_7'] });
+  userMessage: '내일 발표가 걱정돼요', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: ['PHP_4_6_7'] });
 const agent = { id: 'integrated' };
 const enabled = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-key', OPENAI_MODEL: 'test-model' };
 

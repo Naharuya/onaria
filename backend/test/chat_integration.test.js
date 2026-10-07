@@ -11,7 +11,7 @@ import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 const env = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only', OPENAI_MODEL: 'test-model' };
 const body = (sessionId = 'http-test', extra = {}) => ({
   session: { sessionId, selectedEmotion: '불안', emotionIntensity: 7, turnCount: 1 },
-  userMessage: '내일 발표가 걱정돼요', systemPromptVersion: 'ko-v1', allowedVerseIds: ['PHP_4_6_7'], ...extra,
+  userMessage: '내일 발표가 걱정돼요', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: ['PHP_4_6_7'], ...extra,
 });
 function fakeStructured(calls) {
   return async (task) => {

@@ -17,7 +17,7 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleAndroidAuth = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleRevocation = null, appleAndroidAuth = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
@@ -157,6 +157,9 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
         name: req.body?.name,
         phone: req.body?.phone,
         churchName: req.body?.churchName,
+        termsAccepted: req.body?.termsAccepted,
+        privacyAccepted: req.body?.privacyAccepted,
+        adultConfirmed: req.body?.adultConfirmed,
         loginProvider: trusted.provider,
         providerUserId: trusted.providerUserId,
       }));
@@ -194,7 +197,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       return res.json({ member: publicMember(member), providers: memberStore.listIdentities?.(member.id) ?? [], currentProvider: trusted.provider });
     } catch (error) { return next(error); }
   });
-  app.delete('/v1/account/providers/:provider', (req, res, next) => {
+  app.delete('/v1/account/providers/:provider', async (req, res, next) => {
     try {
       const sessionToken = req.get('x-onaria-member-session');
       if (!sessionToken || !memberSessions) throw new IdentityError();
@@ -203,7 +206,14 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!member) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
       const provider = req.params.provider;
       if (provider === trusted.provider) return res.status(409).json({ message: '현재 로그인에 사용 중인 계정은 연결 해제할 수 없습니다. 다른 계정으로 로그인한 뒤 다시 시도해 주세요.' });
+      const detachedIdentity = memberStore.listIdentityDetails?.(member.id)?.find(i => i.provider === provider);
+      if (provider === 'apple') {
+        if (!appleRevocation) throw new IdentityError(503);
+        await appleRevocation({ authorizationCode: req.body?.appleAuthorizationCode, credential: req.body?.appleCredential,
+          providerUserId: detachedIdentity?.providerUserId });
+      }
       if (!memberStore.detachIdentity?.(member.id, provider)) return res.status(404).json({ message: '연결된 계정을 찾을 수 없습니다.' });
+      if (detachedIdentity) memberSessions.revokeIdentity?.(detachedIdentity);
       return res.status(204).end();
     } catch (error) {
       if (error.code === 'LAST_IDENTITY') return res.status(409).json({ message: error.message });
@@ -225,7 +235,14 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       const trusted = memberSessions.verify(sessionToken);
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
       if (!member) return res.status(404).json({ message: '삭제할 회원 정보를 찾을 수 없습니다.' });
+      if ((memberStore.listIdentities?.(member.id) ?? []).includes('apple')) {
+        if (!appleRevocation) throw new IdentityError(503);
+        await appleRevocation({ authorizationCode: req.body?.appleAuthorizationCode, credential: req.body?.appleCredential,
+          providerUserId: memberStore.listIdentityDetails?.(member.id)?.find(i => i.provider === 'apple')?.providerUserId });
+      }
+      const identities = memberStore.listIdentityDetails?.(member.id) ?? [trusted];
       if (!memberStore.deleteById?.(member.id)) return res.status(409).json({ message: '계정 삭제를 완료하지 못했습니다.' });
+      for (const identity of identities) memberSessions.revokeIdentity?.(identity);
       memberSessions.revoke(sessionToken);
       return res.status(204).end();
     } catch (error) { return next(error); }
@@ -279,6 +296,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
 
   app.use((error, _req, res, _next) => {
+    if (error.code === 'PROFILE_SCHEMA_REQUIRED') return res.status(503).json({ message: '회원가입 서버 업데이트가 필요합니다. 잠시 후 다시 시도해 주세요.' });
     if (error instanceof IdentityError) return res.status(error.status).json({ message: error.message });
     // JSON parsing fails before a route or provider runs. Keep client errors
     // distinct from AI availability failures and never reflect parser details.

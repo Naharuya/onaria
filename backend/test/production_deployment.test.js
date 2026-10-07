@@ -38,7 +38,7 @@ const build = (index, id, records = [approved()]) => index.build({ indexVersion:
 const ready = index => checkProductionReadiness({ index, traditions: ['protestant'] });
 const quiet = { info() {}, warn() {}, error() {} };
 const body = { session: { sessionId: 'production-deployment-fixture', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 },
-  userMessage: '기독교 위로', systemPromptVersion: 'ko-v1', allowedVerseIds: [] };
+  userMessage: '기독교 위로', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [] };
 
 test('review workflow: version, notes and invalidation survive review cycles', () => {
   const source = approved();

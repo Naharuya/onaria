@@ -43,6 +43,26 @@ test('public routes have unique canonical SEO and do not disclose operational da
   }
   for (const path of ['/.env', '/admin/.env', '/assets/.env', '/src/server.js', '/data/members.sqlite']) assert.equal((await fetch(base + path)).status, 404);
 });
+test('public privacy and deletion guidance describe current account and local-data boundaries', async t => {
+  const base = await serve(t);
+  const privacy = await (await fetch(base + '/privacy')).text();
+  const deletion = await (await fetch(base + '/account-deletion')).text();
+  const terms = await (await fetch(base + '/terms')).text();
+  for (const page of [privacy, deletion]) {
+    assert.match(page, /mailto:vjsjv7003@gmail\.com/);
+    assert.doesNotMatch(page, /vjsjv7003@naver\.com/);
+    assert.doesNotMatch(page, /삭제 기능을 열지 않습니다|문의처와 처리 절차는 정식 공개 전 확정/);
+  }
+  assert.match(privacy, /선택 입력/);
+  assert.match(privacy, /1년 자동 파기를 제공한다고 약속하지 않습니다/);
+  assert.match(privacy, /기기에 저장한 기록은 계정 삭제와 별도/);
+  assert.match(deletion, /Apple 본인 확인/);
+  assert.match(deletion, /계정 소유 확인 없이/);
+  assert.match(terms, /만 18세 이상/);
+  assert.match(terms, /무료로 제공/);
+  assert.match(terms, /앱 내 구매·유료 구독·결제 기능은 제공하지 않습니다/);
+});
+
 test('production rejects plain HTTP and untrusted spoofed proxy headers, including legacy bearer', async t => {
   const base = await serve(t, { production: true });
   for (const path of ['/admin', '/admin/admin.js', '/v1/admin/overview', '/v1/admin/session']) {
