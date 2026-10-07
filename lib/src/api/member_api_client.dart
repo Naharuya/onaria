@@ -16,7 +16,8 @@ class MemberApiClient {
       {required String name,
       required String phone,
       required String churchName,
-      String loginProvider = 'phone'}) async {
+      String loginProvider = 'phone',
+      bool adultConfirmed = false}) async {
     ApiConfig.requireSecureEndpoint(baseUrl);
     final request = http.Request('POST', baseUrl.resolve('/v1/auth/signup'))
       ..followRedirects = false
@@ -30,7 +31,8 @@ class MemberApiClient {
         'churchName': churchName,
         'loginProvider': loginProvider,
         'termsAccepted': true,
-        'privacyAccepted': true
+        'privacyAccepted': true,
+        'adultConfirmed': adultConfirmed
       });
     final response = await _httpClient
         .send(request)
@@ -97,6 +99,7 @@ class MemberApiClient {
     required String name,
     required String phone,
     required String churchName,
+    required bool adultConfirmed,
     String? sessionToken,
   }) async {
     ApiConfig.requireSecureEndpoint(baseUrl);
@@ -110,6 +113,7 @@ class MemberApiClient {
         'churchName': churchName,
         'termsAccepted': true,
         'privacyAccepted': true,
+        'adultConfirmed': adultConfirmed,
       },
       sessionToken: sessionToken,
     );

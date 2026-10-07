@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app/conversation_draft.dart';
 import '../app/api_config.dart';
+import '../app/ai_consent.dart';
 import '../app/member_session_store.dart';
+import '../app/member_registration_store.dart';
 import '../src/api/provider_auth_api_client.dart';
+import '../src/auth/apple_android_auth_client.dart';
 import '../src/auth/naver_login_service.dart';
 import '../app/mind_card_store.dart';
 import '../app/space_scaffold.dart';
@@ -12,25 +17,41 @@ import '../app/verse_history.dart';
 import '../engagement/engagement_controller.dart';
 
 class PrivacyPage extends StatefulWidget {
-  const PrivacyPage({super.key});
+  const PrivacyPage(
+      {super.key,
+      this.sessionStore,
+      this.apiClientFactory,
+      this.registrationStore,
+      this.appleDeletionCredential});
+  final MemberSessionStore? sessionStore;
+  final MemberRegistrationStore? registrationStore;
+  final Future<AuthorizationCredentialAppleID> Function()?
+      appleDeletionCredential;
+  final ProviderAuthApiClient Function(Uri)? apiClientFactory;
   @override
   State<PrivacyPage> createState() => _PrivacyPageState();
 }
 
 class _PrivacyPageState extends State<PrivacyPage> {
   bool _busy = false;
-  bool _hasSession = MemberSessionStore.instance.token != null;
+  late bool _hasSession;
+  MemberSessionStore get _sessionStore =>
+      widget.sessionStore ?? MemberSessionStore.instance;
+  ProviderAuthApiClient _apiClient(Uri base) =>
+      widget.apiClientFactory?.call(base) ??
+      ProviderAuthApiClient(baseUrl: base);
   List<String> _providers = const [];
   String? _currentProvider;
 
   @override
   void initState() {
     super.initState();
+    _hasSession = _sessionStore.token != null;
     _refreshAccount();
   }
 
   Future<void> _refreshAccount() async {
-    final token = MemberSessionStore.instance.token;
+    final token = _sessionStore.token;
     final base = ApiConfig.baseUrl;
     if (token == null || base == null) {
       if (mounted)
@@ -41,7 +62,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
         });
       return;
     }
-    final client = ProviderAuthApiClient(baseUrl: base);
+    final client = _apiClient(base);
     try {
       final account = await client.account(token);
       if (mounted)
@@ -53,7 +74,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     } catch (_) {
       if (mounted)
         setState(() {
-          _hasSession = MemberSessionStore.instance.token != null;
+          _hasSession = _sessionStore.token != null;
           _providers = const [];
           _currentProvider = null;
         });
@@ -71,14 +92,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
       };
 
   Future<void> _logout() async {
-    final token = MemberSessionStore.instance.token;
+    final token = _sessionStore.token;
     final base = ApiConfig.baseUrl;
     if (token == null || base == null) return;
     setState(() => _busy = true);
-    final client = ProviderAuthApiClient(baseUrl: base);
+    final client = _apiClient(base);
     try {
       await client.logout(token);
-      MemberSessionStore.instance.clear();
+      _sessionStore.clear();
       var providerCleared = true;
       try {
         await NaverLoginService().signOut();
@@ -93,8 +114,8 @@ class _PrivacyPageState extends State<PrivacyPage> {
           _providers = const [];
           _currentProvider = null;
         });
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(providerCleared
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(providerCleared
                 ? '로그아웃했어요.'
                 : 'ONARIA에서 로그아웃했어요. 네이버 인증 상태는 다음 로그인 때 다시 정리합니다.')));
       }
@@ -108,8 +129,40 @@ class _PrivacyPageState extends State<PrivacyPage> {
     }
   }
 
+  Future<AuthorizationCredentialAppleID> _appleDeletionCredential() async {
+    final base = ApiConfig.baseUrl;
+    if (base == null || kIsWeb)
+      throw const ProviderAuthApiException('Apple 본인 확인을 사용할 수 없어요.');
+    final android = AppleAndroidAuthClient(baseUrl: base);
+    try {
+      final challenge = defaultTargetPlatform == TargetPlatform.android
+          ? await android.challenge()
+          : null;
+      final credential = await SignInWithApple.getAppleIDCredential(
+          scopes: const [],
+          state: challenge?.state,
+          nonce: challenge?.nonce,
+          webAuthenticationOptions: challenge == null
+              ? null
+              : WebAuthenticationOptions(
+                  clientId: challenge.clientId,
+                  redirectUri: challenge.redirectUri));
+      if (challenge != null) {
+        challenge.checkedProof(
+            returnedState: credential.state, token: credential.identityToken);
+      }
+      if (credential.identityToken == null ||
+          credential.authorizationCode.isEmpty) {
+        throw const ProviderAuthApiException('Apple 본인 확인을 완료하지 못했어요.');
+      }
+      return credential;
+    } finally {
+      android.close();
+    }
+  }
+
   Future<void> _deleteAccount() async {
-    final token = MemberSessionStore.instance.token;
+    final token = _sessionStore.token;
     final base = ApiConfig.baseUrl;
     if (token == null || base == null) return;
     final confirmed = await showDialog<bool>(
@@ -129,14 +182,37 @@ class _PrivacyPageState extends State<PrivacyPage> {
             ));
     if (confirmed != true || !mounted) return;
     setState(() => _busy = true);
-    final client = ProviderAuthApiClient(baseUrl: base);
+    final client = _apiClient(base);
     try {
-      await client.deleteAccount(token);
-      MemberSessionStore.instance.clear();
+      // Fail closed if linked identities cannot be freshly verified. Cached UI
+      // data may be empty after a failed initial load.
+      final account = await client.account(token);
+      final apple = account.providers.contains('apple')
+          ? await (widget.appleDeletionCredential?.call() ??
+              _appleDeletionCredential())
+          : null;
+      await client.deleteAccount(token,
+          appleCredential: apple?.identityToken,
+          appleAuthorizationCode: apple?.authorizationCode);
+      _sessionStore.clear();
+      // A completed server deletion must not be reported as failed if local
+      // metadata cleanup fails. Personal cards/drafts are intentionally kept.
+      var localMetadataCleared = true;
+      try {
+        await (widget.registrationStore ?? MemberRegistrationStore()).clear();
+      } catch (_) {
+        localMetadataCleared = false;
+      }
       if (mounted) {
-        setState(() => _providers = const []);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('회원탈퇴가 완료되었어요.')));
+        setState(() {
+          _hasSession = false;
+          _providers = const [];
+          _currentProvider = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(localMetadataCleared
+                ? '회원탈퇴가 완료되었어요.'
+                : '회원탈퇴가 완료되었어요. 이 기기의 회원 번호 정리는 다시 시도해 주세요.')));
       }
     } catch (_) {
       if (mounted)
@@ -149,13 +225,17 @@ class _PrivacyPageState extends State<PrivacyPage> {
   }
 
   Future<void> _unlinkProvider(String provider) async {
-    final token = MemberSessionStore.instance.token;
+    final token = _sessionStore.token;
     final base = ApiConfig.baseUrl;
     if (token == null || base == null) return;
-    final client = ProviderAuthApiClient(baseUrl: base);
+    final client = _apiClient(base);
     setState(() => _busy = true);
     try {
-      await client.unlinkProvider(token, provider);
+      final apple =
+          provider == 'apple' ? await _appleDeletionCredential() : null;
+      await client.unlinkProvider(token, provider,
+          appleCredential: apple?.identityToken,
+          appleAuthorizationCode: apple?.authorizationCode);
       await _refreshAccount();
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
@@ -219,9 +299,20 @@ class _PrivacyPageState extends State<PrivacyPage> {
               subtitle: Text(
                   '저장한 마음카드에는 감정·강도·선택한 실천과 대화 요약이 포함될 수 있어요. 임시 문장은 저장을 선택했을 때만 보관하며, 전체 대화 원문을 자동 보관하지 않아요. 말씀·여정·실천 기록도 기기에 남아요.')),
           const ListTile(
-              title: Text('서버와 외부 AI'),
-              subtitle: Text(
-                  '대화를 보내면 입력 문장과 필요한 최근 맥락이 서버로 전송돼요. 외부 AI 사용은 서버 설정에 따라 달라져요. 앱의 로컬 기록 삭제는 서버의 사용량 기록이나 회원 정보를 삭제하지 않아요.')),
+              title: Text('서버와 외부 AI'), subtitle: Text(AiConsent.disclosure)),
+          TextButton.icon(
+            icon: const Icon(Icons.privacy_tip_outlined),
+            label: const Text('외부 AI 전송 허용 철회'),
+            onPressed: _busy
+                ? null
+                : () async {
+                    await AiConsent.withdraw();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                            '허용을 철회했어요. 다음 대화 전송 전에 다시 확인해요. 이미 전송된 데이터의 삭제는 개인정보처리방침을 확인해 주세요.')));
+                  },
+          ),
           const ListTile(
               title: Text('음성과 의견'),
               subtitle: Text(
@@ -306,7 +397,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
                           .remove(VerseHistory.storageKey)),
               child: const Text('최근 말씀 선택 기록 삭제')),
           const SizedBox(height: 20),
-
           TextButton(
               onPressed: () async {
                 try {

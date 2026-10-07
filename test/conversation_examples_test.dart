@@ -1,3 +1,5 @@
+import 'package:onaria/app/ai_consent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:onaria/app/app_theme.dart';
 import 'package:onaria/onaria.dart';
 import 'package:onaria/features/conversation_page.dart';
@@ -47,8 +49,9 @@ class _ExampleClient implements LlmApiClient {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    await SharedPreferencesAsync().setString(AiConsent.preferenceKey, AiConsent.version);
   });
   tearDown(() {
     SharedPreferencesAsyncPlatform.instance = null;

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "translation": "KRV_NIV",
-  "copyrightNotice": "Korean: 개역한글 (Public Domain), English: NIV (For development reference).",
+  "translation": "KRV_WEB",
+  "copyrightNotice": "한국어: 성경전서 개역한글판, 대한성서공회 (1961), 저작재산권 보호기간 소멸. English: World English Bible, eBible.org, Public Domain. 원문·출처를 유지합니다.",
   "verses": [
     {
       "id": "PHP_4_6_7",
@@ -11,11 +11,23 @@
       "verseEnd": 7,
       "reference": "빌립보서 4:6-7",
       "translation": "KRV",
-      "text": "아무 것도 염려하지 말고 다만 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라. 그리하면 모든 지각에 뛰어난 하나님의 평안이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라.",
-      "englishText": "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.",
-      "emotions": ["불안", "공포", "놀람"],
-      "tags": ["염려", "평안", "기도", "맡김"],
-      "reflectionQuestion": "지금 하나님께 맡기고 싶은 걱정은 무엇인가요?"
+      "text": "아무 것도 염려하지 말고 오직 모든 일에 기도와 간구로, 너희 구할 것을 감사함으로 하나님께 아뢰라 그리하면 모든 지각에 뛰어난 하나님의 평강이 그리스도 예수 안에서 너희 마음과 생각을 지키시리라",
+      "englishText": "In nothing be anxious, but in everything, by prayer and petition with thanksgiving, let your requests be made known to God. And the peace of God, which surpasses all understanding, will guard your hearts and your thoughts in Christ Jesus.",
+      "emotions": [
+        "불안",
+        "공포",
+        "놀람"
+      ],
+      "tags": [
+        "염려",
+        "평안",
+        "기도",
+        "맡김"
+      ],
+      "reflectionQuestion": "지금 하나님께 맡기고 싶은 걱정은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=php&chap=4"
     },
     {
       "id": "ISA_41_10",
@@ -25,11 +37,23 @@
       "verseEnd": null,
       "reference": "이사야 41:10",
       "translation": "KRV",
-      "text": "두려워하지 말라 내가 너와 함께 함이라 놀라지 말라 나는 네 하나님이 됨이라 내가 너를 굳세게 하리라 참으로 너를 도와 주리라 참으로 나의 의로운 오른손으로 너를 붙들리라.",
-      "englishText": "So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand.",
-      "emotions": ["불안", "외로움", "공포"],
-      "tags": ["두려움", "함께함", "도움", "보호"],
-      "reflectionQuestion": "지금 가장 도움이 필요하다고 느끼는 부분은 무엇인가요?"
+      "text": "두려워 말라 내가 너와 함께 함이니라 놀라지 말라 나는 네 하나님이 됨이니라 내가 너를 굳세게 하리라 참으로 너를 도와 주리라 참으로 나의 의로운 오른손으로 너를 붙들리라",
+      "englishText": "Don’t you be afraid, for I am with you. Don’t be dismayed, for I am your God. I will strengthen you. Yes, I will help you. Yes, I will uphold you with the right hand of my righteousness.",
+      "emotions": [
+        "불안",
+        "외로움",
+        "공포"
+      ],
+      "tags": [
+        "두려움",
+        "함께함",
+        "도움",
+        "보호"
+      ],
+      "reflectionQuestion": "지금 가장 도움이 필요하다고 느끼는 부분은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=isa&chap=41"
     },
     {
       "id": "PSA_23_4",
@@ -39,11 +63,22 @@
       "verseEnd": null,
       "reference": "시편 23:4",
       "translation": "KRV",
-      "text": "내가 사망의 음침한 골짜기로 다닐지라도 해를 두려워하지 않을 것은 주께서 나와 함께 하심이라 주의 지팡이와 막대기가 나를 안위하시나이다.",
-      "englishText": "Even though I walk through the darkest valley, I will fear no evil, for you are with me; your rod and your staff, they comfort me.",
-      "emotions": ["외로움", "슬픔", "공포"],
-      "tags": ["동행", "보호", "위로"],
-      "reflectionQuestion": "혼자가 아니라고 느끼게 해줄 사람이나 기억이 있나요?"
+      "text": "내가 사망의 음침한 골짜기로 다닐찌라도 해를 두려워하지 않을 것은 주께서 나와 함께 하심이라 주의 지팡이와 막대기가 나를 안위하시나이다",
+      "englishText": "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me. Your rod and your staff, they comfort me.",
+      "emotions": [
+        "외로움",
+        "슬픔",
+        "공포"
+      ],
+      "tags": [
+        "동행",
+        "보호",
+        "위로"
+      ],
+      "reflectionQuestion": "혼자가 아니라고 느끼게 해줄 사람이나 기억이 있나요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=23"
     },
     {
       "id": "HEB_13_5",
@@ -53,11 +88,20 @@
       "verseEnd": null,
       "reference": "히브리서 13:5",
       "translation": "KRV",
-      "text": "돈을 사랑하지 말고 있는 바를 족한 줄로 알라 그가 친히 말씀하시기를 내가 결코 너희를 버리지 아니하고 너희를 떠나지 아니하리라 하셨느니라.",
-      "englishText": "Keep your lives free from the love of money and be content with what you have, because God has said, 'Never will I leave you; never will I forsake you.'",
-      "emotions": ["외로움"],
-      "tags": ["버리지않음", "함께함", "신실함"],
-      "reflectionQuestion": "이 말씀을 읽으며 떠오르는 관계가 있나요?"
+      "text": "돈을 사랑치 말고 있는 바를 족한 줄로 알라 그가 친히 말씀하시기를 내가 과연 너희를 버리지 아니하고 과연 너희를 떠나지 아니하리라 하셨느니라",
+      "englishText": "Be free from the love of money, content with such things as you have, for he has said, “I will in no way leave you, neither will I in any way forsake you.”",
+      "emotions": [
+        "외로움"
+      ],
+      "tags": [
+        "버리지않음",
+        "함께함",
+        "신실함"
+      ],
+      "reflectionQuestion": "이 말씀을 읽으며 떠오르는 관계가 있나요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=heb&chap=13"
     },
     {
       "id": "MAT_11_28",
@@ -67,11 +111,21 @@
       "verseEnd": null,
       "reference": "마태복음 11:28",
       "translation": "KRV",
-      "text": "수고하고 무거운 짐 진 자들아 다 내게로 오라 내가 너희를 쉬게 하리라.",
-      "englishText": "Come to me, all you who are weary and burdened, and I will give you rest.",
-      "emotions": ["지침", "슬픔"],
-      "tags": ["쉼", "무거운짐", "회복"],
-      "reflectionQuestion": "지금 잠시 내려놓아도 되는 짐은 무엇인가요?"
+      "text": "수고하고 무거운 짐진 자들아 다 내게로 오라 내가 너희를 쉬게 하리라",
+      "englishText": "“Come to me, all you who labor and are heavily burdened, and I will give you rest.",
+      "emotions": [
+        "지침",
+        "슬픔"
+      ],
+      "tags": [
+        "쉼",
+        "무거운짐",
+        "회복"
+      ],
+      "reflectionQuestion": "지금 잠시 내려놓아도 되는 짐은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=mat&chap=11"
     },
     {
       "id": "ISA_40_31",
@@ -81,11 +135,21 @@
       "verseEnd": null,
       "reference": "이사야 40:31",
       "translation": "KRV",
-      "text": "오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리가 날개치며 올라감 같을 것이요 달음박질하여도 곤비하지 아니하겠고 걸어가도 피곤하지 아니하리로다.",
-      "englishText": "but those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.",
-      "emotions": ["지침", "기대"],
-      "tags": ["새힘", "기다림", "회복"],
-      "reflectionQuestion": "오늘 회복을 위해 가장 먼저 필요한 것은 무엇인가요?"
+      "text": "오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리의 날개치며 올라감 같을 것이요 달음박질하여도 곤비치 아니하겠고 걸어가도 피곤치 아니하리로다",
+      "englishText": "but those who wait for the LORD will renew their strength. They will mount up with wings like eagles. They will run, and not be weary. They will walk, and not faint.",
+      "emotions": [
+        "지침",
+        "기대"
+      ],
+      "tags": [
+        "새힘",
+        "기다림",
+        "회복"
+      ],
+      "reflectionQuestion": "오늘 회복을 위해 가장 먼저 필요한 것은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=isa&chap=40"
     },
     {
       "id": "JAS_1_19_20",
@@ -95,11 +159,22 @@
       "verseEnd": 20,
       "reference": "야고보서 1:19-20",
       "translation": "KRV",
-      "text": "내 사랑하는 형제들아 너희가 알지니 사람마다 듣기는 속히 하고 말하기는 더디 하며 성내기도 더디 하라. 사람이 성내는 것이 하나님의 의를 이루지 못함이라.",
-      "englishText": "My dear brothers and sisters, take note of this: Everyone should be quick to listen, slow to speak and slow to become angry, because human anger does not produce the righteousness that God desires.",
-      "emotions": ["분노", "혐오"],
-      "tags": ["분노", "경청", "절제", "말"],
-      "reflectionQuestion": "감정을 해치지 않게 표현하려면 어떤 문장이 좋을까요?"
+      "text": "내 사랑하는 형제들아 너희가 알거니와 사람마다 듣기는 속히 하고 말하기는 더디 하며 성내기도 더디 하라 사람의 성내는 것이 하나님의 의를 이루지 못함이니라",
+      "englishText": "So, then, my beloved brothers, let every man be swift to hear, slow to speak, and slow to anger; for the anger of man doesn’t produce the righteousness of God.",
+      "emotions": [
+        "분노",
+        "혐오"
+      ],
+      "tags": [
+        "분노",
+        "경청",
+        "절제",
+        "말"
+      ],
+      "reflectionQuestion": "감정을 해치지 않게 표현하려면 어떤 문장이 좋을까요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jas&chap=1"
     },
     {
       "id": "PRO_15_1",
@@ -109,11 +184,21 @@
       "verseEnd": null,
       "reference": "잠언 15:1",
       "translation": "KRV",
-      "text": "유순한 대답은 분노를 쉬게 하여도 과격한 말은 노를 격동하느니라.",
+      "text": "유순한 대답은 분노를 쉬게 하여도 과격한 말은 노를 격동하느니라",
       "englishText": "A gentle answer turns away wrath, but a harsh word stirs up anger.",
-      "emotions": ["분노", "질투"],
-      "tags": ["온유", "말", "갈등"],
-      "reflectionQuestion": "사실과 요청을 차분하게 표현한다면 어떻게 말할 수 있을까요?"
+      "emotions": [
+        "분노",
+        "질투"
+      ],
+      "tags": [
+        "온유",
+        "말",
+        "갈등"
+      ],
+      "reflectionQuestion": "사실과 요청을 차분하게 표현한다면 어떻게 말할 수 있을까요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=pro&chap=15"
     },
     {
       "id": "PSA_34_18",
@@ -123,11 +208,22 @@
       "verseEnd": null,
       "reference": "시편 34:18",
       "translation": "KRV",
-      "text": "여호와는 마음이 상한 자를 가까이 하시고 충심으로 통회하는 자를 구원하시는도다.",
-      "englishText": "The Lord is close to the brokenhearted and saves those who are crushed in spirit.",
-      "emotions": ["슬픔", "혐오", "질투"],
-      "tags": ["상한마음", "위로", "가까이함"],
-      "reflectionQuestion": "지금 가장 위로받고 싶은 마음은 무엇인가요?"
+      "text": "여호와는 마음이 상한 자에게 가까이 하시고 중심에 통회하는 자를 구원하시는도다",
+      "englishText": "The LORD is near to those who have a broken heart, and saves those who have a crushed spirit.",
+      "emotions": [
+        "슬픔",
+        "혐오",
+        "질투"
+      ],
+      "tags": [
+        "상한마음",
+        "위로",
+        "가까이함"
+      ],
+      "reflectionQuestion": "지금 가장 위로받고 싶은 마음은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=34"
     },
     {
       "id": "JHN_14_27",
@@ -137,11 +233,21 @@
       "verseEnd": null,
       "reference": "요한복음 14:27",
       "translation": "KRV",
-      "text": "평안을 너희에게 끼치노니 곧 나의 평안을 너희에게 주노라 내가 너희에게 주는 것은 세상이 주는 것과 같지 아니하니라 너희는 마음에 근심하지도 말고 두려워하지도 말라.",
-      "englishText": "Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled and do not be afraid.",
-      "emotions": ["슬픔", "불안"],
-      "tags": ["평안", "두려움", "마음"],
-      "reflectionQuestion": "지금 마음에 필요한 평안은 어떤 모습인가요?"
+      "text": "평안을 너희에게 끼치노니 곧 나의 평안을 너희에게 주노라 내가 너희에게 주는 것은 세상이 주는 것 같지 아니하니라 너희는 마음에 근심도 말고 두려워하지도 말라",
+      "englishText": "Peace I leave with you. My peace I give to you; not as the world gives, I give to you. Don’t let your heart be troubled, neither let it be fearful.",
+      "emotions": [
+        "슬픔",
+        "불안"
+      ],
+      "tags": [
+        "평안",
+        "두려움",
+        "마음"
+      ],
+      "reflectionQuestion": "지금 마음에 필요한 평안은 어떤 모습인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jhn&chap=14"
     },
     {
       "id": "PRO_3_5_6",
@@ -151,11 +257,22 @@
       "verseEnd": 6,
       "reference": "잠언 3:5-6",
       "translation": "KRV",
-      "text": "너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라. 너는 범사에 그를 인정하라 그리하면 네 길을 지도하시리라.",
-      "englishText": "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.",
-      "emotions": ["복잡함", "불안"],
-      "tags": ["인도", "길", "신뢰", "선택"],
-      "reflectionQuestion": "오늘 당장 결론 내리지 않아도 되는 부분은 무엇인가요?"
+      "text": "너는 마음을 다하여 여호와를 의뢰하고 네 명철을 의지하지 말라 너는 범사에 그를 인정하라 그리하면 네 길을 지도하시리라",
+      "englishText": "Trust in the LORD with all your heart, and don’t lean on your own understanding. In all your ways acknowledge him, and he will make your paths straight.",
+      "emotions": [
+        "복잡함",
+        "불안"
+      ],
+      "tags": [
+        "인도",
+        "길",
+        "신뢰",
+        "선택"
+      ],
+      "reflectionQuestion": "오늘 당장 결론 내리지 않아도 되는 부분은 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=pro&chap=3"
     },
     {
       "id": "JAS_1_5",
@@ -165,11 +282,20 @@
       "verseEnd": null,
       "reference": "야고보서 1:5",
       "translation": "KRV",
-      "text": "너희 중에 누구든지 지혜가 부족하거든 모든 사람에게 후히 주시고 꾸짖지 아니하시는 하나님께 구하라 그리하면 주시리라.",
-      "englishText": "If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault, and it will be given to you.",
-      "emotions": ["복잡함"],
-      "tags": ["지혜", "분별", "구함"],
-      "reflectionQuestion": "결정 전에 더 확인해야 할 정보는 무엇인가요?"
+      "text": "너희 중에 누구든지 지혜가 부족하거든 모든 사람에게 후히 주시고 꾸짖지 아니하시는 하나님께 구하라 그리하면 주시리라",
+      "englishText": "But if any of you lacks wisdom, let him ask of God, who gives to all liberally and without reproach, and it will be given to him.",
+      "emotions": [
+        "복잡함"
+      ],
+      "tags": [
+        "지혜",
+        "분별",
+        "구함"
+      ],
+      "reflectionQuestion": "결정 전에 더 확인해야 할 정보는 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jas&chap=1"
     },
     {
       "id": "1TH_5_18",
@@ -179,11 +305,21 @@
       "verseEnd": null,
       "reference": "데살로니가전서 5:18",
       "translation": "KRV",
-      "text": "범사에 감사하라 이것이 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라.",
-      "englishText": "give thanks in all circumstances; for this is God’s will for you in Christ Jesus.",
-      "emotions": ["감사", "벅참"],
-      "tags": ["감사", "일상", "기도"],
-      "reflectionQuestion": ""
+      "text": "범사에 감사하라 이는 그리스도 예수 안에서 너희를 향하신 하나님의 뜻이니라",
+      "englishText": "In everything give thanks, for this is the will of God in Christ Jesus toward you.",
+      "emotions": [
+        "감사",
+        "벅참"
+      ],
+      "tags": [
+        "감사",
+        "일상",
+        "기도"
+      ],
+      "reflectionQuestion": "",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=1th&chap=5"
     },
     {
       "id": "PSA_100_4",
@@ -193,11 +329,132 @@
       "verseEnd": null,
       "reference": "시편 100:4",
       "translation": "KRV",
-      "text": "감사함으로 그의 문에 들어가며 찬송함으로 그의 궁정에 들어가서 그에게 감사하며 그의 이름을 송축할지어다.",
-      "englishText": "Enter his gates with thanksgiving and his courts with praise; give thanks to him and praise his name.",
-      "emotions": ["감사", "기쁨", "행복", "감탄", "벅참", "놀람"],
-      "tags": ["감사", "찬양", "기쁨"],
-      "reflectionQuestion": "오늘 기억하고 싶은 감사 한 가지는 무엇인가요?"
+      "text": "감사함으로 그 문에 들어가며 찬송함으로 그 궁정에 들어가서 그에게 감사하며 그 이름을 송축할찌어다",
+      "englishText": "Enter into his gates with thanksgiving, and into his courts with praise. Give thanks to him, and bless his name.",
+      "emotions": [
+        "감사",
+        "기쁨",
+        "행복",
+        "감탄",
+        "벅참",
+        "놀람"
+      ],
+      "tags": [
+        "감사",
+        "찬양",
+        "기쁨"
+      ],
+      "reflectionQuestion": "오늘 기억하고 싶은 감사 한 가지는 무엇인가요?",
+      "englishTranslation": "WEB",
+      "englishSource": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+      "koreanSource": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=100"
     }
-  ]
+  ],
+  "englishLicense": {
+    "translation": "World English Bible",
+    "edition": "engwebp",
+    "license": "Public Domain",
+    "licenseUrl": "https://ebible.org/engwebp/copyright.htm",
+    "sourceUrl": "https://ebible.org/Scriptures/engwebp_vpl.zip",
+    "archiveSha256": "f02f675fcd002e6a4a65c4d79a1906b73754a5f366980bbb01fbc60fb39edc84",
+    "sourceEntry": "engwebp_vpl.txt",
+    "sourceSha256": "bd5f4ac05c5742338b3b17086d5731cb2ca005f3ba5025f71494643eb7799833",
+    "retrievedAt": "2026-10-07",
+    "normalization": "Single spaces joining exact selected verse lines; words and punctuation unchanged."
+  },
+  "koreanLicense": {
+    "translation": "성경전서 개역한글판 (1961)",
+    "publisher": "대한성서공회",
+    "license": "저작재산권 보호기간 소멸; 성명표시권·동일성유지권 준수",
+    "licenseUrl": "https://www.bskorea.or.kr/bbs/board.php?bo_table=copyright_faq&wr_id=5",
+    "source": "대한성서공회 공식 개역한글(HAN) 성경읽기",
+    "retrievedAt": "2026-10-07",
+    "normalization": "Official selected verse text with HTML markup removed and whitespace joined; no word or punctuation changes.",
+    "passages": [
+      {
+        "id": "PHP_4_6_7",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=php&chap=4",
+        "pageSha256": "b550639cb714431b912da2c224adf670f80169c64670a56c3a395e44c16ad35a",
+        "selectedTextSha256": "f6c05bb8f6d255f2ed8a9d0858a39f459dcd4d58619f6dc5be8e6578006d8d83"
+      },
+      {
+        "id": "ISA_41_10",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=isa&chap=41",
+        "pageSha256": "b497e53bd7a8cf675f553e5beb75f7951f54b86732d409e4d3dc816f18678862",
+        "selectedTextSha256": "75dcfd7accc9546ef7ec24d72d83ffe0eef2e158c377e3ab095f643d2d95347c"
+      },
+      {
+        "id": "PSA_23_4",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=23",
+        "pageSha256": "2b59bf213ef2e513c8ef2e915fc9d633675f9bb7d98c92df66c55dfb26069ac9",
+        "selectedTextSha256": "9290e65724a63b946f5e47d2feb69111eda18f23748d19ed41755719c2186e51"
+      },
+      {
+        "id": "HEB_13_5",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=heb&chap=13",
+        "pageSha256": "24b8b2fa4580ac9ac1d82880de8e619b664905bc0901d051f8edc9d2e2ffc27c",
+        "selectedTextSha256": "3184f0b29085ec18ba3bc03ef9e70cd793b633c220d74242646c0bc985634356"
+      },
+      {
+        "id": "MAT_11_28",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=mat&chap=11",
+        "pageSha256": "e1f9c51f7f03a7f9722afa2f9545d253f2b634e62311f9dae60a75e6fde4976c",
+        "selectedTextSha256": "477e825aff33c779e7599f17ed35f76e96a3fea83393b483016414a71b75cfea"
+      },
+      {
+        "id": "ISA_40_31",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=isa&chap=40",
+        "pageSha256": "34f774387dab71452a9147b957ae99a54725415186b8f06d15b77f4f4df7e706",
+        "selectedTextSha256": "1b3546103d8db89d490dc83de06a95ee3008cbac313f0ab05553b783a6c60104"
+      },
+      {
+        "id": "JAS_1_19_20",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jas&chap=1",
+        "pageSha256": "2add8a83ad0b8b32e264f4990bc2d71aec0b8dbf130f7ba065a77fe68208c630",
+        "selectedTextSha256": "47a15831bca9a5f3a7b313059148c681d23470dcf58472f7bab1eac77aa71d10"
+      },
+      {
+        "id": "PRO_15_1",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=pro&chap=15",
+        "pageSha256": "d17ed558a923fb6080ee51b2410c81fbd35d359f0fc0334f39c7365d237b7461",
+        "selectedTextSha256": "1a3dfb7af157c706c80f82e82fe6ed733b926c089383c9d856e408eabbad649a"
+      },
+      {
+        "id": "PSA_34_18",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=34",
+        "pageSha256": "f84de9bf799dfef8aecafb5f5d5b53109b94a645ef1e824b36e02af6268dc8c3",
+        "selectedTextSha256": "39369f0ba135e12cda40d2d2378b62069f5af593d96dd3e96d00a196cb741db5"
+      },
+      {
+        "id": "JHN_14_27",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jhn&chap=14",
+        "pageSha256": "69920cde6c81fdc9dc15af90615baa601f03691a41dd4b35c063004d5ebaed8a",
+        "selectedTextSha256": "4b8f146993ada89dc95e028eecbb9597c5898e76eaadb0158ed76facf7e8ed38"
+      },
+      {
+        "id": "PRO_3_5_6",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=pro&chap=3",
+        "pageSha256": "6a630dad74f67f6116871ca34fafb0f102cebb08ed2f1682e60aeb56afa7f687",
+        "selectedTextSha256": "c4a29a9d79462e8b898a64ea8994b7d31786c00ff41b3fdc6c859a572772dcd0"
+      },
+      {
+        "id": "JAS_1_5",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=jas&chap=1",
+        "pageSha256": "2add8a83ad0b8b32e264f4990bc2d71aec0b8dbf130f7ba065a77fe68208c630",
+        "selectedTextSha256": "2a3e23f4f30c0aa7216d273e06f3eee40ae99089f6c8cc2afc3233bafa464118"
+      },
+      {
+        "id": "1TH_5_18",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=1th&chap=5",
+        "pageSha256": "aa9e2cee70aeb1bbfeeb12c803e20a3f114be94ed8bba5a2487c00f3d86d95cc",
+        "selectedTextSha256": "b4f37259561297e8bb47d8bac3128cd00513dab473e14669b5b4e1e929b894ed"
+      },
+      {
+        "id": "PSA_100_4",
+        "url": "https://www.bskorea.or.kr/bible/korbibReadpage.php?version=HAN&book=psa&chap=100",
+        "pageSha256": "96300af081c45527a90a85361783ba22313f729d7c14e50cc99c098b23bbab9d",
+        "selectedTextSha256": "1cfe2d37dd832a545c16df6b6c300c4cb530cab2bb239d2181097cca1f62f5c1"
+      }
+    ]
+  }
 }

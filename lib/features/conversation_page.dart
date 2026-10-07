@@ -8,8 +8,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../app/api_config.dart';
+import '../app/ai_consent.dart';
 import '../app/asset_loader.dart';
 import '../app/mind_card_store.dart';
+import '../app/verse_narration.dart';
 import '../onaria.dart';
 import '../engagement/engagement_controller.dart';
 import '../engagement/domain_events.dart';
@@ -356,6 +358,24 @@ class _ConversationPageState extends State<ConversationPage> {
         _session.turnCount >= _machine.maxCoreTurns) {
       return;
     }
+    // Crisis assistance stays local and never waits for an AI consent dialog.
+    final preflightTyped = _detector.assess(text);
+    final preflightCustom = _detector.assess(_customFeeling ?? '');
+    if (_client != null &&
+        !preflightTyped.isCrisis &&
+        !preflightCustom.isCrisis) {
+      // Prevent overlapping sends while a consent decision is pending.
+      setState(() => _busy = true);
+      bool accepted = false;
+      try {
+        accepted = await AiConsent.request(context);
+      } catch (_) {
+        // Storage or dialog failure must never authorize transmission.
+      }
+      if (!mounted) return;
+      setState(() => _busy = false);
+      if (!accepted) return;
+    }
     _controller.clear();
     setState(() {
       _items.add(_ChatItem(text, fromUser: true));
@@ -391,11 +411,13 @@ class _ConversationPageState extends State<ConversationPage> {
         widget.emotion,
         limit: 100,
       );
-      if (!mounted) return;
+      final consentGranted = await AiConsent.isGranted();
+      if (!mounted || !consentGranted) return;
       final response = await client.send(LlmConversationRequest(
         session: _session,
         userMessage: text,
         systemPromptVersion: 'ko-v1',
+        externalAiConsentVersion: AiConsent.version,
         allowedVerseIds:
             allowedVerses.map((verse) => verse.id).toList(growable: false),
         agentMode: _agentMode,
@@ -608,7 +630,7 @@ class _ConversationPageState extends State<ConversationPage> {
         if (!active()) return;
         setState(() => _isListening = false);
       }
-      await _tts.setSpeechRate(0.42);
+      await _tts.setSpeechRate(yunaNarrationRate);
       if (!active()) return;
       await _tts.setPitch(1.0);
       if (!active()) return;
@@ -629,7 +651,24 @@ class _ConversationPageState extends State<ConversationPage> {
         if (!active()) return;
         await _tts.setLanguage(segment.$1);
         if (!active()) return;
-        await _tts.speak(segment.$2);
+        if (segment.$1 == 'ko-KR') {
+          final voices = await _tts.getVoices;
+          if (!active()) return;
+          final yuna = yunaNarrationVoice(voices);
+          if (yuna != null) {
+            await _tts.setVoice(yuna);
+            if (!active()) return;
+          }
+        }
+        if (segment.$1 == 'ko-KR') {
+          await _tts.speak('${verse.koreanSpokenReference}.');
+          if (!active()) return;
+          await Future<void>.delayed(yunaNarrationReferencePause);
+          if (!active()) return;
+          await _tts.speak(verse.text);
+        } else {
+          await _tts.speak(segment.$2);
+        }
       }
     } catch (_) {
       if (active()) _showVoiceMessage('말씀을 재생하지 못했어요. 기기의 음성 설정을 확인해 주세요.');
@@ -1223,9 +1262,16 @@ class _ConversationPageState extends State<ConversationPage> {
             style: const TextStyle(
                 fontSize: 17, height: 1.8, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center),
+        const SizedBox(height: 8),
+        Text(
+            verse.translation == 'KRV'
+                ? '개역한글(1961) · 대한성서공회'
+                : verse.translation,
+            style: TextStyle(fontSize: 12, color: AppTheme.of(context).muted),
+            textAlign: TextAlign.center),
         if (verse.englishText.isNotEmpty) ...[
           const SizedBox(height: 16),
-          Text('English (NIV)',
+          Text('English (WEB) · eBible.org',
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

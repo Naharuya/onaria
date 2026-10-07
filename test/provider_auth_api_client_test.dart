@@ -5,6 +5,29 @@ import 'package:http/testing.dart';
 import 'package:onaria/src/api/provider_auth_api_client.dart';
 
 void main() {
+  test('Apple deletion proof is sent only in HTTPS DELETE body, never URL',
+      () async {
+    late http.Request captured;
+    final client = ProviderAuthApiClient(
+        baseUrl: Uri.parse('https://api.onaria.ai.kr'),
+        httpClient: MockClient((request) async {
+          captured = request;
+          return http.Response('', 204);
+        }));
+    await client.deleteAccount('member-session',
+        appleCredential: 'synthetic-id-token',
+        appleAuthorizationCode: 'synthetic-code');
+    expect(captured.method, 'DELETE');
+    expect(captured.url.query, isEmpty);
+    expect(captured.url.path, '/v1/account');
+    expect(captured.headers['X-Onaria-Member-Session'], 'member-session');
+    expect(jsonDecode(captured.body), {
+      'appleCredential': 'synthetic-id-token',
+      'appleAuthorizationCode': 'synthetic-code'
+    });
+    client.close();
+  });
+
   final base = Uri.parse('https://api.onaria.ai.kr');
   test(
       'provider credential exchange is POST, no redirect, and parses opaque session',
