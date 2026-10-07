@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('brand structure, honest availability, SEO, links and 404', async ({ page, request }) => {
-  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms']) {
+  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms', '/account-deletion']) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const canonical = await page.locator('link[rel=canonical]').getAttribute('href');
@@ -13,6 +13,12 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
     const hrefs = await page.locator('a').evaluateAll(links => [...new Set(links.map(a => a.getAttribute('href')))]);
     for (const href of hrefs) {
       const url = new URL(href, page.url());
+      if (url.protocol === 'mailto:') {
+        expect(url.pathname, href).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+        expect(url.search, href).toBe('');
+        continue;
+      }
+      expect(url.origin, href).toBe(new URL(page.url()).origin);
       const response = await request.get(url.pathname);
       expect(response.status(), href).toBe(200);
       if (url.hash) expect(await response.text(), href).toContain(`id="${url.hash.slice(1)}"`);

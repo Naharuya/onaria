@@ -35,6 +35,12 @@ export function createMemberSessions({ ttlMs = 30 * 24 * 60 * 60_000, maxSession
         if (!validToken(token)) return false;
         return sessions.delete(digestHex(token));
       },
+      revokeIdentity(identity) {
+        validateIdentity(identity);
+        for (const [key, session] of sessions) {
+          if (session.provider === identity.provider && session.providerUserId === identity.providerUserId) sessions.delete(key);
+        }
+      },
       size() { prune(); return sessions.size; },
       close() {},
     };
@@ -57,6 +63,7 @@ export function createMemberSessions({ ttlMs = 30 * 24 * 60 * 60_000, maxSession
     VALUES (?, ?, ?, ?, ?)`);
   const select = db.prepare('SELECT provider, provider_user_id, expires_at FROM member_sessions WHERE token_hash = ?');
   const remove = db.prepare('DELETE FROM member_sessions WHERE token_hash = ?');
+  const removeIdentity = db.prepare('DELETE FROM member_sessions WHERE provider = ? AND provider_user_id = ?');
   const removeExpired = db.prepare('DELETE FROM member_sessions WHERE expires_at <= ?');
   const count = db.prepare('SELECT COUNT(*) AS count FROM member_sessions');
   const trimOldest = db.prepare(`DELETE FROM member_sessions WHERE token_hash IN (
@@ -83,6 +90,10 @@ export function createMemberSessions({ ttlMs = 30 * 24 * 60 * 60_000, maxSession
     revoke(token) {
       if (!validToken(token)) return false;
       return remove.run(digestHex(token)).changes === 1;
+    },
+    revokeIdentity(identity) {
+      validateIdentity(identity);
+      removeIdentity.run(identity.provider, identity.providerUserId);
     },
     size() { prune(); return count.get().count; },
     close() { db.close(); },

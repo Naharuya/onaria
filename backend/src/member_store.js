@@ -14,7 +14,7 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     CREATE TABLE IF NOT EXISTS members (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      phone TEXT NOT NULL UNIQUE,
+      phone TEXT UNIQUE,
       church_name TEXT NOT NULL,
       login_provider TEXT NOT NULL DEFAULT 'phone',
       provider_user_id TEXT,
@@ -76,12 +76,17 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
   const findById = db.prepare('SELECT * FROM members WHERE id = ?');
 
   const transactionCreate = db.transaction(member => {
-    if (findByPhone.get(member.phone)) {
+    if (member.phone && findByPhone.get(member.phone)) {
       const error = new Error('이미 가입된 휴대폰 번호입니다. 기존 계정으로 로그인한 뒤 소셜 계정을 연결해 주세요.');
       error.code = 'PHONE_EXISTS';
       throw error;
     }
-    const result = insert.run({ ...member, providerUserId: member.providerUserId ?? null, churchName: member.churchName ?? '', termsVersion: '2026-10-06', privacyVersion: '2026-10-06', consentedAt: new Date().toISOString() });
+    if (!member.phone && db.prepare('PRAGMA table_info(members)').all().find(column => column.name === 'phone').notnull) {
+      const error = new Error('선택 입력 가입을 위한 서버 업데이트가 필요합니다.');
+      error.code = 'PROFILE_SCHEMA_REQUIRED';
+      throw error;
+    }
+    const result = insert.run({ ...member, name: member.name ?? '', phone: member.phone || null, providerUserId: member.providerUserId ?? null, churchName: member.churchName ?? '', termsVersion: '2026-10-07-adult', privacyVersion: '2026-10-07', consentedAt: new Date().toISOString() });
     const created = findById.get(result.lastInsertRowid);
     if (member.providerUserId && socialProviders.has(member.loginProvider)) {
       insertIdentity.run(created.id, member.loginProvider, member.providerUserId);
@@ -120,6 +125,10 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     deleteById(memberId) {
       if (!Number.isSafeInteger(memberId) || memberId < 1) return false;
       return deleteById.run(memberId).changes === 1;
+    },
+    listIdentityDetails(memberId) {
+      if (!Number.isSafeInteger(memberId) || memberId < 1) return [];
+      return db.prepare('SELECT provider, provider_user_id AS providerUserId FROM member_identities WHERE member_id = ? ORDER BY provider').all(memberId);
     },
     listIdentities(memberId) {
       if (!Number.isSafeInteger(memberId) || memberId < 1) return [];

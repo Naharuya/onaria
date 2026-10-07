@@ -1,26 +1,27 @@
 import { z } from 'zod';
 
-const phone = z.string().trim()
-  .regex(/^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$/, '휴대폰 번호를 확인해 주세요.')
-  .transform((value) => value.replaceAll('-', ''));
+const phone = z.preprocess(value => value == null || value === '' ? null : value,
+  z.string().trim().regex(/^\+?[0-9][0-9 -]{6,19}$/, '전화번호를 확인해 주세요.')
+    .transform(value => value.replaceAll('-', '').replaceAll(' ', '')).nullable());
 export const memberSchema = z.object({
-  name: z.string().trim().min(1).max(40),
+  name: z.string().trim().max(40).default(''),
   phone,
   churchName: z.string().trim().max(100).default(''),
   termsAccepted: z.literal(true),
   privacyAccepted: z.literal(true),
+  adultConfirmed: z.literal(true),
   loginProvider: z.enum(['phone', 'apple', 'naver', 'kakao', 'google']).default('phone'),
   providerUserId: z.string().trim().min(1).max(200).optional(),
 });
 export function publicMember(member) {
-  return { id: member.id, name: member.name, phone: member.phone, churchName: member.church_name, loginProvider: member.login_provider, createdAt: member.created_at };
+  return { id: member.id, name: member.name, phone: member.phone ?? null, churchName: member.church_name, loginProvider: member.login_provider, createdAt: member.created_at };
 }
 
 export function adminMember(member) {
   return {
     id: member.id,
     name: `${member.name.slice(0, 1)}***`,
-    phone: member.phone.length >= 7
+    phone: (member.phone?.length ?? 0) >= 7
       ? `${member.phone.slice(0, 3)}****${member.phone.slice(-4)}`
       : '****',
     churchName: '비공개',

@@ -100,3 +100,14 @@ test('runtime callback verifies signed Apple Service ID audience and nonce with 
   await assert.rejects(() => token('wrong-nonce').then(id_token => bad.callback({ state: badChallenge.state, id_token, code: 'synthetic-code' })));
   assert.equal(fetches, 2);
 });
+
+test('revocation grant stays server-local and is consumed once within proof TTL', async () => {
+  const { auth } = fixture();
+  const challenge = auth.challenge();
+  const location = await auth.callback({ state: challenge.state, id_token: 'server-local-token', code: 'server-local-code' });
+  const proof = new URLSearchParams(location.split('?')[1].split('#')[0]).get('id_token');
+  assert.ok(!location.includes('server-local-token') && !location.includes('server-local-code'));
+  assert.deepEqual(auth.consumeGrant(proof), { authorizationCode: 'server-local-code', credential: 'server-local-token' });
+  assert.throws(() => auth.consumeGrant(proof));
+  assert.throws(() => auth.resolve(proof));
+});
