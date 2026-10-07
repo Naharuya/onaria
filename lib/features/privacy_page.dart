@@ -5,6 +5,7 @@ import '../app/conversation_draft.dart';
 import '../app/api_config.dart';
 import '../app/member_session_store.dart';
 import '../src/api/provider_auth_api_client.dart';
+import '../src/auth/naver_login_service.dart';
 import '../app/mind_card_store.dart';
 import '../app/space_scaffold.dart';
 import '../app/verse_history.dart';
@@ -78,6 +79,14 @@ class _PrivacyPageState extends State<PrivacyPage> {
     try {
       await client.logout(token);
       MemberSessionStore.instance.clear();
+      var providerCleared = true;
+      try {
+        await NaverLoginService().signOut();
+      } on NaverLoginException {
+        // The server session is already revoked. Keep the app logged out;
+        // the next Naver login retries SDK cleanup before authenticating.
+        providerCleared = false;
+      }
       if (mounted) {
         setState(() {
           _hasSession = false;
@@ -85,7 +94,9 @@ class _PrivacyPageState extends State<PrivacyPage> {
           _currentProvider = null;
         });
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('로그아웃했어요.')));
+            .showSnackBar(SnackBar(content: Text(providerCleared
+                ? '로그아웃했어요.'
+                : 'ONARIA에서 로그아웃했어요. 네이버 인증 상태는 다음 로그인 때 다시 정리합니다.')));
       }
     } catch (_) {
       if (mounted)

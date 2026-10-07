@@ -29,7 +29,8 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   await expect(page.getByRole('link', { name: /다운로드/ })).toHaveCount(0);
   expect((await request.get('/not-an-onaria-page')).status()).toBe(404);
   const sitemap = await (await request.get('/sitemap.xml')).text();
-  expect((sitemap.match(/<loc>/g) || []).length).toBe(6);
+  const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname);
+  expect(sitemapPaths.sort()).toEqual(['/', '/about', '/account-deletion', '/privacy', '/services', '/terms', '/traditions'].sort());
   expect(sitemap).not.toContain('/admin');
   expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /admin');
 });

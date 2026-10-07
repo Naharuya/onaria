@@ -65,7 +65,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NidClientID</key>
-	<string>oYwDAzWTMxv_UI5IvKCN</string>
+	<string>$(NAVER_CLIENT_ID)</string>
 	<key>NidClientSecret</key>
 	<string>$(NAVER_CLIENT_SECRET)</string>
 	<key>NidAppName</key>

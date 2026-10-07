@@ -78,8 +78,10 @@ jobs:
         run: flutter analyze lib test example --no-fatal-infos
 
       - name: Build test APK
-        # No API override: APK/AAB/iOS use ApiConfig.productionBaseUrl.
-        run: flutter build apk --debug
+        run: |
+          printf 'naver.client_id=ci-fixture-id\nnaver.client_secret=ci-fixture-secret\n' > android/naver.properties
+          node scripts/sync-naver-config.mjs
+          flutter build apk --debug
 
       - name: Build test AAB using the same API default
         run: flutter build appbundle --debug
@@ -115,4 +117,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Compile iOS simulator app without signing
-        run: flutter build ios --simulator --debug --no-codesign
+        run: |
+          printf 'naver.client_id=ci-fixture-id\nnaver.client_secret=ci-fixture-secret\n' > android/naver.properties
+          node scripts/sync-naver-config.mjs
+          flutter build ios --simulator --debug --no-codesign

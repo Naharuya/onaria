@@ -32,7 +32,7 @@ GitHub에서 받은 checksum 파일을 함께 사용합니다. 체크섬은 전�
 command -v node npm python3 flock curl sha256sum
 /usr/local/bin/node --version
 npm --version
-systemctl is-active soul-bible-backend
+systemctl is-active onaria-backend.service
 df -h /opt
 ```
 
@@ -48,7 +48,7 @@ df -h /opt
 sudo bash /opt/onaria-upload/deploy-cafe24.sh /opt/onaria-upload/onaria-backend-deploy.zip
 ```
 
-이미 root라면 sudo를 생략합니다. 기존 `/opt/soul-bible/backend/.env`가 있어야 합니다. 쉘의 PATH에서 node/npm이 검색되어야 합니다.
+이미 root라면 sudo를 생략합니다. 기존 `/opt/onaria/backend/.env`가 있어야 합니다. 쉘의 PATH에서 node/npm이 검색되어야 합니다.
 
 스크립트는 체크섬과 ZIP 내부 경로를 먼저 검사하고 동시 배포 잠금을 잡습니다. 서비스를 중지한 뒤 `/opt/onaria-backups/deploy-시각-임의값/previous`에 기존 backend 전체(node_modules 포함)를 복사합니다. 이후 허용된 코드·설정만 교체하고 `npm ci --omit=dev`, 서비스 재시작, `127.0.0.1:8787/health`의 상태 JSON 검사를 수행합니다. npm 로그는 비공개 백업 폴더에만 남습니다.
 

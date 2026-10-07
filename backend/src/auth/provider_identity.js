@@ -17,23 +17,29 @@ export function createOidcProviderVerifier({ provider, issuer, audience, jwksUrl
   };
 }
 
-export function createNaverProviderVerifier({ fetchImpl = globalThis.fetch } = {}) {
+export function createNaverProviderVerifier({ fetchImpl = globalThis.fetch, onFailure } = {}) {
+  const reject = (reason, upstreamStatus = null) => {
+    // Only fixed categories and HTTP status: never token, profile or error text.
+    try { onFailure?.({ reason, upstreamStatus }); } catch { /* logging is best effort */ }
+    return new IdentityError();
+  };
   return async accessToken => {
     if (typeof accessToken !== 'string' || accessToken.length < 16 || accessToken.length > 4096
-      || !/^[A-Za-z0-9._~+\/-]+$/.test(accessToken)) throw new IdentityError();
+      || accessToken !== accessToken.trim()
+      || !/^[A-Za-z0-9._~+\/-]+=*$/.test(accessToken)) throw reject('credential_format');
     let response;
     try {
       response = await fetchImpl(NAVER_PROFILE_URL, {
         method: 'GET', redirect: 'manual', headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
       });
       if (response.status !== 200 || response.redirected
-        || Number(response.headers.get('content-length') ?? 0) > 32768) throw new IdentityError();
+        || Number(response.headers.get('content-length') ?? 0) > 32768) throw reject('provider_response', response.status);
       const body = await response.json();
-      if (body?.resultcode !== '00' || typeof body?.response?.id !== 'string') throw new IdentityError();
+      if (body?.resultcode !== '00' || typeof body?.response?.id !== 'string' || !body.response.id || body.response.id.length > 200) throw reject('provider_profile', response.status);
       return normalized('naver', body.response.id);
     } catch (error) {
       if (error instanceof IdentityError) throw error;
-      throw new IdentityError();
+      throw reject('provider_transport');
     } finally {
       try { await response?.body?.cancel(); } catch { /* best effort */ }
     }
@@ -45,7 +51,9 @@ export function createProviderIdentityVerifier({ apple, google, kakao, naver, fe
     apple: apple ? createOidcProviderVerifier({ provider: 'apple', ...apple, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'apple', reason }) }) : null,
     google: google ? createOidcProviderVerifier({ provider: 'google', ...google, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'google', reason }) }) : null,
     kakao: kakao ? createOidcProviderVerifier({ provider: 'kakao', ...kakao, fetchImpl, now, onFailure: reason => logger.warn?.('provider_identity_rejected', { provider: 'kakao', reason }) }) : null,
-    naver: naver ? createNaverProviderVerifier({ fetchImpl }) : null,
+    naver: naver ? createNaverProviderVerifier({ fetchImpl,
+      onFailure: failure => logger.warn?.('provider_identity_rejected', { provider: 'naver', ...failure }),
+    }) : null,
   };
   return async ({ provider, credential } = {}) => {
     if (!Object.hasOwn(verifiers, provider) || !verifiers[provider]) throw new IdentityError(503);

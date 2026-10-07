@@ -3,11 +3,13 @@ import { test } from 'node:test';
 import { createApp } from '../src/app.js';
 import { createMemberSessions } from '../src/auth/member_session.js';
 import { IdentityError } from '../src/auth/identity_verifier.js';
+import { createNaverProviderVerifier } from '../src/auth/provider_identity.js';
 
 function fixture({ providerIdentity } = {}) {
   const members = new Map([
     ['google:alice', { id: 7, login_provider: 'google', provider_user_id: 'alice' }],
     ['kakao:bob', { id: 8, login_provider: 'kakao', provider_user_id: 'bob' }],
+    ['naver:nora', { id: 9, login_provider: 'naver', provider_user_id: 'nora' }],
   ]);
   const deleted = []; const memberSessions = createMemberSessions();
   const memberStore = {
@@ -49,6 +51,30 @@ test('unknown identity cannot obtain a member session and logout revokes a valid
     });
     assert.equal(logout.status, 204);
     assert.equal((await remove(base, bob.sessionToken)).status, 401);
+    assert.deepEqual(deleted, []);
+  });
+});
+
+test('Naver logout then fresh padded credential relogin preserves existing member', async () => {
+  const credentials = [];
+  const verify = createNaverProviderVerifier({ fetchImpl: async (_url, options) => {
+    credentials.push(options.headers.Authorization);
+    return new Response(JSON.stringify({ resultcode: '00', response: { id: 'nora' } }), { status: 200 });
+  } });
+  const { app, deleted, memberSessions } = fixture({ providerIdentity: ({ credential }) => verify(credential) });
+  await withServer(app, async base => {
+    const first = await login(base, 'naver', 'first-fixture-credential');
+    assert.equal(first.response.status, 201);
+    const logout = await fetch(`${base}/v1/auth/provider/session`, {
+      method: 'DELETE', headers: { 'X-Onaria-Member-Session': first.body.sessionToken },
+    });
+    assert.equal(logout.status, 204);
+    assert.throws(() => memberSessions.verify(first.body.sessionToken), IdentityError);
+    const second = await login(base, 'naver', 'fresh-fixture-credential==');
+    assert.equal(second.response.status, 201);
+    assert.notEqual(second.body.sessionToken, first.body.sessionToken);
+    assert.deepEqual(memberSessions.verify(second.body.sessionToken), { provider: 'naver', providerUserId: 'nora' });
+    assert.deepEqual(credentials, ['Bearer first-fixture-credential', 'Bearer fresh-fixture-credential==']);
     assert.deepEqual(deleted, []);
   });
 });

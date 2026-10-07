@@ -2,15 +2,16 @@
 # No Git on the server. Upload the ZIP, checksum and this script separately.
 set -Eeuo pipefail
 umask 077
-backend="${ONARIA_BACKEND_DIR:-/opt/soul-bible/backend}"
+backend="${ONARIA_BACKEND_DIR:-/opt/onaria/backend}"
 backup_root="${ONARIA_BACKUP_DIR:-/opt/onaria-backups}"
-service=soul-bible-backend
-archive="$(realpath -e -- "${1:?Usage: bash deploy-cafe24.sh /path/onaria-backend-deploy.zip}")"
+service="${ONARIA_BACKEND_SERVICE:-onaria-backend.service}"
+resolve_existing() { python3 -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve(strict=True))' "$1"; }
+archive="$(resolve_existing "${1:?Usage: bash deploy-cafe24.sh /path/onaria-backend-deploy.zip}")"
 for command in python3 npm node systemctl curl cp mv flock sha256sum; do command -v "$command" >/dev/null; done
-backend="$(realpath -e -- "$backend")"
+backend="$(resolve_existing "$backend")"
 [[ "$backend" != / && "$(basename -- "$backend")" == backend && -f "$backend/.env" ]]
 mkdir -p -- "$backup_root"
-backup_root="$(realpath -e -- "$backup_root")"
+backup_root="$(resolve_existing "$backup_root")"
 case "$backup_root/" in "$backend/"*) echo 'Backup directory must be outside backend'; exit 1;; esac
 exec 9>"$backup_root/.deploy.lock"
 flock -n 9 || { echo 'Another deployment is running'; exit 1; }
@@ -114,6 +115,23 @@ if ! (umask 022; npm ci --omit=dev) > "$work/npm-install.log" 2>&1; then
   echo 'Dependency installation failed; details are in the private backup directory.'
   false
 fi
+# A root-driven deploy must remain readable by the existing service account.
+# Preserve backend ownership only for replaced code/dependencies, never data.
+python3 - "$backend" "${items[@]}" node_modules <<'PY'
+import os, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+owner = root.stat()
+if os.geteuid() == 0:
+    for relative in sys.argv[2:]:
+        target = root / relative
+        if not target.exists():
+            continue
+        os.chown(target, owner.st_uid, owner.st_gid, follow_symlinks=False)
+        if target.is_dir() and not target.is_symlink():
+            for directory, dirs, files in os.walk(target, followlinks=False):
+                for name in dirs + files:
+                    os.chown(pathlib.Path(directory) / name, owner.st_uid, owner.st_gid, follow_symlinks=False)
+PY
 systemctl restart "$service"
 health
 trap - ERR INT TERM

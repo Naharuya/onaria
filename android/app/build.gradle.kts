@@ -24,8 +24,14 @@ val naverPropertiesFile = rootProject.file("naver.properties")
 if (naverPropertiesFile.exists()) {
     naverPropertiesFile.inputStream().use { naverProperties.load(it) }
 }
-val naverClientSecret = naverProperties.getProperty("naver.client_secret")
-    ?: localProperties.getProperty("naver.client_secret") ?: ""
+val naverClientId = naverProperties.getProperty("naver.client_id")?.trim().orEmpty()
+val naverClientSecret = naverProperties.getProperty("naver.client_secret")?.trim().orEmpty()
+require(naverClientId.isNotEmpty() && naverClientSecret.isNotEmpty()) {
+    "Configure naver.client_id and naver.client_secret in ignored android/naver.properties"
+}
+require(naverClientId != naverClientSecret) {
+    "Naver Client ID and Client Secret must be different; check android/naver.properties locally"
+}
 
 android {
     namespace = "com.onaria.app"
@@ -54,6 +60,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        resValue("string", "naver_client_id", naverClientId)
         resValue("string", "naver_client_secret", naverClientSecret)
     }
 

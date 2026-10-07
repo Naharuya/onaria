@@ -37,6 +37,9 @@ class GoogleStub extends GoogleSignInPlatform {
 
 class NaverStub extends FlutterNaverLoginPlatform {
   @override
+  Future<NaverLoginResult> logOut() async =>
+      NaverLoginResult(status: NaverLoginStatus.loggedOut);
+  @override
   Future<NaverLoginResult> logIn() => Completer<NaverLoginResult>().future;
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -72,6 +75,7 @@ void main() {
         NaverLoginService().authenticate(),
         throwsA(isA<NaverLoginException>()
             .having((e) => e.message, 'message', contains('지연'))));
+    await tester.pump();
     await tester.pump(const Duration(seconds: 91));
     await check;
   });

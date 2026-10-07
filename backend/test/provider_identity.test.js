@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import { test } from 'node:test';
+import { IdentityError } from '../src/auth/identity_verifier.js';
 import { createNaverProviderVerifier, createOidcProviderVerifier, createProviderIdentityVerifier } from '../src/auth/provider_identity.js';
 
 const now = new Date('2026-10-02T00:00:00Z');
@@ -74,6 +75,43 @@ test('Naver rejects malformed/upstream responses and provider router fails close
   await assert.rejects(() => router({ provider: 'apple', credential: 'x' }), /확인할 수 없습니다/);
   await assert.rejects(() => router({ provider: 'google', credential: 'x' }), /확인할 수 없습니다/);
   await assert.rejects(() => router({ provider: 'evil', credential: 'x' }), /확인할 수 없습니다/);
+});
+
+test('Naver forwards a padded bearer credential unchanged for provider validation', async () => {
+  let authorization;
+  const verify = createNaverProviderVerifier({ fetchImpl: async (_url, options) => {
+    authorization = options.headers.Authorization;
+    return new Response(JSON.stringify({ resultcode: '00', response: { id: 'fixture-existing-member' } }), { status: 200 });
+  } });
+  const credential = 'fixture-bearer-token==';
+  assert.deepEqual(await verify(credential), { provider: 'naver', providerUserId: 'fixture-existing-member' });
+  assert.equal(authorization, `Bearer ${credential}`);
+});
+
+test('Naver rejection diagnostics separate format and upstream 401 without secrets', async () => {
+  const events = [];
+  let calls = 0;
+  const verify = createNaverProviderVerifier({ onFailure: event => events.push(event), fetchImpl: async () => {
+    calls++;
+    return new Response('private-upstream-body', { status: 401 });
+  } });
+  await assert.rejects(() => verify('bad\r\nheader'), IdentityError);
+  assert.equal(calls, 0);
+  await assert.rejects(() => verify('private-fixture-credential'), IdentityError);
+  assert.deepEqual(events, [
+    { reason: 'credential_format', upstreamStatus: null },
+    { reason: 'provider_response', upstreamStatus: 401 },
+  ]);
+  assert.equal(JSON.stringify(events).includes('private'), false);
+});
+
+test('Naver padding is accepted only at the end and header whitespace is rejected', async () => {
+  let calls = 0;
+  const verify = createNaverProviderVerifier({ fetchImpl: async () => { calls++; throw Error('must not call'); } });
+  for (const credential of ['=fixture-invalid-token', 'fixture=invalid-token', 'fixture-invalid-token\n', 'fixture-invalid-token\r\n']) {
+    await assert.rejects(() => verify(credential), IdentityError);
+  }
+  assert.equal(calls, 0);
 });
 
 test('runtime provider config enables providers independently and fails closed when absent', async () => {
