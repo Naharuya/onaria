@@ -21,3 +21,7 @@
 - Added pinned public source conversion and complete assets; Korean 31,084 / English 31,103 verse records, each 66 books and 1,189 chapters. Original verse text preserved.
 - Corpus/reference tests passed (4). Full Flutter regression: 156 passed / 1 existing skip; additional search-screen test: 1 passed. New source static analysis clean; iOS simulator compile passed. See FULL_BIBLE_SEARCH.md.
 - No production API, DB, authentication keys, installed apps or TestFlight builds changed. Signed release and device verification remain pending.
+
+## 2026-10-08 — Requested current-device Bible search update
+- Updated app version to 1.0.0+13. Galaxy Release APK installed with existing certificate and adb install -r; launch passed. iPhone Release app verified (team/bundle/Apple sign-in/device profile) and installed as build 13 without uninstall.
+- Both binaries contain exact full Bible assets. iPhone automatic launch was refused while locked; interactive search checks pending device unlock. TestFlight upload and App Store review not performed.

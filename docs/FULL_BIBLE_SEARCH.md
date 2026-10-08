@@ -15,7 +15,7 @@ Rebuild: `python3 scripts/build_full_bible_assets.py /path/to/reviewed/source/di
 
 Existing emotion-selected Bible catalog, AI evidence, authentication, provider keys, production DB and backend remain unchanged. Original source files remain separately stored on Mac `/Users/ari/ARI/data/onaria/bibles/2026-10-08/` and Gabia `/opt/onaria/data/bibles/2026-10-08/`. The server files are archives, not a deployed search API.
 
-This change requires a new app build; installed/TestFlight build 12 does not gain the feature through server file storage. Real Android/iPhone testing, signed release build and TestFlight upload are pending. No review submission or production service restart is performed by this task.
+This change requires a new app build; installed/TestFlight build 12 does not gain the feature through server file storage. Release builds and direct Android/iPhone installation completed as version 1.0.0 build 13 on 2026-10-08. Interactive search checks and TestFlight upload are separate. No review submission or production service restart is performed by this task.
 
 Base commit: a3281e0 (includes the pending authentication recovery and three-second game changes). Branch: codex/full-bible-search-20261008. Changes should follow those PR dependencies rather than discard them.
 
@@ -26,4 +26,6 @@ Base commit: a3281e0 (includes the pending authentication recovery and three-sec
 - New source and tests targeted static analysis: no issues. Whole-project analysis: no errors or warnings, 18 pre-existing informational lints.
 - All converted Korean and English verse strings compared with original XML: equal in original order.
 - iOS simulator debug compile: passed using local ignored empty provider settings; this is not a signed release or provider-login verification.
-- Real-device search verification and Android release compile: pending; do not represent mock/local results as device confirmation.
+- Android signed Release compile and data-preserving install: passed, 1.0.0+13; launch passed. iPhone signed Release compile, signature/profile/Apple-sign-in entitlement checks and direct device install: passed, 1.0.0(13). Full Bible assets verified in both binaries. Interactive search remains pending user unlock; iPhone launch blocked by device lock. TestFlight remains build 12 until a separate upload.
+
+Device-install evidence: `/Users/ari/ARI/deploy-artifacts/onaria-bible-search-20261008/`. Direct installation does not update the App Store Connect/TestFlight build. No uninstall, app-data clear or server deployment was performed.

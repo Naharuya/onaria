@@ -1,6 +1,6 @@
 name: onaria
 description: 감정 기반 AI 신앙 대화 onaria MVP 앱.
-version: 0.4.4+10
+version: 1.0.0+13
 publish_to: none
 
 environment:
