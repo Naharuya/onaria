@@ -60,9 +60,16 @@ class ProviderAuthApiClient {
     );
   }
 
-  Future<void> unlinkProvider(String sessionToken, String provider) async {
+  Future<void> unlinkProvider(String sessionToken, String provider,
+      {String? appleCredential, String? appleAuthorizationCode}) async {
     final response = await _send('DELETE', '/v1/account/providers/$provider',
-        sessionToken: sessionToken);
+        sessionToken: sessionToken,
+        body: appleCredential == null
+            ? null
+            : {
+                'appleCredential': appleCredential,
+                'appleAuthorizationCode': appleAuthorizationCode,
+              });
     if (response.statusCode != 204) {
       throw ProviderAuthApiException(_readError(response.body));
     }
@@ -76,9 +83,16 @@ class ProviderAuthApiClient {
     }
   }
 
-  Future<void> deleteAccount(String sessionToken) async {
-    final response =
-        await _send('DELETE', '/v1/account', sessionToken: sessionToken);
+  Future<void> deleteAccount(String sessionToken,
+      {String? appleCredential, String? appleAuthorizationCode}) async {
+    final response = await _send('DELETE', '/v1/account',
+        sessionToken: sessionToken,
+        body: appleCredential == null
+            ? null
+            : {
+                'appleCredential': appleCredential,
+                'appleAuthorizationCode': appleAuthorizationCode,
+              });
     if (response.statusCode != 204) {
       throw ProviderAuthApiException(_readError(response.body));
     }

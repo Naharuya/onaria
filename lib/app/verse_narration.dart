@@ -1,5 +1,10 @@
 import '../src/verses/verse_models.dart';
 
+// User-selected calm 160 pace. Native TTS rate is normalized and its actual
+// timing varies by device/engine; confirm the result on the physical device.
+const yunaNarrationRate = 0.40;
+const yunaNarrationReferencePause = Duration(milliseconds: 900);
+
 enum NarrationPace {
   calm('차분하게', 0.46),
   natural('편안하게', 0.50),
@@ -24,9 +29,9 @@ List<Map<String, String>> narrationVoices(dynamic raw, String locale) {
         !features.contains('notinstalled');
   }).toList();
   int quality(Map voice) => switch ('${voice['quality']}'.toLowerCase()) {
-        'very high' => 500,
-        'high' => 400,
-        'normal' => 300,
+        'very high' || 'premium' => 500,
+        'high' || 'enhanced' => 400,
+        'normal' || 'default' => 300,
         'low' => 200,
         'very low' => 100,
         _ => int.tryParse('${voice['quality']}') ?? 0,
@@ -40,6 +45,19 @@ List<Map<String, String>> narrationVoices(dynamic raw, String locale) {
               'identifier': voice['identifier'] as String,
           })
       .toList();
+}
+
+/// Prefer an installed Apple Yuna voice; never assume another engine has it.
+Map<String, String>? yunaNarrationVoice(dynamic raw) {
+  final voices = narrationVoices(raw, 'ko-KR');
+  for (final voice in voices) {
+    final name = voice['name']!.toLowerCase();
+    final identifier = (voice['identifier'] ?? '').toLowerCase();
+    if (name == 'yuna' || name == '유나' || identifier.endsWith('.yuna')) {
+      return voice;
+    }
+  }
+  return null;
 }
 
 List<(String, String)> verseNarration(BibleVerse verse, String language) => [

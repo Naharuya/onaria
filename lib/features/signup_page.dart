@@ -33,6 +33,7 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _busy = false;
   bool _termsAccepted = false;
   bool _privacyAccepted = false;
+  bool _adultConfirmed = false;
   String? _pendingProvider;
   String? _pendingProviderCredential;
 
@@ -137,10 +138,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             maxLength: 40,
                             textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
-                              labelText: '이름',
+                              labelText: '이름 (선택)',
                               prefixIcon: Icon(Icons.person_outline),
                             ),
-                            validator: _required,
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -148,15 +148,16 @@ class _SignUpPageState extends State<SignUpPage> {
                             keyboardType: TextInputType.phone,
                             textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
-                              labelText: '전화번호',
-                              hintText: '010-0000-0000',
+                              labelText: '전화번호 (선택)',
+                              hintText: '+82 10 0000 0000',
                               prefixIcon: Icon(Icons.phone_outlined),
                             ),
                             validator: (value) =>
-                                RegExp(r'^01[0-9]-?[0-9]{3,4}-?[0-9]{4}$')
-                                        .hasMatch(value?.trim() ?? '')
+                                (value?.trim().isEmpty ?? true) ||
+                                        RegExp(r'^\+?[0-9][0-9 -]{6,19}$')
+                                            .hasMatch(value?.trim() ?? '')
                                     ? null
-                                    : '휴대폰 번호를 확인해 주세요.',
+                                    : '전화번호를 확인해 주세요.',
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -169,6 +170,16 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
+                          CheckboxListTile(
+                            contentPadding: EdgeInsets.zero,
+                            value: _adultConfirmed,
+                            onChanged: _busy
+                                ? null
+                                : (value) => setState(
+                                    () => _adultConfirmed = value ?? false),
+                            title: const Text('만 18세 이상입니다. (필수)'),
+                            controlAffinity: ListTileControlAffinity.leading,
+                          ),
                           CheckboxListTile(
                             contentPadding: EdgeInsets.zero,
                             value: _termsAccepted,
@@ -230,34 +241,36 @@ class _SignUpPageState extends State<SignUpPage> {
     required VoidCallback onPressed,
     bool outlined = false,
     IconData? icon,
-  }) => ConstrainedBox(
-    constraints: const BoxConstraints(minHeight: 52),
-    child: FilledButton(
-      key: key,
-      style: FilledButton.styleFrom(
-        backgroundColor: background,
-        foregroundColor: foreground,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        side: outlined ? const BorderSide(color: Color(0xFFDADCE0)) : null,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      onPressed: _busy ? null : onPressed,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 24),
-            const SizedBox(width: 10),
-          ],
-          Flexible(
-            child: Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
+  }) =>
+      ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 52),
+        child: FilledButton(
+          key: key,
+          style: FilledButton.styleFrom(
+            backgroundColor: background,
+            foregroundColor: foreground,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            side: outlined ? const BorderSide(color: Color(0xFFDADCE0)) : null,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-        ],
-      ),
-    ),
-  );
+          onPressed: _busy ? null : onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 24),
+                const SizedBox(width: 10),
+              ],
+              Flexible(
+                child: Text(label,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
+        ),
+      );
 
   Future<void> _continueWithApple() async {
     final apiBaseUrl = ApiConfig.baseUrl;
@@ -277,11 +290,16 @@ class _SignUpPageState extends State<SignUpPage> {
         scopes: const [],
         state: challenge?.state,
         nonce: challenge?.nonce,
-        webAuthenticationOptions: challenge == null ? null : WebAuthenticationOptions(
-          clientId: challenge.clientId, redirectUri: challenge.redirectUri),
+        webAuthenticationOptions: challenge == null
+            ? null
+            : WebAuthenticationOptions(
+                clientId: challenge.clientId,
+                redirectUri: challenge.redirectUri),
       );
-      final identityToken = challenge == null ? credential.identityToken :
-          challenge.checkedProof(returnedState: credential.state, token: credential.identityToken);
+      final identityToken = challenge == null
+          ? credential.identityToken
+          : challenge.checkedProof(
+              returnedState: credential.state, token: credential.identityToken);
       if (identityToken == null || identityToken.isEmpty) {
         throw const FormatException('Apple identity token missing');
       }
@@ -459,8 +477,8 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<void> _completeProviderSignUp() async {
-    if (!_termsAccepted || !_privacyAccepted) {
-      _showMessage('이용약관과 개인정보 처리 안내에 동의해 주세요.');
+    if (!_adultConfirmed || !_termsAccepted || !_privacyAccepted) {
+      _showMessage('만 18세 이상 여부를 확인하고 이용약관·개인정보 안내에 동의해 주세요.');
       return;
     }
     if (!_formKey.currentState!.validate()) return;
@@ -479,6 +497,7 @@ class _SignUpPageState extends State<SignUpPage> {
         name: _name.text.trim(),
         phone: _phone.text.trim(),
         churchName: _church.text.trim(),
+        adultConfirmed: _adultConfirmed,
         sessionToken: MemberSessionStore.instance.token,
       );
       await MemberRegistrationStore().saveMemberId(registration.memberId);
@@ -516,9 +535,6 @@ class _SignUpPageState extends State<SignUpPage> {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
   }
-
-  String? _required(String? value) =>
-      value == null || value.trim().isEmpty ? '입력해 주세요.' : null;
 
   @override
   void dispose() {
