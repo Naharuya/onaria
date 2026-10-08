@@ -2,15 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onaria/engagement/mini_games/cross_light/cross_light_game.dart';
 
 void main() {
-  test('six distinct words light the cross after five seconds each', () {
+  test('six distinct words light the cross after three seconds each', () {
     var now = DateTime(2026, 9, 11);
     final game = CrossLightGame(clock: () => now);
     expect(game.collect('peace'), isFalse);
     game.start();
-    expect(game.remainingSeconds, 5);
+    expect(game.remainingSeconds, 3);
     for (final word in crossLightWords.keys) {
       expect(game.collect(word), isFalse);
-      now = now.add(const Duration(seconds: 5));
+      now = now.add(const Duration(milliseconds: 2999));
+      expect(game.collect(word), isFalse);
+      now = now.add(const Duration(milliseconds: 1));
       expect(game.collect('unknown'), isFalse);
       expect(game.collect(word), isTrue);
       expect(game.collect(word), isFalse);
@@ -26,21 +28,21 @@ void main() {
       () {
     var now = DateTime(2026, 9, 11);
     final game = CrossLightGame(clock: () => now)..start();
-    now = now.add(const Duration(seconds: 5));
+    now = now.add(const Duration(seconds: 3));
     game.collect('peace');
     now = now.add(const Duration(seconds: 2));
     game.pause();
     now = now.add(const Duration(minutes: 10));
-    expect(game.remainingSeconds, 3);
+    expect(game.remainingSeconds, 1);
     expect(game.collect('hope'), isFalse);
     game.resume();
-    expect(game.remainingSeconds, 3);
+    expect(game.remainingSeconds, 1);
     expect(game.pieces, contains('peace'));
-    now = now.add(const Duration(seconds: 3));
+    now = now.add(const Duration(seconds: 1));
     expect(game.collect('hope'), isTrue);
     game.restart();
     expect(game.pieces, isEmpty);
-    expect(game.remainingSeconds, 5);
+    expect(game.remainingSeconds, 3);
     expect(game.started, isTrue);
   });
 }

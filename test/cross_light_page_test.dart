@@ -18,7 +18,7 @@ void main() {
     var now = DateTime(2026, 9, 11);
     final game = CrossLightGame(clock: () => now)..start();
     for (final word in crossLightWords.keys) {
-      now = now.add(const Duration(seconds: 5));
+      now = now.add(const Duration(seconds: 3));
       game.collect(word);
     }
     await tester.pumpWidget(MaterialApp(
@@ -51,7 +51,7 @@ void main() {
     var now = DateTime(2026, 9, 11);
     final game = CrossLightGame(clock: () => now)..start();
     for (final word in crossLightWords.keys) {
-      now = now.add(const Duration(seconds: 5));
+      now = now.add(const Duration(seconds: 3));
       game.collect(word);
     }
     final controller = EngagementController(
@@ -101,7 +101,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     expect(game.paused, isTrue);
-    expect(game.remainingSeconds, 5);
+    expect(game.remainingSeconds, 3);
     await tester.scrollUntilVisible(find.text('이어서 하기'), 200);
     await tester.tap(find.text('이어서 하기'));
     await tester.pump();
@@ -153,8 +153,8 @@ void main() {
     for (var round = 1; round <= 2; round++) {
       for (final word in crossLightWords.entries
           .where((entry) => !game.pieces.contains(entry.key))) {
-        now = now.add(const Duration(seconds: 5));
-        await tester.pump(const Duration(seconds: 5));
+        now = now.add(const Duration(seconds: 3));
+        await tester.pump(const Duration(seconds: 3));
         await tester.scrollUntilVisible(
             find.byKey(ValueKey('cross-light-touch-${word.key}')), 180);
         await tester.tap(find.byKey(ValueKey('cross-light-touch-${word.key}')));
