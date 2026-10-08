@@ -1,3 +1,4 @@
+import 'bible_search_page.dart';
 import 'package:flutter/material.dart';
 import '../app/onaria_emblem.dart';
 import '../app/app_theme.dart';
@@ -133,7 +134,10 @@ class _CheckInPageState extends State<CheckInPage> {
                         color: AppTheme.of(context).green, size: 24),
                     tooltip: '메뉴',
                     onSelected: (value) {
-                      if (value == 'growth') {
+                      if (value == 'bible_search') {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const BibleSearchPage()));
+                      } else if (value == 'growth') {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const GrowthPage()));
                       } else if (value == 'saved_cards') {
@@ -160,6 +164,8 @@ class _CheckInPageState extends State<CheckInPage> {
                       }
                     },
                     itemBuilder: (_) => const [
+                      PopupMenuItem(
+                          value: 'bible_search', child: Text('성경 검색')),
                       PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
                       PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
                       PopupMenuItem(

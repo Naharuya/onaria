@@ -55,3 +55,8 @@ ios/Flutter/NaverKeys.xcconfig
 .onaria.local.env
 android/naver.properties
 android/local.properties.before-*
+
+# Public Bible assets (runtime member data remains excluded).
+!assets/data/
+!assets/data/full_bible_ko.json
+!assets/data/full_bible_en.json

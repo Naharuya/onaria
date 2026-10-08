@@ -15,3 +15,9 @@
 ## 2026-10-08 — 별게임 간격
 
 별을 모은 뒤 다음 별을 선택할 수 있는 대기 시간을 5초에서 3초로 변경. 첫 별 즉시 선택, 일시정지/재개 및 기존 기록 보존. 2999ms에서는 선택 불가, 3000ms에서는 선택 가능하도록 회귀 검증.
+
+## 2026-10-08 — Full Bible offline search
+- Added an independent home-menu search screen, Korean/English full-text and book/chapter/verse search, and full-chapter reading.
+- Added pinned public source conversion and complete assets; Korean 31,084 / English 31,103 verse records, each 66 books and 1,189 chapters. Original verse text preserved.
+- Corpus/reference tests passed (4). Full Flutter regression: 156 passed / 1 existing skip; additional search-screen test: 1 passed. New source static analysis clean; iOS simulator compile passed. See FULL_BIBLE_SEARCH.md.
+- No production API, DB, authentication keys, installed apps or TestFlight builds changed. Signed release and device verification remain pending.

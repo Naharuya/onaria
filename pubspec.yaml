@@ -40,5 +40,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/data/bible_verses_ko.json
+    - assets/data/full_bible_ko.json
+    - assets/data/full_bible_en.json
     - assets/prompts/system_prompt_ko.txt
     - assets/images/
