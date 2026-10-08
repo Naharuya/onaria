@@ -25,3 +25,8 @@
 ## 2026-10-08 — Requested current-device Bible search update
 - Updated app version to 1.0.0+13. Galaxy Release APK installed with existing certificate and adb install -r; launch passed. iPhone Release app verified (team/bundle/Apple sign-in/device profile) and installed as build 13 without uninstall.
 - Both binaries contain exact full Bible assets. iPhone automatic launch was refused while locked; interactive search checks pending device unlock. TestFlight upload and App Store review not performed.
+
+## 2026-10-08 — TestFlight Bible search build 13 upload
+- User authorized upload. Source commit 71611b7, ONARIA 1.0.0(13), com.onaria.app / team BJL8U6B46S. App Store-signed archive/export verification passed, including Apple sign-in entitlement and both complete Bible assets.
+- Xcode upload succeeded (exit 0). Apple processing/console appearance and build-13 encryption-compliance status remain unverified; no App Store review submission.
+- Android real-device English reference/text search and complete-chapter opening passed; iPhone launch after unlock passed, interactive search awaits user confirmation.
