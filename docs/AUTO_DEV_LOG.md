@@ -15,3 +15,18 @@
 ## 2026-10-08 — 별게임 간격
 
 별을 모은 뒤 다음 별을 선택할 수 있는 대기 시간을 5초에서 3초로 변경. 첫 별 즉시 선택, 일시정지/재개 및 기존 기록 보존. 2999ms에서는 선택 불가, 3000ms에서는 선택 가능하도록 회귀 검증.
+
+## 2026-10-08 — Full Bible offline search
+- Added an independent home-menu search screen, Korean/English full-text and book/chapter/verse search, and full-chapter reading.
+- Added pinned public source conversion and complete assets; Korean 31,084 / English 31,103 verse records, each 66 books and 1,189 chapters. Original verse text preserved.
+- Corpus/reference tests passed (4). Full Flutter regression: 156 passed / 1 existing skip; additional search-screen test: 1 passed. New source static analysis clean; iOS simulator compile passed. See FULL_BIBLE_SEARCH.md.
+- No production API, DB, authentication keys, installed apps or TestFlight builds changed. Signed release and device verification remain pending.
+
+## 2026-10-08 — Requested current-device Bible search update
+- Updated app version to 1.0.0+13. Galaxy Release APK installed with existing certificate and adb install -r; launch passed. iPhone Release app verified (team/bundle/Apple sign-in/device profile) and installed as build 13 without uninstall.
+- Both binaries contain exact full Bible assets. iPhone automatic launch was refused while locked; interactive search checks pending device unlock. TestFlight upload and App Store review not performed.
+
+## 2026-10-08 — TestFlight Bible search build 13 upload
+- User authorized upload. Source commit 71611b7, ONARIA 1.0.0(13), com.onaria.app / team BJL8U6B46S. App Store-signed archive/export verification passed, including Apple sign-in entitlement and both complete Bible assets.
+- Xcode upload succeeded (exit 0). Apple processing/console appearance and build-13 encryption-compliance status remain unverified; no App Store review submission.
+- Android real-device English reference/text search and complete-chapter opening passed; iPhone launch after unlock passed, interactive search awaits user confirmation.
