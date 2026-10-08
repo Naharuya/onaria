@@ -77,7 +77,7 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
 
   const transactionCreate = db.transaction(member => {
     if (member.phone && findByPhone.get(member.phone)) {
-      const error = new Error('이미 가입된 휴대폰 번호입니다. 기존 계정으로 로그인한 뒤 소셜 계정을 연결해 주세요.');
+      const error = new Error('이 휴대폰 번호로 가입된 ONARIA 계정이 있어요. 가입할 때 사용한 로그인 방법으로 먼저 로그인한 뒤, 추가하려는 소셜 계정을 연결해 주세요.');
       error.code = 'PHONE_EXISTS';
       throw error;
     }

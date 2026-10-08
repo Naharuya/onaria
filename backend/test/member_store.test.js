@@ -60,7 +60,7 @@ test('native SQLite persists members and rejects duplicate phone after reopening
     assert.equal(overview.total, 1);
     assert.equal(overview.recent[0].phone, '010****5678');
     assert.equal(overview.recent[0].churchName, '비공개');
-    assert.throws(() => store.create(fixture), { code: 'PHONE_EXISTS' });
+    assert.throws(() => store.create(fixture), { code: 'PHONE_EXISTS', message: '이 휴대폰 번호로 가입된 ONARIA 계정이 있어요. 가입할 때 사용한 로그인 방법으로 먼저 로그인한 뒤, 추가하려는 소셜 계정을 연결해 주세요.' });
   } finally {
     store?.close();
     rmSync(directory, { recursive: true, force: true });
