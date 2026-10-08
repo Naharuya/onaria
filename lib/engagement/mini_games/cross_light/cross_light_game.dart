@@ -21,7 +21,7 @@ class CrossLightGame {
     if (!started || complete) return Duration.zero;
     final elapsed = (_pausedAt ?? clock()).difference(_last!);
     return Duration(
-        milliseconds: (5000 - elapsed.inMilliseconds).clamp(0, 5000));
+        milliseconds: (3000 - elapsed.inMilliseconds).clamp(0, 3000));
   }
 
   int get remainingSeconds => (remaining.inMilliseconds / 1000).ceil();
@@ -30,7 +30,7 @@ class CrossLightGame {
   double get progress => _pieces.length / crossLightWords.length;
   void start({bool immediatelyReady = false}) {
     _last ??= clock().subtract(
-        immediatelyReady ? const Duration(seconds: 5) : Duration.zero);
+        immediatelyReady ? const Duration(seconds: 3) : Duration.zero);
   }
 
   void pause() {
