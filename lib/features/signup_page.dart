@@ -18,7 +18,9 @@ import '../src/auth/kakao_login_service.dart';
 import '../src/auth/naver_login_service.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({super.key, this.memberClientFactory});
+
+  final MemberApiClient Function(Uri baseUrl)? memberClientFactory;
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -214,12 +216,18 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           const SizedBox(height: 20),
                           FilledButton.icon(
-                            onPressed: _busy ? null : _completeProviderSignUp,
+                            onPressed: _busy
+                                ? null
+                                : _pendingProviderCredential == null
+                                    ? _reauthenticatePendingProvider
+                                    : _completeProviderSignUp,
                             icon: const Icon(Icons.check),
                             label: Text(
                               _busy
                                   ? '처리 중...'
-                                  : '${_providerLabel(_pendingProvider)}로 가입 완료',
+                                  : _pendingProviderCredential == null
+                                      ? '${_providerLabel(_pendingProvider)} 다시 인증하기'
+                                      : '${_providerLabel(_pendingProvider)}로 가입 완료',
                             ),
                           ),
                         ],
@@ -280,7 +288,8 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     setState(() => _busy = true);
-    final client = MemberApiClient(baseUrl: apiBaseUrl);
+    final client = widget.memberClientFactory?.call(apiBaseUrl) ??
+        MemberApiClient(baseUrl: apiBaseUrl);
     final appleAndroid = AppleAndroidAuthClient(baseUrl: apiBaseUrl);
     try {
       final challenge = defaultTargetPlatform == TargetPlatform.android
@@ -476,6 +485,23 @@ class _SignUpPageState extends State<SignUpPage> {
     _showMessage('처음 이용하시는 계정이에요. 아래 회원 정보를 입력해 가입을 완료해 주세요.');
   }
 
+  Future<void> _reauthenticatePendingProvider() async {
+    switch (_pendingProvider) {
+      case 'apple':
+        await _continueWithApple();
+        break;
+      case 'naver':
+        await _continueWithNaver();
+        break;
+      case 'google':
+        await _continueWithGoogle();
+        break;
+      case 'kakao':
+        await _continueWithKakao();
+        break;
+    }
+  }
+
   Future<void> _completeProviderSignUp() async {
     if (!_adultConfirmed || !_termsAccepted || !_privacyAccepted) {
       _showMessage('만 18세 이상 여부를 확인하고 이용약관·개인정보 안내에 동의해 주세요.');
@@ -489,7 +515,8 @@ class _SignUpPageState extends State<SignUpPage> {
     if (provider == null || credential == null || apiBaseUrl == null) return;
 
     setState(() => _busy = true);
-    final client = MemberApiClient(baseUrl: apiBaseUrl);
+    final client = widget.memberClientFactory?.call(apiBaseUrl) ??
+        MemberApiClient(baseUrl: apiBaseUrl);
     try {
       final registration = await client.providerSignUp(
         provider: provider,
@@ -511,7 +538,14 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       Navigator.of(context).pop();
     } on MemberApiException catch (error) {
-      if (mounted) _showMessage(error.message);
+      if (mounted) {
+        if (error.statusCode == 401) {
+          setState(() => _pendingProviderCredential = null);
+          _showMessage('인증을 다시 확인해야 해요. 입력한 정보는 유지됩니다. 다시 인증한 뒤 가입을 완료해 주세요.');
+        } else {
+          _showMessage(error.message);
+        }
+      }
     } catch (_) {
       if (mounted) {
         _showMessage('회원가입을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.');
