@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('brand structure, honest availability, SEO, links and 404', async ({ page, request }) => {
-  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms']) {
+  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms', '/account-deletion']) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const canonical = await page.locator('link[rel=canonical]').getAttribute('href');
@@ -12,6 +12,7 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
     expect(organization.name).toBe('ONARIA');
     const hrefs = await page.locator('a').evaluateAll(links => [...new Set(links.map(a => a.getAttribute('href')))]);
     for (const href of hrefs) {
+      if (href.startsWith('mailto:')) continue;
       const url = new URL(href, page.url());
       const response = await request.get(url.pathname);
       expect(response.status(), href).toBe(200);
@@ -20,7 +21,7 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   }
   await page.goto('/');
   const ids = await page.locator('main > section').evaluateAll(sections => sections.map(s => s.id || s.className));
-  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'cta']);
+  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'account-help', 'cta']);
   await expect(page.locator('.tradition-card')).toHaveCount(0);
   await expect(page.getByRole('link', { name: '일곱 전통' })).toHaveCount(0);
   await expect(page.locator('#ecosystem')).toHaveCount(0);
