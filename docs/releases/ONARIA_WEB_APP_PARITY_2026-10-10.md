@@ -41,3 +41,31 @@ Playwright website8 PASS: /,/privacy,/terms,/account-deletion 포함 route200/SE
 - Production 배포: NOT RUN. 커밋/푸시: NOT RUN(사용자 보류). 새 로컬 웹이 공개 사이트에 반영됐다고 표시하지 않는다.
 
 최종 보강: /account-deletion을 포함한 공개7개 페이지의 WCAG/overflow/메뉴 회귀7 PASS(360/390/430/768/1024/1280/1440). 위20 PASS 이후 테스트 범위만 추가하여 실행한 결과이며 제품 변경 없음.
+
+## Production 배포 결과 — 2026-10-10
+
+사용자 승인 후 웹 parity 런타임 파일만 Production에 배포했다. 앱/회원 DB/세션 DB/AI 원장/백업 timer 설정은 변경하지 않았다.
+
+- Git branch: `release/web-app-parity-20261010`
+- 최초 웹 commit: `cd2544e834645a115ae337540b38bab853cb3de0`
+- GitHub push: PASS
+- Production 교체 파일:
+  - `/opt/onaria/backend/src/website.js`
+  - `/opt/onaria/backend/src/website_content.js`
+  - `/opt/onaria/backend/public/website/site.css`
+- 배포 전 원본은 `/opt/onaria-backups/web-parity-20261010-170354`에 별도 보관.
+- 교체 후 세 파일 SHA-256이 release branch 파일과 일치.
+- `onaria-backend.service` 재시작 후 active, 내부 `/health` 정상.
+- 외부 `https://api.onaria.ai.kr/health` 200.
+- 공개 `/`, `/privacy`, `/terms`, `/account-deletion` 200.
+- 정적 asset `/assets/site.css`, `/assets/site.js`, `/assets/onaria-emblem.svg` 200.
+- 실제 Production Playwright smoke:
+  - width 360 PASS
+  - width 390 PASS
+  - width 768 PASS
+  - width 1440 PASS
+  - 각 폭에서 `/`, `/privacy`, `/terms`, `/account-deletion` status200, h1 단일, horizontal overflow 없음, page error 없음.
+- 공개 문구 확인 PASS: 마음 선택→마음대화→말씀/작은 실천, 4종 로그인, Apple 본인확인, WEB/eBible.org, 일반 공개 스토어 출시 전.
+- 개인정보 문구 확인 PASS: 전체 1년 자동 파기 완료를 주장하지 않음.
+
+앞선 본 문서의 “Production 배포 NOT RUN”은 로컬 검토 시점 기록이며, 이 섹션의 배포 결과가 최신 상태다.
