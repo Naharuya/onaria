@@ -7,7 +7,7 @@ export const costEnv = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE:
 // Synthetic rates above are arithmetic fixtures, not actual API prices.
 export const costBody = (userMessage = '내일 발표가 걱정돼요') => ({
   session: { sessionId: 'mock-session', selectedEmotion: '불안', emotionIntensity: 7, turnCount: 1 },
-  userMessage, systemPromptVersion: 'ko-v1', allowedVerseIds: [], religion: 'protestant',
+  userMessage, systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [], religion: 'protestant',
 });
 export function costFactory(calls = []) {
   return ({ model }) => ({ runStructured: async (task, options) => {

@@ -39,7 +39,7 @@ const search = { tradition: 'protestant', query: '위로', language: 'ko-KR', li
 const env = { NODE_ENV: 'production', ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
 const quiet = { info() {}, warn() {} };
 const body = message => ({ session: { sessionId: 'phase6', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 }, userMessage: message,
-  systemPromptVersion: 'ko-v1', allowedVerseIds: [] });
+  systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [] });
 const mock = async task => task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput();
 const dataset = async () => JSON.parse(await readFile(new URL('../evaluation/gold-candidate-v1.json', import.meta.url), 'utf8'));
 

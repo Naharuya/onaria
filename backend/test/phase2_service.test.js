@@ -10,7 +10,7 @@ import { psychologyOutput, religionOutput } from './fixtures/agent_outputs.js';
 
 const enabled = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only-key', OPENAI_MODEL: 'test-model' };
 const request = (extra = {}) => ({ session: { sessionId: 'phase2', selectedEmotion: '불안', emotionIntensity: 7, turnCount: 1 },
-  userMessage: 'private-user-message', systemPromptVersion: 'ko-v1', allowedVerseIds: ['PHP_4_6_7'], ...extra });
+  userMessage: 'private-user-message', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: ['PHP_4_6_7'], ...extra });
 const agent = { id: 'integrated' };
 function capture() {
   const info = []; const warn = [];

@@ -261,7 +261,7 @@ test('A-track engagement isolates consumer failures and rejects conversation pay
 });
 test('A-track disabled flag and provider failure preserve local fallback without engagement emissions', async () => {
   const body = { session: { sessionId: 'phase9-local', selectedEmotion: '불안', emotionIntensity: 5, turnCount: 1 },
-    userMessage: '오늘 불안해요', systemPromptVersion: 'ko-v1', allowedVerseIds: [], religion: 'protestant' };
+    userMessage: '오늘 불안해요', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [], religion: 'protestant' };
   const local = await createConversationService({ env: {}, logger: quiet })(body);
   const disabled = createConversationService({ env: { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'false', OPENAI_API_KEY: 'test-only' },
     logger: quiet, openAiFactory: () => assert.fail('Disabled model'), knowledgeProvider: { search: () => assert.fail('Disabled retrieval') } });
@@ -276,7 +276,7 @@ test('A-track HTTP regression preserves the public chat schema', async () => {
   const server = await new Promise(resolve => { const listener = app.listen(0, '127.0.0.1', () => resolve(listener)); });
   try {
     const body = { session: { sessionId: 'phase9-http', selectedEmotion: '불안', emotionIntensity: 5, turnCount: 1 },
-      userMessage: '불안할 때 도움이 필요해요', systemPromptVersion: 'ko-v1', allowedVerseIds: [] };
+      userMessage: '불안할 때 도움이 필요해요', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [] };
     const response = await fetch(`http://127.0.0.1:${server.address().port}/v1/mind/chat`, { method: 'POST',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
     assert.equal(response.status, 200); const result = await response.json(); responseSchema.parse(result);
