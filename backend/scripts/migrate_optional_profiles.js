@@ -12,7 +12,14 @@ if (!filename || !path.isAbsolute(filename) || !['--check', '--apply'].includes(
 }
 const db = new Database(filename, { fileMustExist: true, readonly: action === '--check' });
 try {
-  const required = Boolean(db.prepare('PRAGMA table_info(members)').all().find(column => column.name === 'phone')?.notnull);
+  const phoneColumn = db.prepare('PRAGMA table_info(members)').all().find(column => column.name === 'phone');
+  const phoneUnique = db.pragma("index_list('members')").some(index => {
+    if (!index.unique) return false;
+    const escaped = String(index.name).replaceAll("'", "''");
+    const names = db.pragma(`index_info('${escaped}')`).map(row => row.name);
+    return names.length === 1 && names[0] === 'phone';
+  });
+  const required = Boolean(phoneColumn?.notnull || phoneUnique);
   if (action === '--check') console.log(JSON.stringify({ migrationRequired: required }));
   else {
     if (required) await db.backup(backup);

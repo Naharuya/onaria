@@ -11,6 +11,7 @@ import { createRuntimeAppleAndroidAuth, withAppleAndroidProofs } from './auth/ap
 import { createOidcProviderVerifier } from './auth/provider_identity.js';
 import { createRuntimeAppleRevocation } from './auth/apple_revocation.js';
 import { createMemberSessions } from './auth/member_session.js';
+import { createDeletionManifest } from './privacy/deletion_manifest.js';
 
 const port = Number(process.env.PORT || 8787);
 // Defaults to local; only all three explicit OpenAI settings enable the provider.
@@ -20,6 +21,8 @@ const adminSettings = createAdminSettings({ directory: fileURLToPath(new URL('..
 const generate = adminSettings.generate;
 const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
 const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
+const deletionManifest = createDeletionManifest({ filename: process.env.DELETION_MANIFEST_DB_PATH || fileURLToPath(new URL('../data/deletion-manifest.sqlite', import.meta.url)) });
+deletionManifest.reapply(memberStore);
 const appleAndroidAuth = createRuntimeAppleAndroidAuth();
 const providerIdentity = createRuntimeProviderIdentity();
 const app = createApp({
@@ -38,6 +41,7 @@ const app = createApp({
   identity: createRuntimeIdentity(),
   providerIdentity: withAppleAndroidProofs(providerIdentity, appleAndroidAuth),
   memberSessions,
+  deletionManifest,
   webMetrics,
   memberStore,
   production: process.env.NODE_ENV === 'production',
@@ -47,5 +51,5 @@ const app = createApp({
 });
 const host = process.env.HOST || '0.0.0.0';
 const server = app.listen(port, host, () => console.log(`onaria backend listening on ${host}:${port} (${generate.mode})`));
-server.on('close', () => { usageLedger.close?.(); memberStore.close(); memberSessions.close?.(); });
+server.on('close', () => { usageLedger.close?.(); memberStore.close(); memberSessions.close?.(); deletionManifest.close?.(); });
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close());

@@ -17,11 +17,12 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleRevocation = null, appleAndroidAuth = null, memberSessions = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleRevocation = null, appleAndroidAuth = null, memberSessions = null, deletionManifest = null, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
   const app = express();
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
   const feedback = createFeedbackMetrics();
+  const memberVisible = member => member && !(deletionManifest?.contains?.(member.id));
   app.disable('x-powered-by');
   app.set('trust proxy', trustProxy);
   app.use(helmet());
@@ -45,7 +46,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     next();
   });
 
-  app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+  app.get('/health', (_req, res) => res.json({ status: 'ok', version: process.env.ONARIA_VERSION || '1.0.0', build: process.env.ONARIA_BUILD || '20' }));
   app.use('/v1/admin', adminAuth({ token: adminToken, production, allowBearer: allowAdminBearer }));
   app.use('/v1/admin/settings', (req, res, next) => {
     if (!adminSettings) return res.status(503).json({ message: '설정 저장소를 사용할 수 없습니다.' });
@@ -126,30 +127,10 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
       const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
       const existingIdentity = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
-      if (existingIdentity) {
-        const session = memberSessions.issue(trusted);
-        return res.status(200).json({
-          member: publicMember(existingIdentity),
-          sessionToken: session.token,
-          expiresInSeconds: session.expiresInSeconds,
-          linked: false,
-        });
-      }
-
-      const sessionToken = req.get('x-onaria-member-session');
-      if (sessionToken) {
-        const currentIdentity = memberSessions.verify(sessionToken);
-        const currentMember = memberStore.findByProviderIdentity?.(currentIdentity.provider, currentIdentity.providerUserId);
-        if (!currentMember) throw new IdentityError();
-        const member = memberStore.attachIdentity?.(currentMember.id, trusted.provider, trusted.providerUserId);
-        if (!member) throw new IdentityError();
-        const session = memberSessions.issue(trusted);
-        memberSessions.revoke(sessionToken);
-        return res.status(200).json({
-          member: publicMember(member),
-          sessionToken: session.token,
-          expiresInSeconds: session.expiresInSeconds,
-          linked: true,
+      if (memberVisible(existingIdentity)) {
+        return res.status(409).json({
+          code: 'IDENTITY_ALREADY_REGISTERED',
+          message: '이미 가입된 소셜 계정입니다. 로그인으로 다시 시도해 주세요.',
         });
       }
 
@@ -172,7 +153,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       });
     } catch (error) {
       if (error.code === 'PHONE_EXISTS' || error.code === 'IDENTITY_EXISTS') {
-        return res.status(409).json({ message: error.message });
+        return res.status(409).json({ code: error.code, message: error.message });
       }
       return next(error);
     }
@@ -182,10 +163,56 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!providerIdentity || !memberSessions) throw new IdentityError(503);
       const trusted = await providerIdentity({ provider: req.body?.provider, credential: req.body?.credential });
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
-      if (!member) return res.status(404).json({ message: '가입된 회원 정보를 찾을 수 없습니다.' });
+      if (!memberVisible(member)) return res.status(404).json({ code: 'PROVIDER_IDENTITY_NOT_FOUND', message: '가입된 회원 정보를 찾을 수 없습니다.' });
       const session = memberSessions.issue(trusted);
       return res.status(201).json({ sessionToken: session.token, expiresInSeconds: session.expiresInSeconds });
     } catch (error) { return next(error); }
+  });
+  app.post('/v1/account/providers', async (req, res, next) => {
+    try {
+      const sessionToken = req.get('x-onaria-member-session');
+      if (!sessionToken || !providerIdentity || !memberSessions) throw new IdentityError();
+      const currentIdentity = memberSessions.verify(sessionToken);
+      const currentMember = memberStore.findByProviderIdentity?.(
+        currentIdentity.provider,
+        currentIdentity.providerUserId,
+      );
+      if (!memberVisible(currentMember)) throw new IdentityError();
+
+      const trusted = await providerIdentity({
+        provider: req.body?.provider,
+        credential: req.body?.credential,
+      });
+      const owner = memberStore.findByProviderIdentity?.(
+        trusted.provider,
+        trusted.providerUserId,
+      );
+      if (memberVisible(owner) && owner.id !== currentMember.id) {
+        return res.status(409).json({
+          code: 'IDENTITY_EXISTS',
+          message: '이미 다른 ONARIA 회원 계정에 연결된 소셜 계정입니다.',
+        });
+      }
+      const member = owner ?? memberStore.attachIdentity?.(
+        currentMember.id,
+        trusted.provider,
+        trusted.providerUserId,
+      );
+      if (!memberVisible(member)) throw new IdentityError();
+      const session = memberSessions.issue(trusted);
+      memberSessions.revoke(sessionToken);
+      return res.status(200).json({
+        member: publicMember(member),
+        sessionToken: session.token,
+        expiresInSeconds: session.expiresInSeconds,
+        linked: !owner,
+      });
+    } catch (error) {
+      if (error.code === 'IDENTITY_EXISTS' || error.code === 'PROVIDER_ALREADY_LINKED') {
+        return res.status(409).json({ code: error.code, message: error.message });
+      }
+      return next(error);
+    }
   });
   app.get('/v1/account', (req, res, next) => {
     try {
@@ -193,7 +220,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!sessionToken || !memberSessions) throw new IdentityError();
       const trusted = memberSessions.verify(sessionToken);
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
-      if (!member) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
+      if (!memberVisible(member)) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
       return res.json({ member: publicMember(member), providers: memberStore.listIdentities?.(member.id) ?? [], currentProvider: trusted.provider });
     } catch (error) { return next(error); }
   });
@@ -203,7 +230,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!sessionToken || !memberSessions) throw new IdentityError();
       const trusted = memberSessions.verify(sessionToken);
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
-      if (!member) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
+      if (!memberVisible(member)) return res.status(404).json({ message: '회원 정보를 찾을 수 없습니다.' });
       const provider = req.params.provider;
       if (provider === trusted.provider) return res.status(409).json({ message: '현재 로그인에 사용 중인 계정은 연결 해제할 수 없습니다. 다른 계정으로 로그인한 뒤 다시 시도해 주세요.' });
       const detachedIdentity = memberStore.listIdentityDetails?.(member.id)?.find(i => i.provider === provider);
@@ -234,18 +261,26 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       if (!sessionToken || !memberSessions) throw new IdentityError();
       const trusted = memberSessions.verify(sessionToken);
       const member = memberStore.findByProviderIdentity?.(trusted.provider, trusted.providerUserId);
-      if (!member) return res.status(404).json({ message: '삭제할 회원 정보를 찾을 수 없습니다.' });
+      if (!memberVisible(member)) return res.status(404).json({ message: '삭제할 회원 정보를 찾을 수 없습니다.' });
       if ((memberStore.listIdentities?.(member.id) ?? []).includes('apple')) {
         if (!appleRevocation) throw new IdentityError(503);
         await appleRevocation({ authorizationCode: req.body?.appleAuthorizationCode, credential: req.body?.appleCredential,
           providerUserId: memberStore.listIdentityDetails?.(member.id)?.find(i => i.provider === 'apple')?.providerUserId });
       }
+      deletionManifest?.record?.(member.id);
       const identities = memberStore.listIdentityDetails?.(member.id) ?? [trusted];
-      if (!memberStore.deleteById?.(member.id)) return res.status(409).json({ message: '계정 삭제를 완료하지 못했습니다.' });
+      // The stores may use separate databases. Revoke before deleting so a
+      // session-store failure cannot delete the member while reporting failure.
+      // A failed attempt may revoke some sessions; it never reports completion.
       for (const identity of identities) memberSessions.revokeIdentity?.(identity);
       memberSessions.revoke(sessionToken);
+      if (!memberStore.deleteById?.(member.id)) return res.status(409).json({ message: '회원탈퇴를 완료하지 못했습니다. 로그인 상태를 확인한 뒤 다시 시도해 주세요.' });
       return res.status(204).end();
-    } catch (error) { return next(error); }
+    } catch (error) {
+      if (error instanceof IdentityError || error instanceof ZodError || error instanceof SyntaxError) return next(error);
+      try { logger.error?.('account_deletion_failed', { status: 503 }); } catch { /* Never expose raw errors. */ }
+      return res.status(503).json({ message: '회원탈퇴를 완료하지 못했습니다. 일부 로그인이 해제됐을 수 있으니 로그인 상태를 확인한 뒤 다시 시도해 주세요.' });
+    }
   });
   app.post('/v1/mind/chat', async (req, res, next) => {
     try {

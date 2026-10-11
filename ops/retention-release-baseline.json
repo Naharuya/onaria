@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-retention.1",
+  "backendFiles": {
+    "src/server.js": "a8512a28e8f35a2ddc4d6fa1d31b66db924a93f0374c06364fcc291755b877fa",
+    "src/website.js": "d0d9550ef86dd42013c6ae5f58844cc79eb11e23d1a558d4fc117101d1ce34f2",
+    "src/member_store.js": "988bbf2d0c7a04bde98d6a2c52b232f39275bc2a33c781ed4680ab20be6d0e31",
+    "src/privacy/deletion_manifest.js": null,
+    "src/privacy/backup_retention.js": null,
+    "scripts/backup_databases.js": "f569e73280e6c470ee591a5f10f3da2c42a4eb727b04659b01667eb5aaba2e98",
+    "scripts/retention_maintenance.js": null,
+    "scripts/prepare_member_restore.js": null
+  },
+  "nginxSha256": "f33a9fe74050e7c5eee9ff5e0bd8f4377969bc0caaa31fde93b8944e2ed4300d"
+}

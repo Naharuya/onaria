@@ -56,7 +56,8 @@ test('explicit migration preserves members, linked identities, consent metadata 
     assert.equal(db.prepare('SELECT MAX(id) AS id FROM members').get().id, 21);
     assert.equal(db.pragma('foreign_key_check').length, 0);
     assert.equal(migrateOptionalProfiles(db), false);
-    assert.throws(() => db.prepare("INSERT INTO members(name,phone,church_name) VALUES('','01012345678','')").run());
+    db.prepare("INSERT INTO members(name,phone,church_name) VALUES('','01012345678','')").run();
+    assert.equal(db.prepare("SELECT COUNT(*) AS count FROM members WHERE phone='01012345678'").get().count, 2);
   } finally { db.close(); }
 });
 
@@ -83,9 +84,9 @@ test('HTTP social signup requires consent and permits contact-free registration'
     const created = await response.json();
     assert.equal(created.member.phone, null); assert.equal(created.member.name, '');
     assert.equal(store.getAdminOverview().total, 1);
-    const relogin = await signup(input);
-    assert.equal(relogin.status, 200);
-    assert.equal((await relogin.json()).member.id, created.member.id);
+    const duplicateSignup = await signup({ ...input, termsAccepted: true, privacyAccepted: true, adultConfirmed: true });
+    assert.equal(duplicateSignup.status, 409);
+    assert.equal((await duplicateSignup.json()).code, 'IDENTITY_ALREADY_REGISTERED');
     assert.equal(store.getAdminOverview().total, 1);
   } finally { if (server) await new Promise(resolve => server.close(resolve)); store.close(); rmSync(dir, { recursive: true, force: true }); }
 });
