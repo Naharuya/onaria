@@ -21,12 +21,17 @@
     "tracking": false,
     "published": false
   },
-  "publicPolicyPatch": "Adds IP, access time, method/path, response status/size/time and stability/security purposes; not deployed",
+  "publicPolicyPatch": "Deployed from exact-commit CI artifact 33b10d60f2553c02cf3a4da6ceee1d767f4edad6; public privacy HTTP200 and added access-log fields verified",
   "tests": {
     "web": {
       "pass": 10,
       "fail": 0
     }
   },
-  "releaseGate": "HOLD pending explicit shared archive approval and disclosure patch deployment"
+  "releaseGate": "HOLD pending explicit shared archive deletion approval; App Privacy publish and final submission not run",
+  "ci": {
+    "run": 38143277829,
+    "commit": "33b10d60f2553c02cf3a4da6ceee1d767f4edad6",
+    "conclusion": "success"
+  }
 }

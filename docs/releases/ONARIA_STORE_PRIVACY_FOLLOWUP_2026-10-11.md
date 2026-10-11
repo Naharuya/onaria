@@ -18,10 +18,12 @@ Two remaining immutable archives (8 MiB each) contain 3,265 ONARIA records, 16 B
 
 ## Prepared public disclosure
 
-website.js adds retained access-log fields (IP, time, method/path, response status/size/time), stability/performance/security purposes and omission of body/token/query from the access-log format. Syntax check and existing onaria_web test suite: 10 PASS / 0 FAIL. Patch not deployed; current production website hash e466e748ee67423e8b6545415d2c86c2214b48a7b66bddd2079c37a4e64359f1.
+website.js adds retained access-log fields (IP, time, method/path, response status/size/time), stability/performance/security purposes and omission of body/token/query from the access-log format. Syntax check and existing onaria_web test suite: 10 PASS / 0 FAIL. Patch deployed from exact-commit GitHub Actions run 38143277829, commit 33b10d60f2553c02cf3a4da6ceee1d767f4edad6. CI zip/manifest/member hash verified; only website.js changed. Backend restarted once for this follow-up, health ok; public privacy HTTP200 and added disclosure verified. Current website hash 8f785eebcc1811c192b890107a75334e640cda45678b8e7dcc74129c291c5e51.
 
 ## Required scope decision
 
-Approve deleting exactly the two aged mixed archives (including 16 BEAVERS and 2,268 system/user records), then verify no aged ONARIA records remain. Other journal files, application code/data and service settings are excluded. App Store submission remains HOLD until historical retention and public disclosure match operational facts. The project AGENTS.md requires approval for data deletion and forbids unauthorized changes to other projects.
+Approve deleting exactly the two aged mixed archives (including 16 BEAVERS and 2,268 system/user records), then verify no aged ONARIA records remain. Other journal files, application code/data and service settings are excluded. App Store submission remains HOLD until historical retention matches operational facts; public disclosure patch is now applied. The project AGENTS.md requires approval for data deletion and forbids unauthorized changes to other projects.
 
 Sources: https://developer.apple.com/app-store/app-privacy-details/ and https://developers.google.com/identity/sign-in/ios/app-privacy .
+
+Console recheck: version1.0 remains Prepare for Submission, Build24 (1.0.0) connected, manual release selected; description states external AI off/local content, no separate username/password, account merge off and in-app deletion. Five iPhone screenshots visible. Final Review submission not performed.
