@@ -9,7 +9,8 @@
     "scripts/backup_databases.js": "f569e73280e6c470ee591a5f10f3da2c42a4eb727b04659b01667eb5aaba2e98",
     "scripts/retention_maintenance.js": null,
     "scripts/prepare_member_restore.js": null,
-    "scripts/legacy_backup_retention.js": null
+    "scripts/legacy_backup_retention.js": null,
+    "scripts/onaria_legacy_journal_retention.py": null
   },
   "nginxSha256": "f33a9fe74050e7c5eee9ff5e0bd8f4377969bc0caaa31fde93b8944e2ed4300d"
 }

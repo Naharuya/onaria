@@ -6,6 +6,7 @@ paths=['backend/'+p for p in baseline['backendFiles']]
 paths += ['ops/onaria-retention.service','ops/onaria-retention.timer',
  'ops/onaria-backend.service.d/retention-logs.conf','ops/journald@onaria.conf',
  'ops/onaria-nginx-log-format.conf','ops/onaria-nginx.conf','ops/onaria-logrotate',
+ 'ops/onaria-legacy-journal-retention.service','ops/onaria-legacy-journal-retention.timer',
  'ops/onaria-legacy-backup-retention.service','ops/onaria-legacy-backup-retention.timer','ops/retention-release-baseline.json']
 out=root/'build/retention-release';out.mkdir(parents=True,exist_ok=True)
 manifest={'version':'1.0.0-retention.1','commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':{}}
@@ -14,6 +15,7 @@ for name in paths:
  if p.is_symlink() or not p.is_file():raise ValueError('Missing/unsafe release file: '+name)
  data=p.read_bytes()
  if re.search(rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY|sk-(?:proj-)?[A-Za-z0-9_-]{60,}|GOCSPX-[A-Za-z0-9_-]{20,}',data):raise ValueError('Credential pattern: '+name)
+ if name.endswith('.py'):subprocess.run(['python3','-m','py_compile',str(p)],check=True)
  if name.endswith('.js'):subprocess.run(['node','--check',str(p)],check=True)
  manifest['files'][name]=hashlib.sha256(data).hexdigest()
 manifestBytes=(json.dumps(manifest,indent=2)+'\n').encode()
