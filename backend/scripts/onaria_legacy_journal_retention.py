@@ -74,7 +74,11 @@ def maintain(root, work, tool, apply=False):
                 kept, expected, removed, total=filter_export(raw,cutoff)
                 if not removed: continue
                 if hashlib.sha256(source.read_bytes()).hexdigest()!=before: raise RuntimeError('Source journal changed while reading')
-                candidate=work/(before+'.journal')
+                stage=source.parent/'.onaria-retention-staging'
+                if stage.is_symlink(): raise RuntimeError('Symlink staging directory refused')
+                stage.mkdir(mode=0o700,exist_ok=True)
+                if stage.stat().st_uid!=0 or stage.stat().st_mode & 0o077: raise RuntimeError('Private root staging required')
+                candidate=stage/(before+'.journal')
                 if candidate.exists(): raise RuntimeError('Unexpected existing candidate')
                 candidates.append(candidate)
                 if kept:
@@ -98,6 +102,8 @@ def maintain(root, work, tool, apply=False):
         finally:
             for candidate in candidates:
                 if candidate.exists(): candidate.unlink()
+                try: candidate.parent.rmdir()
+                except OSError: pass
 
 if __name__=='__main__':
     import argparse,json
