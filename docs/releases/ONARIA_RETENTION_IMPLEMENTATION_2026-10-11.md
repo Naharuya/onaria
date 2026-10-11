@@ -50,3 +50,16 @@
 AGENTS.md: “production server를 자동 변경하거나 재시작하지 않는다.”
 AGENTS.md: “production DB migration ... 운영 서버 재시작 ... 데이터 삭제 가능 작업은 사용자 승인 전에 실행하지 않는다.”
 기준 적용 승인을 개발·검증에 반영했다. 기존 운영 변경·재시작 및 commit/push HOLD 해제 범위를 명확히 확인하고 위 좁은 변경으로 배포한다.
+
+
+## Authorized production deployment — 2026-10-11
+
+User authorized narrow production release, branch commit/push and one backend restart. Deployed commit: 68fcac67ca8875c8512e19bef928d602040c0c38. GitHub Actions run 38142470290 completed successfully; downloaded artifact onaria-retention-release was checksum and exact-commit verified. Deployment allowlist contained 19 files. Original dirty checkout was preserved.
+
+Validation: isolated release backend 471 PASS / 0 FAIL; nginx configuration and logrotate validation passed. Backend restarted once, health status ok. Public /health, /privacy, /support and /account-deletion returned HTTP 200. New latest backup contains 4 SQLite databases including deletion manifest. Both daily retention timers active/enabled; backup, regular retention and legacy backup maintenance Result=success. Dry run: 3 regular snapshots, 7 legacy directories, 0 aged backup candidates, 0 expired sessions, 0 usage entries older than 62 days, 0 aged deletion entries. No real member deletion test performed.
+
+Account merge remains disabled; Build24 unchanged. Earlier user-reported S22, A33 and iPhone login confirmation is prior evidence, not a new real-device provider login test after this deployment.
+
+Remaining release gate: historical ONARIA messages remain in the shared system journal (earliest observed 2026-09-21). New ONARIA journal namespace is isolated with a 14-day retention setting; this does not purge historical shared journal files. Global vacuum was not run because those files also contain other projects' records. Therefore historical log cleanup and App Store privacy declaration versus actual SDK data flow remain unverified; App Privacy publication and final App Review submission were not performed.
+
+Incident: initial commit c7c0875 was pushed despite a failed migration test due to missing fail-fast shell handling. It was never deployed. Migration fixture alignment and fail-fast handling were corrected; only the successful exact-commit CI artifact above was deployed.
