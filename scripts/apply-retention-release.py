@@ -71,7 +71,7 @@ try:
  logs=Path('/var/log/nginx/onaria');logs.mkdir(mode=0o750,exist_ok=True)
  os.chown(logs,pwd.getpwnam('www-data').pw_uid,grp.getgrnam('adm').gr_gid)
  run(['nginx','-t'])
- run(['systemd-analyze','verify','/etc/systemd/system/onaria-retention.service','/etc/systemd/system/onaria-retention.timer'])
+ run(['systemd-analyze','verify','/etc/systemd/system/onaria-retention.service','/etc/systemd/system/onaria-retention.timer','/etc/systemd/system/onaria-legacy-backup-retention.service','/etc/systemd/system/onaria-legacy-backup-retention.timer'])
  run(['logrotate','-d','/etc/logrotate.d/onaria-retention'])
  run(['systemctl','daemon-reload'])
  run(['systemctl','restart','onaria-backend.service']);restarted=True
@@ -95,6 +95,8 @@ try:
  print('RELEASE_APPLIED',json.dumps({'commit':version,'version':manifest['version'],'backendRestarted':True,'health':'ok'}))
  (work/'result.json').write_text(json.dumps({'commit':version,'version':manifest['version'],'status':'applied','retentionPreview':preview},indent=2)+'\n')
 except Exception:
+ for timer in ['onaria-retention.timer','onaria-legacy-backup-retention.timer']:
+  subprocess.run(['systemctl','disable','--now',timer],capture_output=True)
  for n,p in targets.items():
   if existed[n]:install(previous/n,p)
   elif p.exists():p.unlink()
