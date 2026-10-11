@@ -1,5 +1,5 @@
 {
-  "status": "AWAITING_EXPLICIT_SHARED_SCOPE_APPROVAL",
+  "status": "SUPERSEDED_NOT_EXECUTED",
   "applyNotRun": true,
   "allOlderThanDays": 14,
   "totalRecords": 5549,
@@ -31,5 +31,12 @@
       "onaria": 1777,
       "other": 1245
     }
-  ]
+  ],
+  "replacement": {
+    "method": "verified selective journal rewrite",
+    "removedOnariaEntries": 3265,
+    "retainedOtherEntries": 2284,
+    "otherEntriesRemoved": 0,
+    "commit": "2531cd6de9752249baef6b244a0aec0b96036c90"
+  }
 }

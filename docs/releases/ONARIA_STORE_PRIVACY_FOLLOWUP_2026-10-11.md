@@ -1,29 +1,43 @@
 # ONARIA App Store privacy follow-up
 
-2026-10-11 Asia/Seoul. Build24 and original dirty checkout preserved.
+2026-10-11 Asia/Seoul. This final record supersedes the earlier 12-type draft and mixed-archive purge proposal. Build24 and the original dirty checkout remain unchanged.
 
-## Observed evidence
+## Verified privacy draft
 
-Build24 archive contains 21 privacy manifests. GoogleSignIn declares name, email, phone, coarse location and user ID for functionality, and user ID/device ID/other usage/other data for analytics; Kakao auth declares linked other data for functionality. No SDK manifest declares tracking. These are provider declarations, not complete traffic measurements. Google official guidance additionally describes OAuth user identifiers and IP-derived fraud prevention location.
+Build24 archive contains 21 privacy manifests. GoogleSignIn and Kakao declarations were compared with live production schema, whitelist-only runtime settings and logging code. SDK declarations are not a complete network traffic measurement. All final 11 types are linked to identity; tracking is false, no advertising purpose is selected. Device ID purpose is Analytics only. Actual category wizard radios were corrected for user ID, device ID, other usage and other data; final detailed preview shows only linked data.
 
-Apple definitions: third-party SDK collection is part of the app label; IP use determines classification; retained diagnostic timing associated with IP is linked. Generic free-form collected content is other user content, while the optional church field additionally warrants sensitive religious information.
+| Type | Purpose | Evidence |
+|---|---|---|
+| Name | Functionality | members.name / GoogleSignIn |
+| Email | Functionality | GoogleSignIn declaration |
+| Phone | Functionality | members.phone / GoogleSignIn |
+| Coarse location | Functionality | GoogleSignIn IP fraud prevention |
+| Sensitive info | Functionality | optional members.church_name |
+| User ID | Analytics + Functionality | SDK and member identity |
+| Device ID | Analytics | GoogleSignIn declaration |
+| Other usage | Analytics + Functionality | SDK and retained quota ledger |
+| Performance | Functionality | nginx request_time associated with IP |
+| Other diagnostics | Analytics + Functionality | operational metadata |
+| Other data | Analytics + Functionality | GoogleSignIn and Kakao declarations |
 
-App Store draft corrections saved and observed: Other User Content linked=true (member-linked optional profile text); Performance Data linked=true (nginx retained request time with IP). Tracking remains false, advertising purposes unchecked. Global Publish and final App Review submission NOT RUN. Other 10 existing categories were reviewed against deployed SDK declarations, member data, pseudonymous ledger and diagnostic logs. Raw dialogue is request processing, not claimed persistently stored; external AI remains disabled.
+Other User Content was removed after confirming userMessage and conversationMemory are request-scoped and not persistently stored in server schemas. Optional church affiliation is covered by Sensitive Info. This supersedes the earlier incorrect generic-profile-content rationale. External AI is disabled (local mode); stable pseudonymous usage ledger is conservatively treated as linked.
 
-## Historical journal cleanup
+## Completed retention operations
 
-One archived journal contained only 192 ONARIA records, all older than 14 days. Complete file scope and timestamps were verified before unlink; count and source hash recorded in a root-only server audit file. No real member deletion test.
+The exclusive archived journal containing 192 aged ONARIA records was removed after scope/hash/timestamp verification. Two mixed archives were rewritten through official systemd journal export/import tooling: 3,265 aged ONARIA application entries removed; all 2,284 other records retained, including 16 BEAVERS and 2,268 system/user entries. A multiset fingerprint verified every retained field and real/monotonic timestamp except regenerated journal addressing metadata (__CURSOR, __SEQNUM, __SEQNUM_ID). No other entries removed. The whole-file shared purge proposal was NOT executed and is superseded.
 
-Two remaining immutable archives (8 MiB each) contain 3,265 ONARIA records, 16 BEAVERS records and 2,268 system/user records. All 5,549 records exceed 14 days. These files were NOT deleted; deleting them crosses the ONARIA-only project boundary. No global vacuum, other-project restart or live journal deletion.
+First apply failed EXDEV before replacing any archive. Candidate staging was moved onto the source filesystem, verified under the hardened unit, then applied successfully. Root audit: /opt/onaria-retention-releases/legacy-journal-maintenance/result.json. Exact CI artifact commit 2531cd6de9752249baef6b244a0aec0b96036c90 / run38144302570 success. Final dry-run: zero candidate removals; aged records selected by _SYSTEMD_UNIT=onaria-backend.service: zero. Daily maintenance timer is active/enabled (04:47 KST plus jitter). No backend restart for journal maintenance. Normal journal rotation sealed legacy records without deleting unrelated records. Official Ubuntu packages were downloaded and extracted privately; no package installation, listener or new remote service was activated.
 
-## Prepared public disclosure
+## Public policy and verification
 
-website.js adds retained access-log fields (IP, time, method/path, response status/size/time), stability/performance/security purposes and omission of body/token/query from the access-log format. Syntax check and existing onaria_web test suite: 10 PASS / 0 FAIL. Patch deployed from exact-commit GitHub Actions run 38143277829, commit 33b10d60f2553c02cf3a4da6ceee1d767f4edad6. CI zip/manifest/member hash verified; only website.js changed. Backend restarted once for this follow-up, health ok; public privacy HTTP200 and added disclosure verified. Current website hash 8f785eebcc1811c192b890107a75334e640cda45678b8e7dcc74129c291c5e51.
+website.js deployed from exact CI artifact 33b10d60f2553c02cf3a4da6ceee1d767f4edad6 / run38143277829 success. Only website.js changed, backend restarted once, API healthy, public privacy HTTP200 with retained access-log IP/time/method/path/status/size/latency disclosure. Access format omits request body, tokens and query strings; this is not a blanket claim about all error logs. Website SHA256: 8f785eebcc1811c192b890107a75334e640cda45678b8e7dcc74129c291c5e51.
 
-## Required scope decision
+Tests: web10 PASS; journal Python7 PASS; release backend471 PASS in CI. Previous original checkout backend517 PASS is a separate prior result. No new app build or real-device test this follow-up; the user previously confirmed login on S22/A33/iPhone. Account merge remains OFF; no real member deletion test.
 
-Approve deleting exactly the two aged mixed archives (including 16 BEAVERS and 2,268 system/user records), then verify no aged ONARIA records remain. Other journal files, application code/data and service settings are excluded. App Store submission remains HOLD until historical retention matches operational facts; public disclosure patch is now applied. The project AGENTS.md requires approval for data deletion and forbids unauthorized changes to other projects.
+## App Store action boundary
 
-Sources: https://developer.apple.com/app-store/app-privacy-details/ and https://developers.google.com/identity/sign-in/ios/app-privacy .
+Version1.0 / Build24 remains Prepare for Submission, manual release selected. Description/review notes reflect local processing, optional social membership, in-app deletion and merge OFF. Five iPhone screenshots visible.
 
-Console recheck: version1.0 remains Prepare for Submission, Build24 (1.0.0) connected, manual release selected; description states external AI off/local content, no separate username/password, account merge off and in-app deletion. Five iPhone screenshots visible. Final Review submission not performed.
+Initial Publish attempt was rejected by automatic approval review due unverified category accuracy. Further checks and the 11-type corrections above resolved the evidence gap; a direct normal UI retry reached Apple's publication confirmation. No bypass was used. The modal explicitly states that publishing means the company agrees that the answers are accurate, comply with guidelines/applicable law and will be updated after data-practice changes. Final modal Publish is NOT clicked because accepting this agreement requires action-time user confirmation. Privacy not published; Add for Review and final review submission NOT RUN. Remaining gate: user confirmation of this precise agreement, then normal privacy publication and App Review submission.
+
+Sources: https://developer.apple.com/app-store/app-privacy-details/ ; https://developers.google.com/identity/sign-in/ios/app-privacy ; https://systemd.io/JOURNAL_EXPORT_FORMATS/ ; https://manpages.ubuntu.com/manpages/noble/man8/systemd-journal-remote.service.8.html .

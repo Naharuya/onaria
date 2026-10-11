@@ -13,12 +13,91 @@
     "onariaRecords": 3265,
     "beaversRecords": 16,
     "otherSystemOrUserRecords": 2268,
-    "allRecordsOlderThan14Days": true
+    "allRecordsOlderThan14Days": true,
+    "status": "SUPERSEDED_NOT_EXECUTED"
   },
   "appPrivacyDraftChanges": {
-    "otherUserContentLinked": true,
-    "performanceDataLinked": true,
-    "tracking": false,
+    "types": [
+      {
+        "type": "Name",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "members.name / GoogleSignIn"
+      },
+      {
+        "type": "Email",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "GoogleSignIn declaration"
+      },
+      {
+        "type": "Phone",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "members.phone / GoogleSignIn"
+      },
+      {
+        "type": "Coarse location",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "GoogleSignIn IP fraud prevention"
+      },
+      {
+        "type": "Sensitive info",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "optional members.church_name"
+      },
+      {
+        "type": "User ID",
+        "purpose": "Analytics + Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "SDK and member identity"
+      },
+      {
+        "type": "Device ID",
+        "purpose": "Analytics",
+        "linked": true,
+        "tracking": false,
+        "evidence": "GoogleSignIn declaration"
+      },
+      {
+        "type": "Other usage",
+        "purpose": "Analytics + Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "SDK and retained quota ledger"
+      },
+      {
+        "type": "Performance",
+        "purpose": "Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "nginx request_time associated with IP"
+      },
+      {
+        "type": "Other diagnostics",
+        "purpose": "Analytics + Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "operational metadata"
+      },
+      {
+        "type": "Other data",
+        "purpose": "Analytics + Functionality",
+        "linked": true,
+        "tracking": false,
+        "evidence": "GoogleSignIn and Kakao declarations"
+      }
+    ],
+    "otherUserContentCollected": false,
+    "reason": "request scoped, not stored; church affiliation covered by sensitive info",
     "published": false
   },
   "publicPolicyPatch": "Deployed from exact-commit CI artifact 33b10d60f2553c02cf3a4da6ceee1d767f4edad6; public privacy HTTP200 and added access-log fields verified",
@@ -26,12 +105,39 @@
     "web": {
       "pass": 10,
       "fail": 0
+    },
+    "journalPython": {
+      "pass": 7,
+      "fail": 0
+    },
+    "releaseBackend": {
+      "pass": 471,
+      "fail": 0
     }
   },
-  "releaseGate": "HOLD pending explicit shared archive deletion approval; App Privacy publish and final submission not run",
+  "releaseGate": "HOLD final modal publication agreement requires action-time user confirmation; privacy and review submission not run",
   "ci": {
     "run": 38143277829,
     "commit": "33b10d60f2553c02cf3a4da6ceee1d767f4edad6",
     "conclusion": "success"
-  }
+  },
+  "selectiveJournalCleanup": {
+    "removedOnariaEntries": 3265,
+    "retainedOtherEntries": 2284,
+    "otherEntriesRemoved": 0,
+    "retainedFieldsAndTimestampsVerified": true,
+    "addressMetadataRegenerated": true,
+    "agedOnariaApplicationEntriesRemaining": 0,
+    "timer": "active/enabled",
+    "commit": "2531cd6de9752249baef6b244a0aec0b96036c90",
+    "ciRun": 38144302570,
+    "firstApply": "EXDEV before any replacement; fixed same-filesystem staging"
+  },
+  "autoReview": {
+    "initial": "rejected due unverified category accuracy",
+    "followup": "evidence checked and categories corrected; direct retry allowed and reached agreement modal",
+    "bypass": false
+  },
+  "buildChanged": false,
+  "accountMergeEnabled": false
 }
