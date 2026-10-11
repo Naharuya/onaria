@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'member_record_scope.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -24,7 +26,7 @@ class _SecureMemberSessionPersistence implements MemberSessionPersistence {
   Future<void> delete(String key) => _storage.delete(key: key);
 }
 
-class MemberSessionStore {
+class MemberSessionStore extends ChangeNotifier {
   MemberSessionStore._({MemberSessionPersistence? persistence})
       : _persistence = persistence ?? const _SecureMemberSessionPersistence();
 
@@ -36,6 +38,21 @@ class MemberSessionStore {
   final MemberSessionPersistence _persistence;
   String? _token;
   DateTime? _expiresAt;
+  int _generation = 0;
+  Future<void>? _pendingPersistence;
+  bool _restorationFailed = false;
+  bool _disposed = false;
+  bool _persistenceFailed = false;
+  bool _cleanupFailed = false;
+  bool get persistenceFailed => _persistenceFailed;
+  bool get cleanupFailed => _cleanupFailed;
+  Future<bool> flush() async {
+    await _pendingPersistence;
+    return !_persistenceFailed && !_cleanupFailed;
+  }
+
+  DateTime? get expiresAt => _expiresAt;
+  bool get restorationFailed => _restorationFailed;
 
   static MemberSessionStore forTesting(MemberSessionPersistence persistence) =>
       MemberSessionStore._(persistence: persistence);
@@ -47,35 +64,47 @@ class MemberSessionStore {
     if (_token == null ||
         expiresAt == null ||
         !expiresAt.isAfter(DateTime.now().toUtc())) {
-      clear();
       return null;
     }
     return _token;
   }
 
   Future<void> restore() async {
+    final generation = ++_generation;
+    _restorationFailed = false;
     try {
+      await _pendingPersistence;
       final values = await Future.wait([
         _persistence.read(_tokenKey),
         _persistence.read(_expiresAtKey),
       ]);
+      if (generation != _generation) return;
       final storedToken = values[0];
       final expiresAt = DateTime.tryParse(values[1] ?? '')?.toUtc();
       if (!_validToken(storedToken) ||
           expiresAt == null ||
           !expiresAt.isAfter(DateTime.now().toUtc())) {
+        if (identical(this, instance)) MemberRecordScope.instance.signedOut();
         _token = null;
         _expiresAt = null;
-        await _deletePersisted();
+        _enqueue(_deletePersisted);
+        if (!_disposed) notifyListeners();
         return;
       }
+      if (identical(this, instance)) MemberRecordScope.instance.lock();
       _token = storedToken;
       _expiresAt = expiresAt;
+      if (!_disposed) notifyListeners();
     } catch (_) {
       // Secure storage problems must not prevent app startup or create a
       // partially authenticated state.
-      _token = null;
-      _expiresAt = null;
+      if (generation == _generation) {
+        _restorationFailed = true;
+        if (identical(this, instance)) MemberRecordScope.instance.lock();
+        _token = null;
+        _expiresAt = null;
+        if (!_disposed) notifyListeners();
+      }
     }
   }
 
@@ -85,23 +114,46 @@ class MemberSessionStore {
         expiresInSeconds > 90 * 24 * 60 * 60) {
       throw const FormatException('Invalid member session');
     }
+    if (identical(this, instance)) MemberRecordScope.instance.lock();
     _token = token;
+    _restorationFailed = false;
+    _generation++;
     _expiresAt =
         DateTime.now().toUtc().add(Duration(seconds: expiresInSeconds));
-    unawaited(_persist(token, _expiresAt!));
+    final expiresAt = _expiresAt!;
+    _enqueue(() => _persist(token, expiresAt));
+    if (!_disposed) notifyListeners();
   }
 
   void clear() {
+    final hadSession = _token != null || _restorationFailed;
+    if (identical(this, instance)) MemberRecordScope.instance.signedOut();
+    _generation++;
+    _restorationFailed = false;
     _token = null;
     _expiresAt = null;
-    unawaited(_deletePersisted());
+    _enqueue(_deletePersisted);
+    if (hadSession) if (!_disposed) notifyListeners();
+  }
+
+  void _enqueue(Future<void> Function() operation) {
+    final previous = _pendingPersistence;
+    final next =
+        previous == null ? operation() : previous.then((_) => operation());
+    _pendingPersistence = next;
+    unawaited(next.then((_) {
+      if (identical(_pendingPersistence, next)) _pendingPersistence = null;
+    }));
   }
 
   Future<void> _persist(String token, DateTime expiresAt) async {
     try {
       await _persistence.write(_tokenKey, token);
       await _persistence.write(_expiresAtKey, expiresAt.toIso8601String());
+      _persistenceFailed = false;
     } catch (_) {
+      _persistenceFailed = true;
+      if (!_disposed) notifyListeners();
       // The in-memory session remains usable for this app run. A future login
       // can retry persistence without weakening server-side authentication.
     }
@@ -113,9 +165,19 @@ class MemberSessionStore {
         _persistence.delete(_tokenKey),
         _persistence.delete(_expiresAtKey),
       ]);
+      _cleanupFailed = false;
+      _persistenceFailed = false;
     } catch (_) {
+      _cleanupFailed = true;
+      if (!_disposed) notifyListeners();
       // Best effort. Expiry is still enforced in memory and by the server.
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
   }
 
   static bool _validToken(String? token) =>

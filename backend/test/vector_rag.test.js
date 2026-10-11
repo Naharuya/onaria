@@ -29,7 +29,7 @@ const record = (overrides = {}) => ({ sourceId: 'protestant:test:1', tradition: 
     licenseStatus: 'self_authored', licenseNote: 'Written for this test', provenance: 'onaria test fixture', importedAt: '2026-09-07T00:00:00.000Z' }, ...overrides });
 const input = (records = [record()], overrides = {}) => ({ records, query: '위로', tradition: 'protestant', language: 'ko-KR', limit: 3, ...overrides });
 const body = (userMessage = '위로', religion) => ({ session: { sessionId: 'vector-rag', selectedEmotion: '불안', emotionIntensity: 6, turnCount: 1 },
-  userMessage, religion, systemPromptVersion: 'ko-v1', allowedVerseIds: [] });
+  userMessage, religion, systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [] });
 const env = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-only' };
 const quiet = { info() {}, warn() {} };
 const mockModel = async task => task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput();

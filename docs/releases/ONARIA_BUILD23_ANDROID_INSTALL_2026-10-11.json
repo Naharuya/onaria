@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-10-11T10:59:29.800Z",
+  "devices": [
+    {
+      "device": "R3CT10BVG6V",
+      "versionCode": "23",
+      "install": "PASS",
+      "launch": "PASS",
+      "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07"
+    },
+    {
+      "device": "RFCW1178RRE",
+      "versionCode": "23",
+      "install": "PASS",
+      "launch": "PASS",
+      "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "checkedAtKST": "2026-10-11 evening",
+  "serverVerified": "api.onaria.ai.kr maps to verified ari-prod-01",
+  "db": "/opt/onaria/backend/data/members.sqlite",
+  "mode": "sqlite mode=ro and query_only",
+  "memberCount": 3,
+  "members": [
+    {
+      "memberId": 4,
+      "providers": [
+        "google",
+        "kakao"
+      ],
+      "createdAtUTC": "2026-10-10 06:10:47"
+    },
+    {
+      "memberId": 5,
+      "providers": [
+        "apple"
+      ],
+      "createdAtUTC": "2026-10-11 10:32:27"
+    },
+    {
+      "memberId": 6,
+      "providers": [
+        "naver"
+      ],
+      "createdAtUTC": "2026-10-11 10:32:54"
+    }
+  ],
+  "orphanIdentities": 0,
+  "unmappedLegacyIdentities": 0,
+  "linkConflict": "409 IDENTITY_EXISTS when provider already belongs to another member",
+  "deployedLatestProofPolicy": false,
+  "originalPreSignupLinkFailure": "NOT DETERMINED",
+  "productionWrite": false
+}

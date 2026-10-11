@@ -64,6 +64,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>OnariaProviderConfig</key>
+	<string>$(ONARIA_KAKAO_NATIVE_APP_KEY)</string>
 	<key>NidClientID</key>
 	<string>$(NAVER_CLIENT_ID)</string>
 	<key>NidClientSecret</key>

@@ -1,3 +1,5 @@
+import 'package:onaria/app/ai_consent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 import 'package:onaria/app/api_config.dart';
@@ -22,8 +24,9 @@ class _PendingClient implements LlmApiClient {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    await SharedPreferencesAsync().setString(AiConsent.preferenceKey, AiConsent.version);
     for (final channel in ['flutter_tts', 'plugin.csdcorp.com/speech_to_text']) {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(MethodChannel(channel), (_) async => 1);
@@ -31,6 +34,25 @@ void main() {
   });
   tearDown(() {
     SharedPreferencesAsyncPlatform.instance = null;
+  });
+
+  testWidgets('refusing AI permission preserves input and sends no request', (tester) async {
+    await AiConsent.withdraw();
+    final client = _PendingClient();
+    await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
+      home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '내일 발표가 걱정돼요.');
+    await tester.tap(find.byTooltip('보내기'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(client.called, isFalse);
+    await tester.tap(find.text('전송하지 않기'));
+    await tester.pumpAndSettle();
+    expect(client.called, isFalse);
+    expect(tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      '내일 발표가 걱정돼요.');
+    expect(await AiConsent.isGranted(), isFalse);
   });
 
   testWidgets('slow responses show waiting state and render immediately on arrival', (tester) async {

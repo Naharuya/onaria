@@ -9,7 +9,7 @@ import { responseSchema } from '../src/schema.js';
 
 const psychology = { emotionSummary: '마음이 무거우시군요.', supportNeed: '안전한 돌봄', suggestedTone: 'gentle', avoid: ['치료 중단'] };
 const draft = { perspective: '자신을 탓하지 않고 돌보셔도 괜찮습니다.', guidance: '믿을 만한 사람에게 도움을 요청해 보세요.', reflectionQuestion: '어떤 도움이 필요하신가요?', sourceRefs: [], cautions: [] };
-const body = (userMessage, religion) => ({ session: { sessionId: 'specialization', selectedEmotion: '불안', emotionIntensity: 5, turnCount: 2 }, userMessage, religion, systemPromptVersion: 'ko-v1', allowedVerseIds: ['test-verse'] });
+const body = (userMessage, religion) => ({ session: { sessionId: 'specialization', selectedEmotion: '불안', emotionIntensity: 5, turnCount: 2 }, userMessage, religion, systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: ['test-verse'] });
 const messages = ['기독교에서 기도는 무엇인가요?', '가톨릭 성경과 성사를 알고 싶어요.', '불교의 연기는 무엇인가요?', '유대교 토라를 알고 싶어요.', '이슬람의 기도를 알려주세요.', '힌두교 다르마는 무엇인가요?', '유교의 효는 무엇인가요?'];
 for (const [index, id] of religionIds.entries()) test(`specialization: question routes to ${id} and uses common contract`, async () => {
   assert.equal(resolveReligion({ userMessage: messages[index] }).tradition, id);

@@ -1,20 +1,23 @@
+import { consentVersions } from './member_schema.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import Database from 'better-sqlite3';
 import { adminMember } from './member_schema.js';
+import { createAccountMergeStore } from './account_merge_store.js';
 
 const socialProviders = new Set(['apple', 'naver', 'kakao', 'google']);
 
-export function createMemberStore({ filename = path.resolve('data', 'members.sqlite') } = {}) {
+export function createMemberStore({ filename = path.resolve('data', 'members.sqlite'), mergeNow = Date.now } = {}) {
   fs.mkdirSync(path.dirname(filename), { recursive: true });
   const db = new Database(filename);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
+  db.pragma('secure_delete = ON');
   db.exec(`
     CREATE TABLE IF NOT EXISTS members (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      phone TEXT NOT NULL UNIQUE,
+      phone TEXT,
       church_name TEXT NOT NULL,
       login_provider TEXT NOT NULL DEFAULT 'phone',
       provider_user_id TEXT,
@@ -27,11 +30,14 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
       provider TEXT NOT NULL,
       provider_user_id TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE(provider, provider_user_id)
+      UNIQUE(provider, provider_user_id),
+      UNIQUE(member_id, provider)
     );
     CREATE INDEX IF NOT EXISTS member_identities_member_id
       ON member_identities(member_id);
   `);
+
+  const merge = createAccountMergeStore(db, { now: mergeNow });
 
   const memberColumns = new Set(db.prepare('PRAGMA table_info(members)').all().map(row => row.name));
   if (!memberColumns.has('terms_version')) db.exec("ALTER TABLE members ADD COLUMN terms_version TEXT");
@@ -43,10 +49,10 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     SELECT id, login_provider, provider_user_id
     FROM members
     WHERE provider_user_id IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM member_aliases WHERE source_id=members.id)
       AND login_provider IN ('apple', 'naver', 'kakao', 'google');
   `);
 
-  const findByPhone = db.prepare('SELECT * FROM members WHERE phone = ?');
   const findIdentity = db.prepare(`
     SELECT m.*
     FROM member_identities i
@@ -61,27 +67,26 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
     INSERT INTO member_identities (member_id, provider, provider_user_id)
     VALUES (?, ?, ?)
   `);
-  const countMembers = db.prepare('SELECT COUNT(*) AS count FROM members');
+  const countMembers = db.prepare('SELECT COUNT(*) AS count FROM members WHERE NOT EXISTS (SELECT 1 FROM member_aliases WHERE source_id=members.id)');
   const recentMembers = db.prepare(`
     SELECT id, name, phone, church_name, login_provider, created_at
-    FROM members ORDER BY id DESC LIMIT ?
+    FROM members WHERE NOT EXISTS (SELECT 1 FROM member_aliases WHERE source_id=members.id) ORDER BY id DESC LIMIT ?
   `);
   const insert = db.prepare(`
     INSERT INTO members (name, phone, church_name, login_provider, provider_user_id, terms_version, privacy_version, consented_at)
     VALUES (@name, @phone, @churchName, @loginProvider, @providerUserId, @termsVersion, @privacyVersion, @consentedAt)
   `);
-  const deleteById = db.prepare('DELETE FROM members WHERE id = ?');
   const listIdentitiesByMember = db.prepare('SELECT provider FROM member_identities WHERE member_id = ? ORDER BY provider');
   const deleteIdentity = db.prepare('DELETE FROM member_identities WHERE member_id = ? AND provider = ?');
   const findById = db.prepare('SELECT * FROM members WHERE id = ?');
 
   const transactionCreate = db.transaction(member => {
-    if (findByPhone.get(member.phone)) {
-      const error = new Error('이미 가입된 휴대폰 번호입니다. 기존 계정으로 로그인한 뒤 소셜 계정을 연결해 주세요.');
-      error.code = 'PHONE_EXISTS';
+    if (!member.phone && db.prepare('PRAGMA table_info(members)').all().find(column => column.name === 'phone').notnull) {
+      const error = new Error('선택 입력 가입을 위한 서버 업데이트가 필요합니다.');
+      error.code = 'PROFILE_SCHEMA_REQUIRED';
       throw error;
     }
-    const result = insert.run({ ...member, providerUserId: member.providerUserId ?? null, churchName: member.churchName ?? '', termsVersion: '2026-10-06', privacyVersion: '2026-10-06', consentedAt: new Date().toISOString() });
+    const result = insert.run({ ...member, name: member.name ?? '', phone: member.phone || null, providerUserId: member.providerUserId ?? null, churchName: member.churchName ?? '', termsVersion: consentVersions.terms, privacyVersion: consentVersions.privacy, consentedAt: new Date().toISOString() });
     const created = findById.get(result.lastInsertRowid);
     if (member.providerUserId && socialProviders.has(member.loginProvider)) {
       insertIdentity.run(created.id, member.loginProvider, member.providerUserId);
@@ -90,6 +95,9 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
   });
 
   return {
+    recordOwnerIds: merge.recordOwnerIds,
+    prepareMerge: merge.prepare,
+    confirmMerge: merge.confirm,
     create(member) {
       return transactionCreate(member);
     },
@@ -106,20 +114,32 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
         || typeof providerUserId !== 'string'
         || !providerUserId
         || providerUserId.length > 200) return null;
-      const member = findById.get(memberId);
-      if (!member) return null;
-      const owner = identityOwner.get(loginProvider, providerUserId);
-      if (owner && owner.member_id !== memberId) {
-        const error = new Error('이미 다른 회원 계정에 연결된 소셜 계정입니다.');
-        error.code = 'IDENTITY_EXISTS';
-        throw error;
-      }
-      if (!owner) insertIdentity.run(memberId, loginProvider, providerUserId);
-      return member;
+      return db.transaction(() => {
+        const member = findById.get(memberId);
+        if (!member || !merge.recordOwnerIds(memberId).length) return null;
+        const owner = identityOwner.get(loginProvider, providerUserId);
+        if (owner && owner.member_id !== memberId) {
+          const error = new Error('이미 다른 회원 계정에 연결된 소셜 계정입니다.');
+          error.code = 'IDENTITY_EXISTS';
+          throw error;
+        }
+        const existing = db.prepare('SELECT provider_user_id FROM member_identities WHERE member_id = ? AND provider = ?').get(memberId, loginProvider);
+        if (existing && existing.provider_user_id !== providerUserId) {
+          const error = new Error('이 로그인 수단에는 이미 다른 계정이 연결되어 있습니다.');
+          error.code = 'PROVIDER_ALREADY_LINKED';
+          throw error;
+        }
+        if (!owner) insertIdentity.run(memberId, loginProvider, providerUserId);
+        return member;
+      }).immediate();
     },
     deleteById(memberId) {
       if (!Number.isSafeInteger(memberId) || memberId < 1) return false;
-      return deleteById.run(memberId).changes === 1;
+      return merge.deleteFamily(memberId);
+    },
+    listIdentityDetails(memberId) {
+      if (!Number.isSafeInteger(memberId) || memberId < 1) return [];
+      return db.prepare('SELECT provider, provider_user_id AS providerUserId FROM member_identities WHERE member_id = ? ORDER BY provider').all(memberId);
     },
     listIdentities(memberId) {
       if (!Number.isSafeInteger(memberId) || memberId < 1) return [];
@@ -133,7 +153,11 @@ export function createMemberStore({ filename = path.resolve('data', 'members.sql
         error.code = 'LAST_IDENTITY';
         throw error;
       }
-      return deleteIdentity.run(memberId, provider).changes === 1;
+      return db.transaction(() => {
+        const removed = deleteIdentity.run(memberId, provider).changes === 1;
+        if (removed) db.prepare('UPDATE members SET provider_user_id=NULL WHERE id=? AND login_provider=?').run(memberId, provider);
+        return removed;
+      }).immediate();
     },
     getAdminOverview({ limit = 8 } = {}) {
       return {

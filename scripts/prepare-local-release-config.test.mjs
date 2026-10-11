@@ -18,10 +18,13 @@ test('trusted checkout uses original signing key and local pair without changing
   writeFileSync(join(source, 'android/key.properties'), signing);
   writeFileSync(join(source, 'android/fixture.jks'), 'fixture-only');
   writeFileSync(join(source, 'android/naver.properties'), 'naver.client_id=fixture-id\nnaver.client_secret=fixture-secret\n');
+  writeFileSync(join(source, 'android/kakao.properties'), 'ONARIA_KAKAO_NATIVE_APP_KEY=fixture-kakao\n');
   prepareLocalReleaseConfig(source, target);
   assert.equal(readFileSync(join(source, 'android/key.properties'), 'utf8'), signing);
   assert.ok(readFileSync(join(target, 'android/key.properties'), 'utf8').includes(`storeFile=${join(source, 'android/fixture.jks')}`));
   assert.ok(readFileSync(join(target, 'ios/Flutter/NaverKeys.xcconfig'), 'utf8').includes('NAVER_CLIENT_SECRET = fixture-secret'));
+  assert.equal(readFileSync(join(target, 'android/kakao.properties'), 'utf8'), 'ONARIA_KAKAO_NATIVE_APP_KEY=fixture-kakao\n');
+  if (process.platform !== 'win32') assert.equal(statSync(join(target, 'android/kakao.properties')).mode & 0o777, 0o600);
   if (process.platform !== 'win32') assert.equal(statSync(join(target, 'android/key.properties')).mode & 0o777, 0o600);
   assert.throws(() => prepareLocalReleaseConfig(source, source), /Distinct ONARIA/);
   writeFileSync(join(target, 'pubspec.yaml'), 'name: another_app\n');

@@ -1,0 +1,17 @@
+{
+  "project": "ONARIA",
+  "at": "2026-10-11T08:08:29.584Z",
+  "device": "A33 SM_A336N",
+  "serial": "RFCW1178RRE",
+  "method": "existing android-release.mjs checks + adb install -r; verified prebuilt APK",
+  "previousVersion": 20,
+  "installedVersion": "1.0.0+21",
+  "apkSha256": "4b64da7af2ce2286fdb208c62ca94c9eb04a489a8f970210811112901994e5e1",
+  "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07",
+  "install": "PASS",
+  "launch": "PASS",
+  "dataClear": false,
+  "uninstall": false,
+  "authE2E": "NOT RUN",
+  "productionChange": false
+}

@@ -1,0 +1,17 @@
+{
+  "project": "ONARIA",
+  "at": "2026-10-11T08:13:56.248484+00:00",
+  "device": "physical iPhone 15",
+  "previousBuild": 19,
+  "installedVersion": "1.0.0+21",
+  "signatureVerification": "PASS",
+  "provisioningVerification": "PASS",
+  "install": "PASS",
+  "launch": "PASS",
+  "uninstall": false,
+  "dataClear": false,
+  "authE2E": "NOT RUN",
+  "recordPreservation": "NOT VERIFIED",
+  "productionChange": false,
+  "signedRunnerSha256": "ae977e2deac2119e74aafac34300f21d1ca00fab0c6700729d00a0caaae27b1b"
+}

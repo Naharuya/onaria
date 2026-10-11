@@ -1,0 +1,23 @@
+[Unit]
+Description=ONARIA SQLite Backup
+After=onaria-backend.service
+ConditionPathIsDirectory=/opt/onaria/backend/data
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/onaria/backend
+Environment=ONARIA_DATA_DIR=/opt/onaria/backend/data
+Environment=ONARIA_BACKUP_DIR=/opt/onaria-periodic-backups
+ExecStart=/usr/bin/node /opt/onaria/backend/scripts/backup_databases.js
+UMask=0077
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/opt/onaria/backend/data
+ReadWritePaths=/opt/onaria-periodic-backups

@@ -17,10 +17,10 @@ export function prepareLocalReleaseConfig(source, target) {
   const signingTarget = resolve(target, 'android/key.properties');
   writeFileSync(signingTarget, properties, { mode: 0o600 });
   chmodSync(signingTarget, 0o600);
-  for (const name of ['android/naver.properties', '.onaria.local.env']) {
+  for (const name of ['android/naver.properties', 'android/kakao.properties', '.onaria.local.env']) {
     const from = resolve(source, name);
     if (!existsSync(from)) {
-      if (name === 'android/naver.properties') throw Error('Local Naver configuration missing');
+      if (name === 'android/naver.properties' || name === 'android/kakao.properties') throw Error('Local provider configuration missing');
       continue;
     }
     copyFileSync(from, resolve(target, name));

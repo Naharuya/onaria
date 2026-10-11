@@ -1,0 +1,13 @@
+{
+  "model": "A33",
+  "build": "24",
+  "launchOk": true,
+  "homeVisible": true,
+  "accountMenuState": [
+    "로그인됨 · Apple"
+  ],
+  "optionalMergeEntryVisible": true,
+  "mergeEntryEnabled": "false",
+  "mergeEntryClickable": "false",
+  "unhandledExceptionMarkers": 0
+}

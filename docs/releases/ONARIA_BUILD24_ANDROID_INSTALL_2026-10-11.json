@@ -1,0 +1,16 @@
+[
+  {
+    "device": "R3CT10BVG6V",
+    "build": "24",
+    "install": "PASS",
+    "launch": "PASS",
+    "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07"
+  },
+  {
+    "device": "RFCW1178RRE",
+    "build": "24",
+    "install": "PASS",
+    "launch": "PASS",
+    "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07"
+  }
+]

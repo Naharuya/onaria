@@ -54,4 +54,11 @@ ios/Flutter/NaverKeys.xcconfig
 # Local social login build values; never commit.
 .onaria.local.env
 android/naver.properties
+android/kakao.properties
 android/local.properties.before-*
+
+# 로컬 운영 접속 정보 — 공개 저장소 추적 금지
+/SSH_ACCESS.md
+
+# Local dependency directories or links are never release source.
+backend/node_modules

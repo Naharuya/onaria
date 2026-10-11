@@ -12,7 +12,7 @@ const psychology = { emotionSummary: '요즘 마음이 무겁게 느껴지시는
 const normal = (extra = {}) => ({ perspective: '지금 느끼는 마음을 판단하지 않고 돌아보셔도 좋겠습니다.',
   guidance: '원하시면 오늘 자신을 돌볼 작은 행동 하나를 정해 보세요.', reflectionQuestion: '지금 어떤 도움이 가장 필요하신가요?', sourceRefs: [], cautions: [], ...extra });
 const body = (religion = 'protestant', emotion = '불안') => ({ session: { sessionId: 'phase3', selectedEmotion: emotion, emotionIntensity: 6, turnCount: 1 },
-  userMessage: '복잡한 마음을 돌아보고 싶어요', systemPromptVersion: 'ko-v1', allowedVerseIds: [], religion });
+  userMessage: '복잡한 마음을 돌아보고 싶어요', systemPromptVersion: 'ko-v1', externalAiConsentVersion: 'openai-chat-v1', allowedVerseIds: [], religion });
 const env = { ONARIA_COST_ROUTER_V1_ENABLED: 'false', ONARIA_AI_MODE: 'openai', ONARIA_MULTI_AGENT_ENABLED: 'true', OPENAI_API_KEY: 'test-key', OPENAI_MODEL: 'test-model' };
 
 test('phase 3: psychology is an internal observation contract, not a final answer', () => {

@@ -1,0 +1,57 @@
+{
+  "head": "1aef3815c8e25022a948c4307e1c755e5cc8507b",
+  "version": "1.0.0",
+  "build": 20,
+  "backendTests": 489,
+  "flutterTests": 174,
+  "flutterSkipped": 1,
+  "analyzeErrors": 0,
+  "analyzeWarnings": 0,
+  "ios": {
+    "bundle": "com.onaria.app",
+    "team": "BJL8U6B46S",
+    "strictSignature": true
+  },
+  "artifacts": {
+    "build/app/outputs/flutter-apk/app-release.apk": {
+      "sha256": "a27d741109e8968695fabae7689d5e7aca3df8641d721297b04e8a31ba96094c",
+      "bytes": 63008120,
+      "phase": "A33 safe Naver SDK diagnostics",
+      "installedDevices": [
+        "A33"
+      ],
+      "sourceHashNaverService": "7ed97ca3fe119f7ef78aa6085ac2f5d2204c9775465358d6b9f5e007cb78c790"
+    },
+    "build/app/outputs/bundle/release/app-release.aab": {
+      "sha256": "b808da7c70a06f419b66ad155dc810b7f922da2fbdf1b7efca25dfda3736f76b",
+      "bytes": 61631755
+    }
+  },
+  "aabSignature": "PASS",
+  "sourceHashes": {
+    "backend/src/app.js": "5d49b47b9ff96ae6ae9e6887549a4aa39cc5150afc475dce7f6a1a6dd1db894c",
+    "backend/src/member_store.js": "988bbf2d0c7a04bde98d6a2c52b232f39275bc2a33c781ed4680ab20be6d0e31",
+    "backend/src/social_identity_migration.js": "66b1323bfaeac9fcf8a76bc9e55e253eadaa5cccc5289f7673f34179e748f089",
+    "backend/scripts/migrate_social_identities.js": "2bf41cababcac9ba2072e60b1bab46adcccdd16a41c181848e0d22b3d81c8e74",
+    "backend/src/server.js": "2a4e7d63b74e012e0cc8442d03e0cddbd6104e29ce30cf3227a48860a1b1b1a8",
+    "lib/features/signup_page.dart": "64fd305ddd407aa1cdf4538be7a5b397c42b84df997ac19a4fa508b37fe07f1f",
+    "lib/src/api/member_api_client.dart": "cbf98a1807e96e153ed166183b0456fbb90fa1b927814eec6da697ba5ec594ea",
+    "lib/features/account_menu.dart": "f26b04dcca8830d3e8a947d52e4a0afb1c7cec3f2b9e379b1987d5beeb44377e",
+    "lib/app/member_session_store.dart": "f3321899452c12035a7faa950c571b78081e4e386e788b593863a3e91f76b85d",
+    "pubspec.yaml": "620d3757ba7ef3e1d8ce96fa1004239c817ced59eefd88bf8d76fc856b6aa700"
+  },
+  "productionUpdatedFiles": [
+    "backend/src/app.js",
+    "backend/src/member_store.js",
+    "backend/src/social_identity_migration.js",
+    "backend/scripts/migrate_social_identities.js"
+  ],
+  "productionServerStartupFixDeployed": false,
+  "priorIdentityFinalApk": {
+    "sha256": "6144b65fad316f6315499d629d3a7603233e1def7877f8fbc6632a14f85c1f43",
+    "bytes": 63008120
+  },
+  "naverDiagnosticFocusedTests": 9,
+  "naverDiagnosticFullTests": 176,
+  "naverDiagnosticFullSkipped": 1
+}

@@ -8,8 +8,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../app/api_config.dart';
+import '../app/ai_consent.dart';
 import '../app/asset_loader.dart';
 import '../app/mind_card_store.dart';
+import '../app/verse_narration.dart';
 import '../onaria.dart';
 import '../engagement/engagement_controller.dart';
 import '../engagement/domain_events.dart';
@@ -19,6 +21,7 @@ import '../engagement/sharing/share_card.dart';
 import '../engagement/sharing/share_preview_page.dart';
 import 'growth_page.dart';
 import 'conversation_question_examples.dart';
+import 'emotion_situation_examples.dart';
 
 class _ChatItem {
   const _ChatItem(this.text,
@@ -72,89 +75,6 @@ class _ConversationPageState extends State<ConversationPage> {
   static const _cardTitle = '오늘의 마음 카드';
   static const _cardClosingMessage =
       '오늘 마음을 외면하지 않고 바라본 것만으로도 충분히 의미 있는 시간이었어요.';
-
-  static const _emotionSpecificPrompts = <EmotionType, List<String>>{
-    EmotionType.anxiety: [
-      '내일 있을 중요한 일이 자꾸 걱정돼요.',
-      '미래가 불투명해서 마음이 불안하고 떨려요.',
-      '갑자기 안 좋은 일이 생길까 봐 불안한 마음이 커요.'
-    ],
-    EmotionType.loneliness: [
-      '문득 세상에 나 혼자 남겨진 것 같은 기분이 들어요.',
-      '진심으로 내 마음을 이해해줄 사람이 없는 것 같아 외로워요.',
-      '혼자 있는 시간이 길어지니 마음이 공허해지네요.'
-    ],
-    EmotionType.exhaustion: [
-      '요즘 업무가 너무 많아 몸과 마음이 다 타버린 것 같아요.',
-      '아무것도 하고 싶지 않고 그저 쉬고만 싶어요.',
-      '반복되는 일상에 지쳐서 에너지가 하나도 없어요.'
-    ],
-    EmotionType.anger: [
-      '상대방이 무례하게 행동해서 화를 참기 힘들어요.',
-      '정당하지 못한 상황을 겪으니 너무 억울하고 화가 나요.',
-      '자꾸만 짜증이 나고 마음이 날카로워져 있어요.'
-    ],
-    EmotionType.sadness: [
-      '이유 없이 자꾸만 눈물이 나고 마음이 울적해요.',
-      '소중한 것을 잃어버린 것 같은 상실감이 커요.',
-      '가슴 한구석이 먹먹하고 슬픈 기분이 가시질 않아요.'
-    ],
-    EmotionType.complexity: [
-      '여러 가지 고민이 겹쳐서 머릿속이 너무 복잡해요.',
-      '내 마음을 나도 잘 모르겠어서 답답한 기분이에요.',
-      '어떤 선택을 해야 할지 몰라 마음이 갈팡질팡해요.'
-    ],
-    EmotionType.gratitude: [
-      '오늘 하루를 평안하게 보낼 수 있음에 감사해요.',
-      '주변 사람들의 따뜻한 말 한마디가 큰 힘이 되었어요.',
-      '작은 일에서도 감사를 발견하니 마음이 풍요로워지네요.'
-    ],
-    EmotionType.joy: [
-      '오랫동안 기다려온 기쁜 소식을 들었어요.',
-      '내가 좋아하는 일을 할 수 있어서 너무 즐거워요.',
-      '함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요.'
-    ],
-    EmotionType.fear: [
-      '새로운 도전을 앞두고 실패할까 봐 너무 무서워요.',
-      '안 좋은 일이 일어날 것 같은 예감에 마음이 졸여요.',
-      '어두운 밤이나 혼자 있는 상황이 두렵게 느껴질 때가 있어요.'
-    ],
-    EmotionType.disgust: [
-      '누군가의 비도덕적인 행동을 보고 마음이 상했어요.',
-      '정말 싫어하는 상황에 놓이게 되어 기분이 좋지 않아요.',
-      '받아들이기 힘든 일을 겪고 거부감이 강하게 들어요.'
-    ],
-    EmotionType.surprise: [
-      '생각지도 못한 깜짝 파티를 받아서 놀랐어요.',
-      '갑작스러운 변화에 어떻게 대처해야 할지 얼떨떨해요.',
-      '믿기지 않는 놀라운 이야기를 들어서 가슴이 두근거려요.'
-    ],
-    EmotionType.happiness: [
-      '날씨가 너무 좋아서 걷는 것만으로도 행복해요.',
-      '사랑하는 가족과 함께 맛있는 음식을 먹어 행복해요.',
-      '지금 이 평화로운 순간이 오래도록 유지되면 좋겠어요.'
-    ],
-    EmotionType.anticipation: [
-      '조만간 떠날 여행을 생각하니 벌써부터 설레요.',
-      '새로운 일을 시작하게 되어 기분 좋은 긴장감이 들어요.',
-      '내일은 어떤 즐거운 일이 생길지 기대하며 기다리고 있어요.'
-    ],
-    EmotionType.admiration: [
-      '아름다운 노을을 보며 자연의 신비로움에 감탄했어요.',
-      '누군가의 훌륭한 성품이나 성취를 보고 큰 감명을 받았어요.',
-      '예술 작품을 보며 말로 표현하기 힘든 감동을 느꼈어요.'
-    ],
-    EmotionType.overwhelmed: [
-      '너무 큰 사랑과 격려를 받아서 마음이 벅차올라요.',
-      '나에게 주어진 축복이 너무 과분하다는 생각이 들어요.',
-      '가슴이 꽉 찬 것 같은 벅찬 감동에 말을 잇기 힘들어요.'
-    ],
-    EmotionType.jealousy: [
-      '나보다 앞서가는 사람을 보니 자꾸 비교하게 돼요.',
-      '내가 갖고 싶던 걸 가진 친구를 보며 질투심이 생겨요.',
-      '타인의 행복이 마냥 축하해주기 힘들 때가 있어 괴로워요.'
-    ],
-  };
 
   static const _emotionSpecificActions = <EmotionType, List<String>>{
     EmotionType.anxiety: [
@@ -272,7 +192,7 @@ class _ConversationPageState extends State<ConversationPage> {
       answerExamples: assistant!.answerExamples,
       userMessage: _session.lastUserMessage ?? '',
       emotion: widget.emotion,
-      situationExamples: _emotionSpecificPrompts[widget.emotion] ?? const [],
+      situationExamples: emotionSituationExamples[widget.emotion] ?? const [],
     );
   }
 
@@ -356,6 +276,24 @@ class _ConversationPageState extends State<ConversationPage> {
         _session.turnCount >= _machine.maxCoreTurns) {
       return;
     }
+    // Crisis assistance stays local and never waits for an AI consent dialog.
+    final preflightTyped = _detector.assess(text);
+    final preflightCustom = _detector.assess(_customFeeling ?? '');
+    if (_client != null &&
+        !preflightTyped.isCrisis &&
+        !preflightCustom.isCrisis) {
+      // Prevent overlapping sends while a consent decision is pending.
+      setState(() => _busy = true);
+      bool accepted = false;
+      try {
+        accepted = await AiConsent.request(context);
+      } catch (_) {
+        // Storage or dialog failure must never authorize transmission.
+      }
+      if (!mounted) return;
+      setState(() => _busy = false);
+      if (!accepted) return;
+    }
     _controller.clear();
     setState(() {
       _items.add(_ChatItem(text, fromUser: true));
@@ -391,11 +329,13 @@ class _ConversationPageState extends State<ConversationPage> {
         widget.emotion,
         limit: 100,
       );
-      if (!mounted) return;
+      final consentGranted = await AiConsent.isGranted();
+      if (!mounted || !consentGranted) return;
       final response = await client.send(LlmConversationRequest(
         session: _session,
         userMessage: text,
         systemPromptVersion: 'ko-v1',
+        externalAiConsentVersion: AiConsent.version,
         allowedVerseIds:
             allowedVerses.map((verse) => verse.id).toList(growable: false),
         agentMode: _agentMode,
@@ -608,7 +548,7 @@ class _ConversationPageState extends State<ConversationPage> {
         if (!active()) return;
         setState(() => _isListening = false);
       }
-      await _tts.setSpeechRate(0.42);
+      await _tts.setSpeechRate(yunaNarrationRate);
       if (!active()) return;
       await _tts.setPitch(1.0);
       if (!active()) return;
@@ -629,7 +569,24 @@ class _ConversationPageState extends State<ConversationPage> {
         if (!active()) return;
         await _tts.setLanguage(segment.$1);
         if (!active()) return;
-        await _tts.speak(segment.$2);
+        if (segment.$1 == 'ko-KR') {
+          final voices = await _tts.getVoices;
+          if (!active()) return;
+          final yuna = yunaNarrationVoice(voices);
+          if (yuna != null) {
+            await _tts.setVoice(yuna);
+            if (!active()) return;
+          }
+        }
+        if (segment.$1 == 'ko-KR') {
+          await _tts.speak('${verse.koreanSpokenReference}.');
+          if (!active()) return;
+          await Future<void>.delayed(yunaNarrationReferencePause);
+          if (!active()) return;
+          await _tts.speak(verse.text);
+        } else {
+          await _tts.speak(segment.$2);
+        }
       }
     } catch (_) {
       if (active()) _showVoiceMessage('말씀을 재생하지 못했어요. 기기의 음성 설정을 확인해 주세요.');
@@ -1223,9 +1180,16 @@ class _ConversationPageState extends State<ConversationPage> {
             style: const TextStyle(
                 fontSize: 17, height: 1.8, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center),
+        const SizedBox(height: 8),
+        Text(
+            verse.translation == 'KRV'
+                ? '개역한글(1961) · 대한성서공회'
+                : verse.translation,
+            style: TextStyle(fontSize: 12, color: AppTheme.of(context).muted),
+            textAlign: TextAlign.center),
         if (verse.englishText.isNotEmpty) ...[
           const SizedBox(height: 16),
-          Text('English (NIV)',
+          Text('English (WEB) · eBible.org',
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

@@ -15,7 +15,7 @@ async function serve(t, options = {}) {
 }
 test('public routes have unique canonical SEO and do not disclose operational data', async t => {
   const base = await serve(t);
-  const publicPaths = ['/', '/about', '/services', '/traditions', '/privacy', '/account-deletion', '/terms'];
+  const publicPaths = ['/', '/about', '/services', '/traditions', '/privacy', '/account-deletion', '/terms', '/support'];
   for (const path of publicPaths) {
     const response = await fetch(base + path); const text = await response.text();
     assert.equal(response.status, 200); assert.match(text, /<html lang="ko">/);
@@ -43,6 +43,32 @@ test('public routes have unique canonical SEO and do not disclose operational da
   }
   for (const path of ['/.env', '/admin/.env', '/assets/.env', '/src/server.js', '/data/members.sqlite']) assert.equal((await fetch(base + path)).status, 404);
 });
+test('public privacy and deletion guidance describe current account and local-data boundaries', async t => {
+  const base = await serve(t);
+  const privacy = await (await fetch(base + '/privacy')).text();
+  const deletion = await (await fetch(base + '/account-deletion')).text();
+  const terms = await (await fetch(base + '/terms')).text();
+  for (const page of [privacy, deletion]) {
+    assert.match(page, /mailto:vjsjv7003@gmail\.com/);
+    assert.doesNotMatch(page, /vjsjv7003@naver\.com/);
+    assert.doesNotMatch(page, /삭제 기능을 열지 않습니다|문의처와 처리 절차는 정식 공개 전 확정/);
+  }
+  assert.match(privacy, /선택 입력/);
+  assert.match(privacy, /보유 기준은 14일/);
+  assert.match(privacy, /사용량 원장은.*62일/);
+  assert.match(privacy, /최신 삭제 명부/);
+  assert.match(privacy, /소셜 로그인 제공자와 SDK/);
+  assert.doesNotMatch(privacy, /확정된 보유기간.*대조해야/);
+  assert.match(privacy, /회원탈퇴가 서버에서 확인되면 이 기기의 해당 계정 기록을 삭제/);
+  assert.match(deletion, /Apple 본인 확인/);
+  assert.match(deletion, /계정 소유 확인 없이/);
+  assert.match(deletion, /홈 메뉴의 계정 관리에서 회원탈퇴/);
+  assert.doesNotMatch(deletion, /홈 메뉴의 개인정보·회원탈퇴/);
+  assert.match(terms, /만 18세 이상/);
+  assert.match(terms, /무료로 제공/);
+  assert.match(terms, /앱 내 구매·유료 구독·결제 기능은 제공하지 않습니다/);
+});
+
 test('production rejects plain HTTP and untrusted spoofed proxy headers, including legacy bearer', async t => {
   const base = await serve(t, { production: true });
   for (const path of ['/admin', '/admin/admin.js', '/v1/admin/overview', '/v1/admin/session']) {
@@ -128,4 +154,25 @@ test('session cost percentiles group calls without exposing identifiers or treat
   assert.equal(unknown.sessionCosts.p50CostUsd, null);
   assert.equal(unknown.sessionCosts.p90CostUsd, null);
   assert.equal(modelUsageSample({ entries: () => [] }).sessionCosts.p50CostUsd, null);
+});
+
+test('homepage matches app flow, account boundaries, consent and Bible source without release promises', async t => {
+  const base = await serve(t); const html = await (await fetch(base + '/')).text();
+  for (const text of ['마음 선택 → 마음대화 →', '네이버 · Google · 카카오 · Apple', '같은 휴대폰 번호만으로 자동 연결하지', '계정 관리 → 회원탈퇴', 'Apple 본인확인', '회원탈퇴와 기기 기록 삭제는 별개', '개역한글판', 'World English Bible(WEB)', 'eBible.org', '허용한 경우에만 외부 AI', '외부 AI 호출을 기다리지 않고', '일반 공개 스토어 출시 전']) assert.ok(html.includes(text), text);
+  assert.doesNotMatch(html, /NIV|지금 다운로드|전체 데이터 1년 자동 파기 완료/);
+  assert.equal((html.match(/class="step-number"/g) || []).length, 3);
+  assert.match(html, /href="\/account-deletion"/);
+});
+
+test('support page is public, canonical and links account/privacy/help paths', async t => {
+  const base = await serve(t);
+  const response = await fetch(base + '/support');
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<h1>고객지원<\/h1>/);
+  assert.match(html, /mailto:vjsjv7003@gmail\.com/);
+  assert.match(html, /href="\/account-deletion"/);
+  assert.match(html, /href="\/privacy"/);
+  assert.match(html, /href="\/terms"/);
+  assert.match(html, /rel="canonical" href="https:\/\/onaria\.ai\.kr\/support"/);
 });

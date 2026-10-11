@@ -33,6 +33,16 @@ require(naverClientId != naverClientSecret) {
     "Naver Client ID and Client Secret must be different; check android/naver.properties locally"
 }
 
+val kakaoProperties = Properties()
+val kakaoPropertiesFile = rootProject.file("kakao.properties")
+if (kakaoPropertiesFile.exists()) {
+    kakaoPropertiesFile.inputStream().use { kakaoProperties.load(it) }
+}
+val kakaoNativeAppKey = kakaoProperties.getProperty("ONARIA_KAKAO_NATIVE_APP_KEY")?.trim().orEmpty()
+require(kakaoNativeAppKey.isNotEmpty()) {
+    "Configure ONARIA_KAKAO_NATIVE_APP_KEY in ignored android/kakao.properties"
+}
+
 android {
     namespace = "com.onaria.app"
     compileSdk = flutter.compileSdkVersion
@@ -62,6 +72,7 @@ android {
         versionName = flutter.versionName
         resValue("string", "naver_client_id", naverClientId)
         resValue("string", "naver_client_secret", naverClientSecret)
+        resValue("string", "onaria_provider_config", kakaoNativeAppKey)
     }
 
     signingConfigs {

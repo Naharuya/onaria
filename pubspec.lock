@@ -594,10 +594,9 @@ packages:
   naver_login_flutter:
     dependency: "direct main"
     description:
-      name: naver_login_flutter
-      sha256: "1e9e6ab74ccf0680a9c6340dc053b5cb30db1f21ff716d2a067be6450bf863c9"
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/naver_login_flutter"
+      relative: true
+    source: path
     version: "4.0.0"
   node_preamble:
     dependency: transitive

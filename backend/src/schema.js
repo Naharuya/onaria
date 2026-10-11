@@ -29,6 +29,7 @@ export const requestSchema = z.object({
   agentMode: z.enum(agentIds).default('auto'),
   verseLanguage: z.enum(['korean', 'english', 'bilingual']).default('bilingual'),
   religion: religionSchema.optional(),
+  externalAiConsentVersion: z.string().max(80).optional(),
 }).strict();
 
 export const responseSchema = z.object({

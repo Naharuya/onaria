@@ -12,6 +12,14 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "onaria/config")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "providerConfig") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                result.success(getString(R.string.onaria_provider_config))
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "onaria/image_export")
             .setMethodCallHandler { call, result ->
                 if (call.method != "saveImage") {

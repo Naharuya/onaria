@@ -63,8 +63,13 @@ class KakaoLoginService {
     }
     try {
       idToken ??= await gateway.loginWithAccount(nonce: nonce);
-    } catch (error) {
-      throw KakaoLoginException('카카오 인증 오류: $error');
+    } on KakaoClientException catch (error) {
+      if (error.reason == ClientErrorCause.cancelled) {
+        throw const KakaoLoginException('카카오 로그인이 취소되었습니다.');
+      }
+      throw const KakaoLoginException('카카오 인증을 완료하지 못했어요. 다시 시도해 주세요.');
+    } catch (_) {
+      throw const KakaoLoginException('카카오 인증을 완료하지 못했어요. 다시 시도해 주세요.');
     }
     if (idToken == null || idToken.isEmpty) {
       throw const KakaoLoginException('카카오 인증 정보를 확인하지 못했습니다.');

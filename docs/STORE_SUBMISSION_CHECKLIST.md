@@ -1,8 +1,9 @@
 # ONARIA MVP Store Submission Checklist
 
-기준일: 2026-09-21
+기준일: 2026-10-07
 
 이 문서는 ONARIA MVP를 Google Play와 Apple App Store에 등록하기 위한 실행 체크리스트다.
+2026-10-07 최신 준비물은 `docs/releases/APP_STORE_SUBMISSION_PACKAGE_2026-10-07.md`를 따른다. 콘솔에서 확인되지 않은 체크 항목은 미완료로 유지한다.
 운영 서버 변경과 스토어 심사 제출은 최종 Preflight 및 사용자 승인 후 진행한다.
 
 ## 1. 현재 확정된 앱 정보
@@ -10,7 +11,7 @@
 - 앱 이름: ONARIA
 - Android applicationId: `com.onaria.app`
 - iOS bundle ID: `com.onaria.app`
-- 현재 앱 버전: `0.4.1+6`
+- 소스/Release 후보 버전: `1.0.0+19`. 2026-10-10 iPhone/Android 실기기에 Release `1.0.0(19)` 설치 후 Naver·Google·Kakao·Apple 로그인/세션 유지, 계정 연결, 회원탈퇴·세션 폐기·재가입 E2E를 검증했다. Production 배포와 스토어 제출은 아직 하지 않았다.
 - Production API: `https://api.onaria.ai.kr`
 - Website: `https://onaria.ai.kr`
 - Privacy URL: `https://onaria.ai.kr/privacy`
@@ -32,10 +33,10 @@
 - [x] applicationId = `com.onaria.app`
 - [x] targetSdk = 36
 - [x] compileSdk = 36
-- [ ] 신규 upload keystore 생성 또는 기존 정식 키 복원 정책 확정
-- [ ] Release AAB 생성
+- [x] 기존 정식 서명과 설치 APK 인증서 동일성 확인(build18). 키 교체/신규 생성 없음. 최종 AAB/Play App Signing 지문 대조는 별도 미완료.
+- [x] Release AAB 생성 — 1.0.0(19), app-release.aab 약61.6MB
 - [ ] AAB non-debuggable 확인
-- [ ] Production API 포함 확인
+- [x] Production API 포함 확인 — 기본 https://api.onaria.ai.kr, Release HTTP/IP/loopback 차단
 - [ ] Play App Signing 등록
 - [ ] versionCode 중복 여부 확인
 
@@ -109,7 +110,7 @@
 ### 현재 데이터 경로
 - 마음대화 입력/최근 대화 맥락: 서버 전송
 - 외부 AI 활성 시 필요한 대화 맥락: AI 제공자 전달 가능
-- 회원가입: 이름, 휴대폰 번호, 선택 교회명
+- 회원가입: 소셜 식별자 및 선택 이름·휴대폰 번호·교회명
 - 마음카드: 일부 기기 로컬 저장
 - 감정카드 사용 빈도/키워드: 현재 기기 로컬
 - AI 사용량: 토큰/비용 추정/가명 식별자 가능
@@ -122,7 +123,7 @@
 ### 수집 가능 데이터
 - 사용자 제공 텍스트 대화
 - 음성 입력은 STT 처리 후 텍스트로 사용
-- 회원가입 시 이름/전화번호/교회명
+- 회원가입 소셜 식별자, 선택 입력 이름/전화번호/교회명
 - AI usage metadata
 - 안전 분류 metadata
 
@@ -136,13 +137,14 @@
 ### 확인이 필요한 항목
 - [ ] 외부 AI 제공자에게 전송되는 정확한 데이터 항목
 - [ ] 국외 이전 국가/법인/보유기간
-- [x] 정책상 기본 보유기간: 1년
+- [ ] 전체 데이터 1년 보유·자동 파기: 미구현, 공개 보장 금지
+- [ ] 개인정보 기본 보유기간 1년 기준: 데이터별 시작점·만료 작업·실행 주기·활성 계정/법정 보유 등 예외와 백업 복원 처리 확정 및 검증. 현재 회원 자동 파기/정시 작업이 없으므로 기준 충족으로 표시하지 않음.
 - [ ] 회원 DB 1년 자동 파기 구현 및 테스트
-- [ ] 탈퇴/삭제 요청 처리
+- [x] 앱 회원탈퇴/삭제 요청 처리 및 iPhone/Android 실기기 E2E 검증 (Apple 연결 시 재인증 포함)
 - [ ] analytics가 실제 production에서 켜지는지
-- [ ] crash reporting/analytics SDK 존재 여부
-- [ ] 데이터 암호화/전송 HTTPS 확인
-- [ ] 계정 삭제 기능 제공 방식
+- [x] crash reporting/analytics SDK 존재 여부 — 현재 Firebase Analytics/Crashlytics/Sentry/Mixpanel/Amplitude/AppCenter/Datadog/New Relic 미확인
+- [x] 데이터 전송 HTTPS 확인 — Release API endpoint HTTPS 강제; 저장 데이터 암호화 여부는 별도 운영 검토
+- [x] 계정 삭제 기능 제공 방식 — 앱 계정 관리에서 본인 인증 기반 회원탈퇴, Apple 연결 시 재인증
 
 ## 6. 법적 문서 출시 전 확정 필요
 
@@ -152,13 +154,13 @@
 - [x] 대표자명: 조세진
 - [ ] 사업자등록번호 (해당 시)
 - [ ] 주소
-- [x] 개인정보 보호 문의 이메일: vjsjv7003@naver.com
-- [x] 고객지원 이메일: vjsjv7003@naver.com
-- [x] 개인정보 기본 보유기간: 1년
-- [ ] 안전한 본인확인 기반 회원 탈퇴/삭제 절차 구현
-- [x] 현재 ONARIA가 직접 설정한 서버/AI·클라우드 기준 국외이전 없음
+- [x] 개인정보 보호 문의 이메일: vjsjv7003@gmail.com
+- [x] 고객지원 이메일: vjsjv7003@gmail.com
+- [ ] DB·세션·사용량·운영 로그·백업별 보유기간 및 실제 파기 검증
+- [x] 안전한 본인확인 기반 회원 탈퇴/삭제 절차 구현 및 양 플랫폼 실기기 검증
+- [ ] 운영 AI·클라우드·로그·음성 플랫폼 데이터 흐름 기준 국외이전 여부 확인 (기존 없음 기록을 현재 운영 검증으로 간주하지 않음)
 - [ ] 향후 해외 서비스 도입 확정 시 실제 이전 전 정책·Data Safety 재검토
-- [ ] 만 14세 미만 이용 정책
+- [x] 첫 출시 만 18세 이상 성인 대상 (사용자 확인); 스토어 연령 등급 설정 별도 검증
 - [ ] 분쟁/준거법/서비스 중단 안내
 
 ## 7. 스토어 설명 초안
@@ -196,20 +198,20 @@ ONARIA는 의료 진단, 치료, 전문 상담 또는 종교기관의 공식 자
 
 ## 9. 제출 전 최종 기술 Gate
 
-- [ ] `flutter pub get`
-- [ ] `flutter test`
-- [ ] `flutter analyze lib test example --no-fatal-infos`
+- [x] `flutter pub get`
+- [x] `flutter test` — 166 PASS / 1 SKIPPED
+- [x] `flutter analyze lib test example --no-fatal-infos` — error0/warning0/info17, exit0
 - [ ] Android debug build
-- [ ] Android release AAB
+- [x] Android release AAB — 1.0.0(19)
 - [ ] iOS simulator compile
 - [ ] iOS archive/TestFlight build
-- [ ] backend tests
+- [x] backend tests — 477 PASS / 0 FAIL
 - [ ] Website/Admin E2E
-- [ ] production /health
+- [x] production /health — 내부/외부 200, 현재 응답 {status:ok}
 - [ ] normal AI roundtrip
 - [ ] crisis provider-call delta 0
 - [ ] 개인정보/약관 실제 운영정보 일치
-- [ ] secret scan
+- [x] secret scan — Release 후보 patch에서 Kakao/Naver/Android signing 실제 값 미포함 확인
 - [ ] 최종 commit SHA 고정
 
 ## 10. 사람의 입력이 반드시 필요한 항목

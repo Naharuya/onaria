@@ -5,9 +5,11 @@ import '../engagement/engagement_controller.dart';
 import '../engagement/engagement_page.dart';
 import '../engagement/notifications/reminder_controller.dart';
 import '../features/check_in_page.dart';
+import '../features/account_menu.dart';
 import 'app_theme.dart';
 import 'social_auth_config.dart';
 import 'theme_controller.dart';
+import 'member_record_scope.dart';
 
 class OnariaApp extends StatefulWidget {
   const OnariaApp({
@@ -27,17 +29,33 @@ class OnariaApp extends StatefulWidget {
 
 class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
   final _theme = ThemeController();
-  final _navigator = GlobalKey<NavigatorState>();
-  late final _engagement = widget.engagement ?? EngagementController();
+  var _navigator = GlobalKey<NavigatorState>();
+  late var _engagement = widget.engagement ?? EngagementController();
 
   @override
   void initState() {
     super.initState();
+    MemberRecordScope.instance.addListener(_recordAccountChanged);
     _theme.load();
     WidgetsBinding.instance.addObserver(this);
     _engagement.reminders.onTap = _openReminder;
     unawaited(_engagement.load());
     unawaited(_engagement.visit());
+  }
+
+  void _recordAccountChanged() {
+    if (!mounted) return;
+    // Discard routes, controllers and in-memory summaries from the old account.
+    final old = _engagement;
+    old.reminders.onTap = null;
+    unawaited(old.reminders.gateway.cancelAll().catchError((Object _) {}));
+    if (widget.engagement == null) old.dispose();
+    setState(() {
+      _navigator = GlobalKey<NavigatorState>();
+      _engagement = widget.engagement ?? EngagementController();
+    });
+    _engagement.reminders.onTap = _openReminder;
+    unawaited(_engagement.load());
   }
 
   void _openReminder(ReminderKind kind) {
@@ -76,6 +94,7 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    MemberRecordScope.instance.removeListener(_recordAccountChanged);
     _theme.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _engagement.reminders.onTap = null;
@@ -94,7 +113,30 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
                   navigatorKey: _navigator,
                   debugShowCheckedModeBanner: false,
                   theme: AppTheme.forColor(color),
-                  home: widget.homeOverride ?? const CheckInPage(),
+                  home: widget.homeOverride ??
+                      (MemberRecordScope.instance.locked
+                          ? const Scaffold(
+                              body: SafeArea(
+                                child: Column(children: [
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: AccountMenuButton(),
+                                  ),
+                                  Expanded(
+                                    child: Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(24),
+                                        child: Text(
+                                          '계정을 확인한 뒤 기록을 열 수 있어요.\n메뉴에서 로그인 상태를 다시 확인해 주세요.',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ]),
+                              ),
+                            )
+                          : const CheckInPage()),
                   initialRoute: '/',
                 )));
   }

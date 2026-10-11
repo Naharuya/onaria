@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily ONARIA retention maintenance
+
+[Timer]
+OnCalendar=*-*-* 04:17:00 Asia/Seoul
+Persistent=true
+RandomizedDelaySec=10m
+Unit=onaria-retention.service
+
+[Install]
+WantedBy=timers.target

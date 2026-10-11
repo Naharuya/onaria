@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily ONARIA historical journal cleanup
+
+[Timer]
+OnCalendar=*-*-* 04:47:00 Asia/Seoul
+RandomizedDelaySec=10min
+Persistent=true
+Unit=onaria-legacy-journal-retention.service
+
+[Install]
+WantedBy=timers.target

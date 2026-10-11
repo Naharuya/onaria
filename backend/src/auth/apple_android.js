@@ -46,7 +46,7 @@ export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verif
       if (!identity || identity.provider !== 'apple' || typeof identity.providerUserId !== 'string'
         || !identity.providerUserId || identity.providerUserId.length > 200) throw new IdentityError();
       const proof = prefix + random();
-      proofs.set(proof, { identity: Object.freeze({ provider: 'apple', providerUserId: identity.providerUserId }), expires: now() + ttl });
+      proofs.set(proof, { authorizationCode: body.code, credential: body.id_token, identity: Object.freeze({ provider: 'apple', providerUserId: identity.providerUserId }), expires: now() + ttl });
       // Do not place the Apple JWT, authorization code, email or name in an
       // Android intent URL. The SDK returns this temporary proof as id_token.
       return intent({ state: body.state, id_token: proof, code: proof });
@@ -57,6 +57,12 @@ export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verif
       const stored = proofs.get(proof);
       if (!stored) throw new IdentityError();
       return stored.identity;
+    },
+    consumeGrant(proof) {
+      api.resolve(proof);
+      const stored = proofs.get(proof);
+      proofs.delete(proof);
+      return { authorizationCode: stored.authorizationCode, credential: stored.credential };
     },
     router() {
       const router = express.Router();

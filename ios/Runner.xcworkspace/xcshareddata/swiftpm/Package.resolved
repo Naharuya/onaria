@@ -73,6 +73,15 @@
       }
     },
     {
+      "identity" : "naveridlogin-sdk-ios-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/naver/naveridlogin-sdk-ios-swift.git",
+      "state" : {
+        "revision" : "70f0cecb996768b3f6df88ec72567e3c5dee1035",
+        "version" : "5.2.1"
+      }
+    },
+    {
       "identity" : "promises",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/promises.git",

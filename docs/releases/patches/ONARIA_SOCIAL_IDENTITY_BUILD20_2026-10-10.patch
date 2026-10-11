@@ -1,0 +1,406 @@
+--- a/backend/src/member_store.js
++++ b/backend/src/member_store.js
+@@ -27,7 +27,8 @@
+       provider TEXT NOT NULL,
+       provider_user_id TEXT NOT NULL,
+       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-      UNIQUE(provider, provider_user_id)
++      UNIQUE(provider, provider_user_id),
++      UNIQUE(member_id, provider)
+     );
+     CREATE INDEX IF NOT EXISTS member_identities_member_id
+       ON member_identities(member_id);
+@@ -105,16 +106,24 @@
+         || typeof providerUserId !== 'string'
+         || !providerUserId
+         || providerUserId.length > 200) return null;
+-      const member = findById.get(memberId);
+-      if (!member) return null;
+-      const owner = identityOwner.get(loginProvider, providerUserId);
+-      if (owner && owner.member_id !== memberId) {
+-        const error = new Error('이미 다른 회원 계정에 연결된 소셜 계정입니다.');
+-        error.code = 'IDENTITY_EXISTS';
+-        throw error;
+-      }
+-      if (!owner) insertIdentity.run(memberId, loginProvider, providerUserId);
+-      return member;
++      return db.transaction(() => {
++        const member = findById.get(memberId);
++        if (!member) return null;
++        const owner = identityOwner.get(loginProvider, providerUserId);
++        if (owner && owner.member_id !== memberId) {
++          const error = new Error('이미 다른 회원 계정에 연결된 소셜 계정입니다.');
++          error.code = 'IDENTITY_EXISTS';
++          throw error;
++        }
++        const existing = db.prepare('SELECT provider_user_id FROM member_identities WHERE member_id = ? AND provider = ?').get(memberId, loginProvider);
++        if (existing && existing.provider_user_id !== providerUserId) {
++          const error = new Error('이 로그인 수단에는 이미 다른 계정이 연결되어 있습니다.');
++          error.code = 'PROVIDER_ALREADY_LINKED';
++          throw error;
++        }
++        if (!owner) insertIdentity.run(memberId, loginProvider, providerUserId);
++        return member;
++      }).immediate();
+     },
+     deleteById(memberId) {
+       if (!Number.isSafeInteger(memberId) || memberId < 1) return false;
+--- a/backend/src/app.js
++++ b/backend/src/app.js
+@@ -208,7 +208,7 @@
+         linked: !owner,
+       });
+     } catch (error) {
+-      if (error.code === 'IDENTITY_EXISTS') {
++      if (error.code === 'IDENTITY_EXISTS' || error.code === 'PROVIDER_ALREADY_LINKED') {
+         return res.status(409).json({ code: error.code, message: error.message });
+       }
+       return next(error);
+--- /dev/null
++++ b/backend/src/social_identity_migration.js
+@@ -0,0 +1,51 @@
++import { createHash } from 'node:crypto';
++import { migrateOptionalProfiles } from './optional_profile_migration.js';
++
++function unique(db, table, names) {
++  return db.pragma(`index_list('${table}')`).some(index => {
++    if (!index.unique || index.partial) return false;
++    const escaped = index.name.replaceAll("'", "''");
++    return JSON.stringify(db.pragma(`index_info('${escaped}')`).map(row => row.name)) === JSON.stringify(names);
++  });
++}
++export function checkSocialIdentitySchema(db) {
++  const phone = db.pragma('table_info(members)').find(row => row.name === 'phone');
++  if (!phone) throw new Error('Unsupported member schema');
++  const duplicateGroups = db.prepare('SELECT COUNT(*) AS n FROM (SELECT member_id, provider FROM member_identities GROUP BY member_id, provider HAVING COUNT(*) > 1)').get().n;
++  if (duplicateGroups) throw new Error('Duplicate member/provider ownership requires explicit review; no rows changed');
++  if (db.pragma('integrity_check', { simple: true }) !== 'ok' || db.pragma('foreign_key_check').length) throw new Error('Database integrity check failed');
++  return {
++    phoneNullable: !phone.notnull,
++    phoneUnique: unique(db, 'members', ['phone']),
++    identityUnique: unique(db, 'member_identities', ['provider', 'provider_user_id']),
++    memberProviderUnique: unique(db, 'member_identities', ['member_id', 'provider']),
++    members: db.prepare('SELECT COUNT(*) AS n FROM members').get().n,
++    identities: db.prepare('SELECT COUNT(*) AS n FROM member_identities').get().n,
++  };
++}
++function snapshot(db) {
++  // Internal digest only. Never emit member/profile/identity contents.
++  return createHash('sha256').update(JSON.stringify({
++    members: db.prepare('SELECT * FROM members ORDER BY id').all(),
++    identities: db.prepare('SELECT * FROM member_identities ORDER BY id').all(),
++    sequences: db.prepare("SELECT name, seq FROM sqlite_sequence WHERE name IN ('members','member_identities') ORDER BY name").all(),
++  })).digest('hex');
++}
++export function migrateSocialIdentities(db) {
++  const before = checkSocialIdentitySchema(db);
++  if (before.phoneNullable && !before.phoneUnique && before.identityUnique && before.memberProviderUnique) return false;
++  if (!before.identityUnique) throw new Error('Unsupported identity ownership schema');
++  const digest = snapshot(db);
++  db.pragma('foreign_keys = OFF');
++  try {
++    db.transaction(() => {
++      // Nested transaction keeps both changes atomic; helper re-enables FK afterwards.
++      migrateOptionalProfiles(db);
++      db.exec('CREATE UNIQUE INDEX IF NOT EXISTS member_identities_member_provider_unique ON member_identities(member_id, provider)');
++      if (snapshot(db) !== digest) throw new Error('Migration changed existing data or sequences');
++      const after = checkSocialIdentitySchema(db);
++      if (!after.phoneNullable || after.phoneUnique || !after.memberProviderUnique) throw new Error('Migration postcondition failed');
++    }).immediate();
++  } finally { db.pragma('foreign_keys = ON'); }
++  return true;
++}
+--- /dev/null
++++ b/backend/scripts/migrate_social_identities.js
+@@ -0,0 +1,23 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import Database from 'better-sqlite3';
++import { checkSocialIdentitySchema, migrateSocialIdentities } from '../src/social_identity_migration.js';
++
++const [mode, filename, backup] = process.argv.slice(2);
++if (!['--check', '--apply'].includes(mode) || !path.isAbsolute(filename ?? '') || !fs.existsSync(filename)
++  || (mode === '--apply' && (!path.isAbsolute(backup ?? '') || fs.existsSync(backup) || backup === filename))) {
++  throw new Error('Usage: --check /absolute/members.sqlite OR --apply /absolute/members.sqlite /absolute/new-backup.sqlite');
++}
++const db = new Database(filename, { readonly: mode === '--check', fileMustExist: true });
++try {
++  const before = checkSocialIdentitySchema(db);
++  const required = !before.phoneNullable || before.phoneUnique || !before.memberProviderUnique;
++  if (mode === '--apply' && required) {
++    await db.backup(backup);
++    fs.chmodSync(backup, 0o600);
++    const backupDb = new Database(backup, { readonly: true, fileMustExist: true });
++    try { checkSocialIdentitySchema(backupDb); } finally { backupDb.close(); }
++    migrateSocialIdentities(db);
++  }
++  console.log(JSON.stringify({ mode, required, changed: mode === '--apply' && required, before, after: checkSocialIdentitySchema(db) }));
++} finally { db.close(); }
+--- a/backend/test/provider_account_link.test.js
++++ b/backend/test/provider_account_link.test.js
+@@ -96,3 +96,29 @@
+     assert.equal(store.findByProviderIdentity('naver', 'naver:second').id, signup.json.member.id);
+   });
+ });
++
++test('unknown identity and invalid link sessions fail closed without mutation',async()=>{
++ await fixture(async({base,store,member})=>{
++ const unknown=await post(base,'/v1/auth/provider/session',{provider:'naver',credential:'unknown'});
++ assert.equal(unknown.response.status,404);assert.equal(unknown.json.code,'PROVIDER_IDENTITY_NOT_FOUND');
++ for(const token of [undefined,'invalid']) {
++ const linked=await post(base,'/v1/account/providers',{provider:'naver',credential:'unknown'},token);
++ assert.equal(linked.response.status,401);
++ }assert.deepEqual(store.listIdentities(member.id),['google']);
++ });
++});
++test('same-provider replacement blocked, duplicate idempotent and old session revoked on success',async()=>{
++ await fixture(async({base,store,sessions,member})=>{
++ const login=await post(base,'/v1/auth/provider/session',{provider:'google',credential:'existing'});
++ const conflict=await post(base,'/v1/account/providers',{provider:'google',credential:'different'},login.json.sessionToken);
++ assert.equal(conflict.response.status,409);assert.equal(conflict.json.code,'PROVIDER_ALREADY_LINKED');
++ assert.ok(sessions.verify(login.json.sessionToken));
++ const same=await post(base,'/v1/account/providers',{provider:'google',credential:'existing'},login.json.sessionToken);
++ assert.equal(same.response.status,200);assert.equal(same.json.linked,false);
++ assert.throws(()=>sessions.verify(login.json.sessionToken));
++ assert.deepEqual(store.listIdentities(member.id),['google']);
++ const linked=await post(base,'/v1/account/providers',{provider:'naver',credential:'new'},same.json.sessionToken);
++ assert.equal(linked.response.status,200);assert.throws(()=>sessions.verify(same.json.sessionToken));
++ assert.equal(store.getAdminOverview().total,1);
++ });
++});
+--- /dev/null
++++ b/backend/test/social_identity_migration.test.js
+@@ -0,0 +1,41 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import Database from 'better-sqlite3';
++import { migrateSocialIdentities, checkSocialIdentitySchema } from '../src/social_identity_migration.js';
++function fixture({duplicate=false,nullable=false}={}) {
++ const db=new Database(':memory:'); db.pragma('foreign_keys=ON');
++ db.exec(`CREATE TABLE members(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,phone TEXT ${nullable?'':'NOT NULL UNIQUE'},church_name TEXT NOT NULL,login_provider TEXT NOT NULL DEFAULT 'phone',provider_user_id TEXT,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,terms_version TEXT,privacy_version TEXT,consented_at TEXT);
++ CREATE TABLE member_identities(id INTEGER PRIMARY KEY AUTOINCREMENT,member_id INTEGER NOT NULL REFERENCES members(id) ON DELETE CASCADE,provider TEXT NOT NULL,provider_user_id TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,UNIQUE(provider,provider_user_id));
++ INSERT INTO members(id,name,phone,church_name) VALUES(7,'test','same','');
++ INSERT INTO member_identities(id,member_id,provider,provider_user_id) VALUES(4,7,'google','test-g');
++ UPDATE sqlite_sequence SET seq=29 WHERE name='members'; UPDATE sqlite_sequence SET seq=33 WHERE name='member_identities';`);
++ if(duplicate) db.exec("INSERT INTO member_identities(member_id,provider,provider_user_id) VALUES(7,'google','other')");
++ return db;
++}
++test('migration preserves all rows and sequences, enforces ownership and is repeat-safe',()=>{
++ const db=fixture(); try {
++ const members=db.prepare('SELECT * FROM members').all(),identities=db.prepare('SELECT * FROM member_identities').all();
++ assert.equal(migrateSocialIdentities(db),true);
++ assert.deepEqual(db.prepare('SELECT * FROM members').all(),members); assert.deepEqual(db.prepare('SELECT * FROM member_identities').all(),identities);
++ assert.equal(db.prepare("SELECT seq FROM sqlite_sequence WHERE name='members'").get().seq,29);
++ assert.equal(db.prepare("SELECT seq FROM sqlite_sequence WHERE name='member_identities'").get().seq,33);
++ assert.equal(migrateSocialIdentities(db),false);
++ assert.throws(()=>db.exec("INSERT INTO member_identities(member_id,provider,provider_user_id) VALUES(7,'google','other')"),/UNIQUE/);
++ db.exec("INSERT INTO members(name,phone,church_name) VALUES('test','same','')");
++ assert.equal(db.prepare('SELECT MAX(id) AS id FROM members').get().id,30);
++ assert.equal(db.pragma('foreign_keys',{simple:true}),1);
++ }finally{db.close();}
++});
++test('duplicate member/provider migration is blocked without modifying data',()=>{
++ const db=fixture({duplicate:true});try {
++ assert.throws(()=>migrateSocialIdentities(db),/explicit review/);
++ assert.equal(db.prepare('SELECT COUNT(*) AS n FROM member_identities').get().n,2);
++ assert.equal(db.pragma('table_info(members)').find(c=>c.name==='phone').notnull,1);
++ }finally{db.close();}
++});
++test('already nullable schema preserves data and only adds missing ownership constraint',()=>{
++ const db=fixture({nullable:true});try {
++ assert.equal(migrateSocialIdentities(db),true);const state=checkSocialIdentitySchema(db);
++ assert.equal(state.phoneUnique,false);assert.equal(state.memberProviderUnique,true);
++ }finally{db.close();}
++});
+--- a/lib/features/signup_page.dart
++++ b/lib/features/signup_page.dart
+@@ -20,7 +20,10 @@
+ enum _IdentityFlowStage { idle, chooseAction, signUp, linkExisting }
+ 
+ class SignUpPage extends StatefulWidget {
+-  const SignUpPage({super.key});
++  const SignUpPage({super.key, this.credentialLoader, this.memberClientFactory});
++
++  final Future<String> Function(String provider)? credentialLoader;
++  final MemberApiClient Function()? memberClientFactory;
+ 
+   @override
+   State<SignUpPage> createState() => _SignUpPageState();
+@@ -387,6 +390,10 @@
+       );
+ 
+   Future<void> _continueWithApple() async {
++    if (widget.credentialLoader != null) {
++      await _continueWithCredentialLoader('apple');
++      return;
++    }
+     final apiBaseUrl = ApiConfig.baseUrl;
+     if (apiBaseUrl == null) {
+       _showMessage('서버 설정이 필요해요. ' + ApiConfig.setupHint);
+@@ -445,6 +452,10 @@
+   }
+ 
+   Future<void> _continueWithGoogle() async {
++    if (widget.credentialLoader != null) {
++      await _continueWithCredentialLoader('google');
++      return;
++    }
+     final apiBaseUrl = ApiConfig.baseUrl;
+     if (apiBaseUrl == null) {
+       _showMessage('서버 설정이 필요해요. ${ApiConfig.setupHint}');
+@@ -480,6 +491,10 @@
+   }
+ 
+   Future<void> _continueWithNaver() async {
++    if (widget.credentialLoader != null) {
++      await _continueWithCredentialLoader('naver');
++      return;
++    }
+     final apiBaseUrl = ApiConfig.baseUrl;
+     if (apiBaseUrl == null) {
+       _showMessage('서버 설정이 필요해요. ${ApiConfig.setupHint}');
+@@ -510,6 +525,10 @@
+   }
+ 
+   Future<void> _continueWithKakao() async {
++    if (widget.credentialLoader != null) {
++      await _continueWithCredentialLoader('kakao');
++      return;
++    }
+     final apiBaseUrl = ApiConfig.baseUrl;
+     if (apiBaseUrl == null) {
+       _showMessage('서버 설정이 필요해요. ' + ApiConfig.setupHint);
+@@ -539,6 +558,23 @@
+     } finally {
+       providerApi.close();
+       memberApi.close();
++      if (mounted) setState(() => _busy = false);
++    }
++  }
++
++  Future<void> _continueWithCredentialLoader(String provider) async {
++    if (_busy) return;
++    setState(() => _busy = true);
++    final client = widget.memberClientFactory?.call() ?? MemberApiClient(baseUrl: ApiConfig.baseUrl!);
++    try {
++      final credential = await widget.credentialLoader!(provider);
++      await _handleProviderCredential(provider: provider, credential: credential, client: client);
++    } on MemberApiException catch (error) {
++      _showMessage(error.message);
++    } catch (_) {
++      _showMessage('로그인을 완료하지 못했어요. 다시 시도해 주세요.');
++    } finally {
++      client.close();
+       if (mounted) setState(() => _busy = false);
+     }
+   }
+@@ -591,7 +627,7 @@
+       );
+       existingSessionToken = existingSession.token;
+     } on MemberApiException catch (error) {
+-      if (error.statusCode == 404) {
++      if (error.statusCode == 404 && error.code == 'PROVIDER_IDENTITY_NOT_FOUND') {
+         _showMessage(
+           '이 ${_providerLabel(provider)} 계정은 기존 ONARIA 회원에 연결되어 있지 않아요. 예전에 ONARIA에서 사용하던 다른 로그인 수단을 선택해 주세요.',
+         );
+@@ -641,7 +677,7 @@
+       Navigator.of(context).pop();
+       return;
+     } on MemberApiException catch (error) {
+-      if (error.statusCode != 404) rethrow;
++      if (error.statusCode != 404 || error.code != 'PROVIDER_IDENTITY_NOT_FOUND') rethrow;
+     }
+ 
+     final currentSession = MemberSessionStore.instance.token;
+--- a/lib/src/api/member_api_client.dart
++++ b/lib/src/api/member_api_client.dart
+@@ -92,6 +92,7 @@
+       throw MemberApiException(
+         _readError(response.body),
+         statusCode: response.statusCode,
++        code: _readCode(response.body),
+       );
+     }
+     return _readAuthenticatedRegistration(response.body);
+--- /dev/null
++++ b/test/social_identity_flow_test.dart
+@@ -0,0 +1,79 @@
++import 'dart:convert';
++import 'package:flutter/material.dart';
++import 'package:flutter_test/flutter_test.dart';
++import 'package:http/http.dart' as http;
++import 'package:http/testing.dart';
++import 'package:onaria/features/signup_page.dart';
++import 'package:onaria/src/api/member_api_client.dart';
++import 'package:onaria/app/member_session_store.dart';
++import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
++import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
++
++void main() {
++  setUp(() {
++    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
++    MemberSessionStore.instance.clear();
++  });
++  tearDown(() { MemberSessionStore.instance.clear(); });
++  Future<void> open(WidgetTester tester, Future<http.Response> Function(http.Request) handler) async {
++    await tester.pumpWidget(MaterialApp(home: Builder(builder: (context) => Scaffold(body: TextButton(
++      onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => SignUpPage(
++        credentialLoader: (provider) async => 'proof-$provider',
++        memberClientFactory: () => MemberApiClient(baseUrl: Uri.parse('https://api.onaria.ai.kr'), httpClient: MockClient(handler)),
++      ))), child: const Text('시작'))))));
++    await tester.tap(find.text('시작')); await tester.pumpAndSettle();
++  }
++  http.Response unknown() => http.Response(jsonEncode({'code':'PROVIDER_IDENTITY_NOT_FOUND','message':'unknown'}),404);
++  Future<void> tap(WidgetTester tester,String label) async {
++    if (find.text(label).evaluate().isEmpty) { await tester.scrollUntilVisible(find.text(label), 180); }
++    await tester.ensureVisible(find.text(label)); await tester.pumpAndSettle(); await tester.tap(find.text(label)); await tester.pumpAndSettle();
++  }
++  testWidgets('unknown identity offers choice before optional signup fields', (tester) async {
++    await tester.binding.setSurfaceSize(const Size(800,1200));
++    addTearDown(() => tester.binding.setSurfaceSize(null));
++    await open(tester, (_) async => unknown());
++    await tap(tester,'네이버로 계속하기');
++    await tester.scrollUntilVisible(find.text('기존 ONARIA 계정에 연결'),180);
++    expect(find.text('기존 ONARIA 계정에 연결'), findsOneWidget);
++    expect(find.text('이름 (선택)'),findsNothing);
++    await tap(tester,'새 계정 만들기');
++    await tester.scrollUntilVisible(find.text('이름 (선택)'),180,scrollable:find.byType(Scrollable).first);
++    expect(find.text('이름 (선택)'),findsOneWidget);
++  });
++  testWidgets('failed existing proof preserves pending credential; successful retry stores linked session', (tester) async {
++    await tester.binding.setSurfaceSize(const Size(800,1200));
++    addTearDown(() => tester.binding.setSurfaceSize(null));
++    var attempts=0;
++    await open(tester,(request) async {
++      final body=jsonDecode(request.body) as Map<String,dynamic>;
++      if(request.url.path.endsWith('/session')) {
++        if(body['provider']=='naver') return unknown();
++        if(++attempts==1) return unknown();
++        return http.Response(jsonEncode({'sessionToken':'A'*43,'expiresInSeconds':3600}),201);
++      }
++      expect(request.url.path,'/v1/account/providers');
++      expect(body,{'provider':'naver','credential':'proof-naver'});
++      expect(request.headers['X-Onaria-Member-Session'],'A'*43);
++      return http.Response(jsonEncode({'member':{'id':7},'sessionToken':'B'*43,'expiresInSeconds':3600}),200);
++    });
++    await tap(tester,'네이버로 계속하기'); await tap(tester,'기존 ONARIA 계정에 연결');
++    expect(find.text('기존 ONARIA 계정으로 본인 확인'),findsOneWidget);
++    await tap(tester,'Google로 계속하기');
++    expect(find.text('기존 ONARIA 계정으로 본인 확인'),findsOneWidget);
++    expect(MemberSessionStore.instance.token,isNull);
++    await tap(tester,'Google로 계속하기');
++    expect(MemberSessionStore.instance.token,'B'*43);
++    expect(find.text('시작'),findsOneWidget);
++  });
++  testWidgets('unrelated 404 never enables signup and small screen keeps provider order', (tester) async {
++    tester.view.physicalSize=const Size(320,568);tester.view.devicePixelRatio=1;
++    addTearDown(tester.view.resetPhysicalSize);addTearDown(tester.view.resetDevicePixelRatio);
++    await open(tester,(_) async => http.Response('{"code":"ROUTE_NOT_FOUND","message":"failed"}',404));
++    await tap(tester,'네이버로 계속하기');
++    expect(find.text('새 계정 만들기'),findsNothing);
++    expect(tester.takeException(),isNull);
++    final apple=tester.getTopLeft(find.byKey(const ValueKey('apple-signup'))).dy;
++    final google=tester.getTopLeft(find.byKey(const ValueKey('google-signup'))).dy;
++    expect(apple,lessThan(google));
++  });
++}

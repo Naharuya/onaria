@@ -1,0 +1,37 @@
+name: ONARIA retention release
+on:
+  push:
+    branches: ['codex/retention-20261011']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: onaria-retention-release
+  cancel-in-progress: false
+jobs:
+  verify-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ONARIA_AI_MODE: local
+      ONARIA_EXTERNAL_API_DISABLED: 'true'
+      OPENAI_API_KEY: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm test
+        working-directory: backend
+      - run: python3 -m unittest discover -s backend/test -p "legacy_journal_retention_test.py"
+      - run: python3 scripts/package-retention-release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onaria-retention-release
+          path: build/retention-release/
+          if-no-files-found: error
+          retention-days: 14

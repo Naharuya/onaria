@@ -1,0 +1,10 @@
+{
+  "model": "iPhone15",
+  "build": "24",
+  "signature": "PASS",
+  "provisioning": "PASS",
+  "installExit": 0,
+  "launchExit": 0,
+  "installedBuild": "24",
+  "realSocialAuthAndMerge": "NOT_RUN"
+}

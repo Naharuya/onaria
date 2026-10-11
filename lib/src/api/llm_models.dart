@@ -9,6 +9,7 @@ class LlmConversationRequest {
     this.locale = 'ko-KR',
     this.agentMode = 'auto',
     this.verseLanguage = 'bilingual',
+    this.externalAiConsentVersion,
   });
 
   final ConversationSession session;
@@ -18,6 +19,7 @@ class LlmConversationRequest {
   final String locale;
   final String agentMode;
   final String verseLanguage;
+  final String? externalAiConsentVersion;
 
   Map<String, dynamic> toJson() => {
         'session': session.toJson(),
@@ -27,6 +29,8 @@ class LlmConversationRequest {
         'locale': locale,
         'agentMode': agentMode,
         'verseLanguage': verseLanguage,
+        if (externalAiConsentVersion != null)
+          'externalAiConsentVersion': externalAiConsentVersion,
       };
 }
 

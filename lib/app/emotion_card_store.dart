@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'member_record_scope.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,8 +35,17 @@ class EmotionCardStore {
   EmotionCardStore({SharedPreferencesAsync? preferences})
       : _preferences = preferences ?? SharedPreferencesAsync();
 
-  static const _presetKey = 'onaria.emotion_card.preset_counts.v1';
-  static const _customKey = 'onaria.emotion_card.custom_keyword_counts.v1';
+  final RecordAccess _access = MemberRecordScope.instance.capture();
+  String get _presetKey {
+    _access.requireCurrent();
+    return _access.key('onaria.emotion_card.preset_counts.v1');
+  }
+
+  String get _customKey {
+    _access.requireCurrent();
+    return _access.key('onaria.emotion_card.custom_keyword_counts.v1');
+  }
+
   final SharedPreferencesAsync _preferences;
 
   static const _stopWords = <String>{
@@ -115,6 +125,7 @@ class EmotionCardStore {
     try {
       final decoded = jsonDecode(raw);
       if (decoded is! Map) return <String, int>{};
+      _access.requireCurrent();
       return decoded.map((key, value) => MapEntry(
             key.toString(),
             value is int ? value : int.tryParse(value.toString()) ?? 0,
@@ -125,5 +136,10 @@ class EmotionCardStore {
   }
 
   Future<void> _writeMap(String key, Map<String, int> value) =>
-      _preferences.setString(key, jsonEncode(value));
+      _writeCurrent(key, value);
+
+  Future<void> _writeCurrent(String key, Map<String, int> value) {
+    _access.requireCurrent();
+    return _preferences.setString(key, jsonEncode(value));
+  }
 }
