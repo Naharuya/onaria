@@ -1,0 +1,11 @@
+{
+  "healthStatus": 200,
+  "appleAndroidPostChallenge": 200,
+  "appleRequiredFieldsPresent": true,
+  "s22NaverAccountInputSurfaceObserved": true,
+  "s22CleanupErrorObserved": false,
+  "s22BackToLogin": true,
+  "s22CancellationMessageObserved": true,
+  "authE2E": "NOT VERIFIED",
+  "productionChanges": false
+}

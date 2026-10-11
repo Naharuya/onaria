@@ -1,0 +1,14 @@
+[Unit]
+Description=ONARIA legacy rollback backup retention
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/onaria/backend
+ExecStart=/usr/bin/node /opt/onaria/backend/scripts/legacy_backup_retention.js --apply
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/onaria-backups

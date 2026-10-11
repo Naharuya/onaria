@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "build": "24",
+  "bundle": "com.onaria.app",
+  "signatureValid": true,
+  "team": [
+    "BJL8U6B46S"
+  ],
+  "getTaskAllow": false,
+  "hasProvisionedDevices": false,
+  "sha256": "a3b14fffb8b8d106396ba5b4e0ca47aea20df99e155cde475c5ea95cf7edea71",
+  "uploadExit": 0,
+  "uploadSucceeded": true,
+  "exportSucceeded": true,
+  "appStoreAppId": "6819979630",
+  "reviewNotesSaved": true,
+  "reviewDemoLoginRequired": false,
+  "manualRelease": true,
+  "iphoneScreenshots": 5,
+  "ipadScreenshots": 5,
+  "androidLogin": "S22/A33 user confirmed; providers unspecified",
+  "iosLogin": "not confirmed for Build24",
+  "productionMerge": "disabled",
+  "submission": "NOT RUN: processing and release gates pending",
+  "appleProcessingStatus": "PROCESSING: observed App Store Connect"
+}

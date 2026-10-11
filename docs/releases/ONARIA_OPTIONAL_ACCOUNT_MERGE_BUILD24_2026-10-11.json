@@ -1,0 +1,24 @@
+{
+  "project": "ONARIA",
+  "build": "1.0.0+24",
+  "backend": {
+    "pass": 509,
+    "fail": 0
+  },
+  "flutterFull": {
+    "pass": 195,
+    "skip": 1,
+    "fail": 0
+  },
+  "mergeFocused": {
+    "pass": 8,
+    "fail": 0
+  },
+  "analyze": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "productionMerge": "DISABLED_NOT_DEPLOYED",
+  "releaseGate": "HOLD",
+  "commitPush": "HOLD"
+}

@@ -1,0 +1,124 @@
+{
+  "build": "1.0.0(24)",
+  "manifestCount": 21,
+  "dataTypes": {
+    "NSPrivacyCollectedDataTypeName": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeEmailAddress": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypePhoneNumber": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeOtherDataTypes": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics",
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy",
+        "kakao_flutter_sdk_auth_kakao_flutter_sdk_auth.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeCoarseLocation": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeUserID": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics",
+        "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeDeviceID": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    },
+    "NSPrivacyCollectedDataTypeOtherUsageData": {
+      "linked": true,
+      "tracking": false,
+      "purposes": [
+        "NSPrivacyCollectedDataTypePurposeAnalytics"
+      ],
+      "sources": [
+        "GoogleSignIn_GoogleSignIn.bundle/PrivacyInfo.xcprivacy"
+      ]
+    }
+  },
+  "consoleCorrections": [
+    "DeviceID analytics purpose",
+    "OtherUsageData analytics purpose"
+  ],
+  "userDeviceLoginConfirmation": [
+    "S22",
+    "A33",
+    "iPhone15"
+  ],
+  "productionMergeEnabled": false,
+  "publicPolicyGaps": [
+    "SDK processing disclosures missing",
+    "backup and operational log retention unresolved"
+  ],
+  "finalSubmission": "HOLD pending public policy implementation",
+  "followup": {
+    "build24Processed": true,
+    "reviewBuild24Saved": true,
+    "exportQuestionnaireSaved": true,
+    "deviceIdAnalyticsSaved": true,
+    "otherUsageAnalyticsSaved": true,
+    "privacyPublished": false,
+    "finalSubmission": "HOLD",
+    "userReportedLoginDevices": [
+      "S22",
+      "A33",
+      "iPhone"
+    ],
+    "backupTimer": "active",
+    "backupServiceResult": "success",
+    "backupRetentionImplementation": "not found in inspected script",
+    "nginxRotationConfigured": "daily/14 rotations; execution evidence inaccessible",
+    "journaldTimeRetention": "not configured in inspected file",
+    "productionChanges": false
+  }
+}

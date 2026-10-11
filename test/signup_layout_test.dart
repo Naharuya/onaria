@@ -44,7 +44,7 @@ void main() {
     await tester.ensureVisible(find.byKey(const ValueKey('apple-signup')));
     await tester.tap(find.byKey(const ValueKey('apple-signup')));
     await tester.pump();
-    expect(find.text('안드로이드 Apple 로그인 서버 연결을 준비 중이에요. 다른 방법으로 로그인해 주세요.'),
+    expect(find.text('인증 요청을 완료하지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.'),
         findsOneWidget);
     expect(find.text('회원 정보'), findsNothing);
     expect(tester.takeException(), isNull);

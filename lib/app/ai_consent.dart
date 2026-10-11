@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'member_record_scope.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Version changes require a fresh decision; no conversation content is stored.
 class AiConsent {
   static const version = 'openai-chat-v1';
-  static const preferenceKey = 'onaria.external_ai_consent_version';
+  static String get preferenceKey {
+    final access = MemberRecordScope.instance.capture();
+    access.requireCurrent();
+    return access.key('onaria.external_ai_consent_version');
+  }
+
   static const disclosure =
       '받는 곳: ONARIA 서버와 외부 AI 제공자 OpenAI(외부 AI가 활성화된 경우).\n\n'
       '전달 항목: 입력한 대화, 선택한 감정·강도, 필요한 이전 답변·질문과 대화 요약. 이름·전화번호·로그인 토큰은 AI 요청에 포함하지 않아요. 민감한 개인 정보는 입력하지 마세요.\n\n'
@@ -19,7 +25,11 @@ class AiConsent {
       SharedPreferencesAsync().remove(preferenceKey);
 
   static Future<bool> request(BuildContext context) async {
-    if (await isGranted()) return true;
+    final access = MemberRecordScope.instance.capture();
+    if (await isGranted()) {
+      access.requireCurrent();
+      return true;
+    }
     if (!context.mounted) return false;
     bool adultConfirmed = false;
     final accepted = await showDialog<bool>(
@@ -54,6 +64,7 @@ class AiConsent {
                   ],
                 )));
     if (accepted != true) return false;
+    access.requireCurrent();
     await grant();
     return true;
   }

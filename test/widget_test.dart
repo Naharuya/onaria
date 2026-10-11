@@ -6,20 +6,39 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 import 'package:onaria/app/onaria_app.dart';
+import 'package:onaria/app/member_record_scope.dart';
 import 'package:onaria/app/social_auth_config.dart';
 
 void main() {
+  testWidgets('unverified startup holds records until the account is verified',
+      (tester) async {
+    MemberRecordScope.instance.lock();
+    await tester.pumpWidget(const OnariaApp());
+    await tester.pumpAndSettle();
+    expect(find.textContaining('계정을 확인한 뒤 기록을 열 수 있어요.'), findsOneWidget);
+    expect(find.text('오늘 마음은\n어떤가요?'), findsNothing);
+    expect(tester.takeException(), isNull);
+    MemberRecordScope.instance.verified(42);
+    await tester.pumpAndSettle();
+    expect(find.text('오늘 마음은\n어떤가요?'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   setUp(() {
+    MemberRecordScope.instance.signedOut();
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
   });
 
   tearDown(() {
+    MemberRecordScope.instance.signedOut();
     SharedPreferencesAsyncPlatform.instance = null;
   });
 
@@ -37,7 +56,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('메뉴'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('로그인·계정 연결'));
+    await tester.tap(find.text('로그인'));
     await tester.pumpAndSettle();
     expect(find.text('로그인 또는 시작하기'), findsOneWidget);
     for (final link in [

@@ -17,7 +17,7 @@ void main() {
   tearDown(() => SharedPreferencesAsyncPlatform.instance = null);
 
   test(
-      'ONARIA reads existing cards and conversation summaries without migration',
+      'legacy device records stay untouched and are not automatically attributed',
       () async {
     final preferences = SharedPreferencesAsync();
     final record = jsonEncode({
@@ -36,8 +36,7 @@ void main() {
     });
     await preferences.setStringList('soul_bible.mind_cards.v1', [record]);
     final cards = await MindCardStore(preferences: preferences).getAll();
-    expect(cards.single.id, 'existing-card');
-    expect(cards.single.memorySummary, '기존 대화 요약');
+    expect(cards, isEmpty);
     expect(
         await preferences.getStringList('soul_bible.mind_cards.v1'), [record]);
   });

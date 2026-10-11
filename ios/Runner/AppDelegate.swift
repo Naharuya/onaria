@@ -14,6 +14,14 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    let configChannel = FlutterMethodChannel(
+      name: "onaria/config",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+    configChannel.setMethodCallHandler { call, result in
+      guard call.method == "providerConfig" else { result(FlutterMethodNotImplemented); return }
+      result(Bundle.main.object(forInfoDictionaryKey: "OnariaProviderConfig") as? String ?? "")
+    }
     let channel = FlutterMethodChannel(
       name: "onaria/image_export",
       binaryMessenger: engineBridge.applicationRegistrar.messenger()

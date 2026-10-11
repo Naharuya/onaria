@@ -1,0 +1,12 @@
+{
+  "model": "A33",
+  "device": "RFCW1178RRE",
+  "launchOk": true,
+  "homeVisible": true,
+  "verificationGateVisible": false,
+  "accountMenuState": [
+    "로그인됨 · Apple"
+  ],
+  "unhandledExceptionMarkers": 0,
+  "versionCode": "23"
+}

@@ -1,0 +1,46 @@
+{
+  "unitTests": "6 PASS",
+  "dryRunExit": 0,
+  "plan": {
+    "version": 1,
+    "status": "PLAN_ONLY_NOT_AUTHORIZED",
+    "targetId": 4,
+    "sourceIds": [
+      5,
+      6
+    ],
+    "providers": [
+      "apple",
+      "google",
+      "kakao",
+      "naver"
+    ],
+    "preservedRecordOwnerIds": [
+      4,
+      5,
+      6
+    ],
+    "requiredProofMemberIds": [
+      4,
+      5,
+      6
+    ],
+    "guestAndUnclaimedRecords": "EXCLUDED",
+    "sourceMemberDeletion": false,
+    "requirements": [
+      "fresh server-verified proof for every member bound to one merge attempt",
+      "explicit user confirmation of the exact target and sources",
+      "expiring one-use merge attempt with replay protection",
+      "snapshot recheck under transaction before identity reassignment",
+      "revoke all old sessions before issuing a canonical member session",
+      "authenticated record-owner mapping before local import",
+      "copy and verify records; never overwrite conflicting record ids or delete originals",
+      "idempotent operation and durable audit receipt without provider credentials",
+      "resolve deletion and backup semantics for all preserved owner ids before activation"
+    ]
+  },
+  "identityValues": "redacted; duplicate identity values are not tested by this projection",
+  "actualProofVerification": "NOT RUN",
+  "mergeExecution": "NOT IMPLEMENTED",
+  "productionWrite": false
+}

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'member_record_scope.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../onaria.dart';
@@ -14,7 +15,12 @@ class ConversationDraft {
   final int intensity;
   final String? customEmotion;
   static const _key = 'onaria.unsent_draft.v1';
-  static const autoSaveKey = 'onaria.draft_autosave.v1';
+  static String get autoSaveKey {
+    final access = MemberRecordScope.instance.capture();
+    access.requireCurrent();
+    return access.key('onaria.draft_autosave.v1');
+  }
+
   static Future<void>? _pending;
   static Future<void> _serial(Future<void> Function() action) async {
     while (_pending != null) {
@@ -30,25 +36,39 @@ class ConversationDraft {
     }
   }
 
-  Future<void> save() => _serial(() {
-        if (const CrisisDetector().assess(text).isCrisis ||
-            const CrisisDetector().assess(customEmotion ?? '').isCrisis) {
-          throw StateError('Safety input is not saved as a draft');
-        }
-        return SharedPreferencesAsync().setString(
-            _key,
-            jsonEncode({
-              'text': text,
-              'emotion': emotion.name,
-              'intensity': intensity,
-              'customEmotion': customEmotion,
-            }));
-      });
-  static Future<void> delete() =>
-      _serial(() => SharedPreferencesAsync().remove(_key));
+  Future<void> save() {
+    final access = MemberRecordScope.instance.capture();
+    return _serial(() {
+      access.requireCurrent();
+      if (const CrisisDetector().assess(text).isCrisis ||
+          const CrisisDetector().assess(customEmotion ?? '').isCrisis) {
+        throw StateError('Safety input is not saved as a draft');
+      }
+      return SharedPreferencesAsync().setString(
+          access.key(_key),
+          jsonEncode({
+            'text': text,
+            'emotion': emotion.name,
+            'intensity': intensity,
+            'customEmotion': customEmotion,
+          }));
+    });
+  }
+
+  static Future<void> delete() {
+    final access = MemberRecordScope.instance.capture();
+    return _serial(() {
+      access.requireCurrent();
+      return SharedPreferencesAsync().remove(access.key(_key));
+    });
+  }
+
   static Future<ConversationDraft?> load() async {
+    final access = MemberRecordScope.instance.capture();
     if (_pending != null) await _pending;
-    final raw = await SharedPreferencesAsync().getString(_key);
+    access.requireCurrent();
+    final raw = await SharedPreferencesAsync().getString(access.key(_key));
+    access.requireCurrent();
     if (raw == null) return null;
     try {
       final value = jsonDecode(raw);

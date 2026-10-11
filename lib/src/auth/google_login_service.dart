@@ -42,7 +42,7 @@ class GoogleLoginService {
       if (error.code == GoogleSignInExceptionCode.canceled) {
         throw const GoogleLoginException('Google 로그인이 취소되었습니다.');
       }
-      throw GoogleLoginException('Google 인증 오류: ${error.code.name}');
+      throw const GoogleLoginException('Google 인증을 완료하지 못했어요. 다시 시도해 주세요.');
     } on GoogleLoginException {
       rethrow;
     } catch (_) {

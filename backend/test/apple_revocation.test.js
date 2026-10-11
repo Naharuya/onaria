@@ -75,6 +75,7 @@ test('Apple revocation failure preserves member and sessions; success deletes on
   const apple = sessions.issue(identities[0]), linked = sessions.issue(identities[1]);
   const unrelated = sessions.issue({ provider: 'apple', providerUserId: 'unrelated' });
   const app = createApp({ generate: async () => ({}), memberStore: store, memberSessions: sessions,
+    providerIdentity: async ({provider, credential}) => ({provider,providerUserId:credential}),
     appleRevocation: async proof => {
       assert.equal(proof.providerUserId, 'member');
       assert.equal(proof.authorizationCode, 'code');
@@ -86,7 +87,7 @@ test('Apple revocation failure preserves member and sessions; success deletes on
   t.after(() => new Promise(resolve => server.close(resolve)));
   const remove = () => fetch(`http://127.0.0.1:${server.address().port}/v1/account`, {
     method: 'DELETE', headers: { 'content-type': 'application/json', 'x-onaria-member-session': apple.token },
-    body: JSON.stringify({ appleAuthorizationCode: 'code', appleCredential: 'credential' }),
+    body: JSON.stringify({ reauthProvider:'apple',reauthCredential:'member',appleAuthorizationCode: 'code', appleCredential: 'credential' }),
   });
   assert.equal((await remove()).status, 503);
   assert.equal(deleted, false); assert.doesNotThrow(() => sessions.verify(linked.token));

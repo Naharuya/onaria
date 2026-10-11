@@ -1,0 +1,38 @@
+--- a/backend/src/server.js
++++ b/backend/src/server.js
+@@ -22,7 +22,7 @@
+ const memberStore = createMemberStore(process.env.MEMBER_DB_PATH ? { filename: process.env.MEMBER_DB_PATH } : {});
+ const memberSessions = createMemberSessions({ filename: process.env.MEMBER_SESSION_DB_PATH || fileURLToPath(new URL('../data/member-sessions.sqlite', import.meta.url)) });
+ const deletionManifest = createDeletionManifest({ filename: process.env.DELETION_MANIFEST_DB_PATH || fileURLToPath(new URL('../data/deletion-manifest.sqlite', import.meta.url)) });
+-delectionManifest.reapply(memberStore);
++deletionManifest.reapply(memberStore);
+ const appleAndroidAuth = createRuntimeAppleAndroidAuth();
+ const providerIdentity = createRuntimeProviderIdentity();
+ const app = createApp({
+--- /dev/null
++++ b/backend/test/server_startup.test.js
+@@ -0,0 +1,24 @@
++import assert from 'node:assert/strict';
++import { test } from 'node:test';
++import { spawn } from 'node:child_process';
++import { mkdtempSync, rmSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { fileURLToPath } from 'node:url';
++test('isolated server starts with deletion manifest and shuts down cleanly', async () => {
++  const dir=mkdtempSync(join(tmpdir(),'onaria-server-start-'));
++  const child=spawn(process.execPath,[fileURLToPath(new URL('../src/server.js',import.meta.url))],{
++    cwd:dir,env:{PATH:process.env.PATH,NODE_ENV:'test',PORT:'0',HOST:'127.0.0.1',
++      MEMBER_DB_PATH:join(dir,'members.sqlite'),MEMBER_SESSION_DB_PATH:join(dir,'sessions.sqlite'),
++      DELETION_MANIFEST_DB_PATH:join(dir,'manifest.sqlite')},stdio:['ignore','pipe','pipe'],
++  });
++  try {
++    await new Promise((resolve,reject)=>{
++      let output='';const timer=setTimeout(()=>reject(new Error('isolated startup timeout')),5000);
++      child.stdout.on('data',data=>{output+=data;if(output.includes('onaria backend listening on')) {clearTimeout(timer);resolve();}});
++      child.once('exit',()=>{clearTimeout(timer);reject(new Error('isolated startup exited before ready'));});
++    });
++    child.kill('SIGTERM');
++    const code=await new Promise(resolve=>child.once('exit',resolve));assert.equal(code,0);
++  } finally {if(child.exitCode===null) child.kill('SIGKILL');rmSync(dir,{recursive:true,force:true});}
++});

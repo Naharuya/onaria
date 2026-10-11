@@ -1,0 +1,38 @@
+{
+  "project": "ONARIA",
+  "head": "1aef3815c8e25022a948c4307e1c755e5cc8507b",
+  "scope": "dirty local auth UX candidate; not installed or deployed",
+  "source_version": "1.0.0+21",
+  "version_gate": "user confirmed iOS store 19, Google Play 7, installed/local Android 20; candidate 21",
+  "android_package": "com.onaria.app",
+  "android_signer_sha256": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07",
+  "ios": "release no-codesign compile only",
+  "historical_artifacts_build20": {
+    "build/app/outputs/flutter-apk/app-release.apk": {
+      "sha256": "5b4f77cc3f6846d195a80bac6fd21ffca5acbd2aa15e81fa24f9d835176e1c5b",
+      "bytes": 63106112
+    },
+    "build/app/outputs/bundle/release/app-release.aab": {
+      "sha256": "152e03780d7e4e7c1e0bd251e1b62ddf523d40721497c5475fb5cd160f1dfea2",
+      "bytes": 61723269
+    },
+    "build/ios/iphoneos/Runner.app/Runner": {
+      "sha256": "7a50231b2b16437ce659ea3881327e9bfad404ff5bc2b79bece44df637318daf",
+      "bytes": 3561832
+    }
+  },
+  "artifacts": {
+    "build/app/outputs/flutter-apk/app-release.apk": {
+      "sha256": "4b64da7af2ce2286fdb208c62ca94c9eb04a489a8f970210811112901994e5e1",
+      "bytes": 63106112
+    },
+    "build/app/outputs/bundle/release/app-release.aab": {
+      "sha256": "98c0594eeae6775c13e6bfb6aa9d361c11efb8d27df62b20f3750c009683f886",
+      "bytes": 61723264
+    },
+    "build/ios/iphoneos/Runner.app/Runner": {
+      "sha256": "a2555ffb4ec096fa4442c732c09dff0f8a01e76ed01c66c55db4d4f916330eb5",
+      "bytes": 3561832
+    }
+  }
+}

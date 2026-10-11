@@ -65,6 +65,7 @@ void main() {
                 appleProofs++;
                 throw StateError('simulated cancelled Apple reauthentication');
               },
+              reauthenticationCredential: (_) async => 'fresh-fixture-proof',
               apiClientFactory: (base) => ProviderAuthApiClient(
                   baseUrl: base,
                   httpClient: MockClient((request) async {
@@ -76,14 +77,14 @@ void main() {
                       }
                       if (scenario == 'fresh-apple-proof-failure') {
                         return http.Response(
-                            '{"providers":["apple"],"currentProvider":"apple"}',
+                            '{"member":{"id":123},"providers":["apple"],"currentProvider":"apple"}',
                             200);
                       }
                       if (scenario == 'lookup-failure' && accountCalls > 1) {
                         return http.Response('{}', 503);
                       }
                       return http.Response(
-                          '{"providers":["naver"],"currentProvider":"naver"}',
+                          '{"member":{"id":123},"providers":["naver"],"currentProvider":"naver"}',
                           200);
                     }
                     deletes++;
@@ -115,13 +116,20 @@ void main() {
         expect(find.text('현재 로그인'), findsNothing);
         expect(
             find.text(scenario == 'metadata-failure'
-                ? '회원탈퇴가 완료되었어요. 이 기기의 회원 번호 정리는 다시 시도해 주세요.'
+                ? '서버 회원탈퇴는 완료됐어요. 이 회원의 기기 정보 정리는 다시 확인해 주세요.'
                 : '회원탈퇴가 완료되었어요.'),
             findsOneWidget);
       } else {
         expect(session.token, isNotNull);
         expect(await MemberRegistrationStore().loadMemberId(), 123);
         expect(find.byKey(const ValueKey('account-deletion')), findsOneWidget);
+        if (scenario == 'deletion-failure') {
+          expect(
+              find.text(
+                  '회원탈퇴 처리 결과를 확인하지 못했어요. 일부 로그인이 해제됐을 수 있으니 계정 상태를 확인해 주세요.'),
+              findsOneWidget);
+          expect(find.text('회원탈퇴가 완료되었어요.'), findsNothing);
+        }
       }
       expect(await prefs.getString('soul_bible.mind_cards.v1'),
           'saved-personal-card');
