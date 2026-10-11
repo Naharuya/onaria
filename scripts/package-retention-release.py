@@ -6,7 +6,7 @@ paths=['backend/'+p for p in baseline['backendFiles']]
 paths += ['ops/onaria-retention.service','ops/onaria-retention.timer',
  'ops/onaria-backend.service.d/retention-logs.conf','ops/journald@onaria.conf',
  'ops/onaria-nginx-log-format.conf','ops/onaria-nginx.conf','ops/onaria-logrotate',
- 'ops/retention-release-baseline.json']
+ 'ops/onaria-legacy-backup-retention.service','ops/onaria-legacy-backup-retention.timer','ops/retention-release-baseline.json']
 out=root/'build/retention-release';out.mkdir(parents=True,exist_ok=True)
 manifest={'version':'1.0.0-retention.1','commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':{}}
 for name in paths:

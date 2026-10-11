@@ -22,7 +22,7 @@ with zipfile.ZipFile(archive) as z:
  'ops/onaria-retention.service','ops/onaria-retention.timer',
  'ops/onaria-backend.service.d/retention-logs.conf','ops/journald@onaria.conf',
  'ops/onaria-nginx-log-format.conf','ops/onaria-nginx.conf','ops/onaria-logrotate',
- 'ops/retention-release-baseline.json'}
+ 'ops/onaria-legacy-backup-retention.service','ops/onaria-legacy-backup-retention.timer','ops/retention-release-baseline.json'}
  if set(manifest['files'])!=allowed:raise RuntimeError('Release allowlist mismatch')
  for n,sha in baseline['backendFiles'].items():
   p=backend/n
@@ -37,6 +37,8 @@ with zipfile.ZipFile(archive) as z:
  for n in names:
   p=stage/n;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(z.read(n));p.chmod(0o600)
 ops={
+ 'ops/onaria-legacy-backup-retention.service':'/etc/systemd/system/onaria-legacy-backup-retention.service',
+ 'ops/onaria-legacy-backup-retention.timer':'/etc/systemd/system/onaria-legacy-backup-retention.timer',
  'ops/onaria-retention.service':'/etc/systemd/system/onaria-retention.service',
  'ops/onaria-retention.timer':'/etc/systemd/system/onaria-retention.timer',
  'ops/onaria-backend.service.d/retention-logs.conf':'/etc/systemd/system/onaria-backend.service.d/retention-logs.conf',
@@ -88,6 +90,8 @@ try:
  print('RETENTION_PREVIEW',json.dumps(preview))
  run(['systemctl','start','onaria-retention.service'])
  run(['systemctl','enable','--now','onaria-retention.timer'])
+ run(['systemctl','start','onaria-legacy-backup-retention.service'])
+ run(['systemctl','enable','--now','onaria-legacy-backup-retention.timer'])
  print('RELEASE_APPLIED',json.dumps({'commit':version,'version':manifest['version'],'backendRestarted':True,'health':'ok'}))
  (work/'result.json').write_text(json.dumps({'commit':version,'version':manifest['version'],'status':'applied','retentionPreview':preview},indent=2)+'\n')
 except Exception:
