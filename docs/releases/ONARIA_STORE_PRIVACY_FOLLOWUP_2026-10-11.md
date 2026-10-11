@@ -41,3 +41,8 @@ Version1.0 / Build24 remains Prepare for Submission, manual release selected. De
 Initial Publish attempt was rejected by automatic approval review due unverified category accuracy. Further checks and the 11-type corrections above resolved the evidence gap; a direct normal UI retry reached Apple's publication confirmation. No bypass was used. The modal explicitly states that publishing means the company agrees that the answers are accurate, comply with guidelines/applicable law and will be updated after data-practice changes. Final modal Publish is NOT clicked because accepting this agreement requires action-time user confirmation. Privacy not published; Add for Review and final review submission NOT RUN. Remaining gate: user confirmation of this precise agreement, then normal privacy publication and App Review submission.
 
 Sources: https://developer.apple.com/app-store/app-privacy-details/ ; https://developers.google.com/identity/sign-in/ios/app-privacy ; https://systemd.io/JOURNAL_EXPORT_FORMATS/ ; https://manpages.ubuntu.com/manpages/noble/man8/systemd-journal-remote.service.8.html .
+
+
+## Final submission update — 2026-10-11 23:11 KST
+
+Supersedes the action-time agreement HOLD above. User explicitly approved Apple publication agreement and Build24 review submission. Privacy publication completed (console: SeJin Jo published moments ago). Version1.0 / Build1.0.0(24) added and final Submit for Review completed. Console confirmed one item submitted and Waiting for Review. Submission ID: d7f03fc5-6f1b-4a62-94a0-7a6464a08c34. Manual release remains selected; approval will not automatically publish the app. Screenshot: onaria-build24-submitted-20261011.jpg. No app rebuild, production change or new device test in this final submission step.

@@ -68,3 +68,8 @@ Incident: initial commit c7c0875 was pushed despite a failed migration test due 
 ## Final follow-up status (supersedes historical-journal HOLD)
 
 Selective cleanup completed: exclusive192 plus mixed3,265 aged ONARIA entries removed; all2,284 unrelated mixed-file records retained with fields and timestamps verified. Daily maintenance active; aged ONARIA application entries zero. Exact helper CI commit2531cd6de9752249baef6b244a0aec0b96036c90 / run38144302570 success. Initial EXDEV failed before archive replacement, fixed with same-filesystem staging. The proposed mixed whole-file purge was not executed. Final privacy draft is11 linked types, no tracking; Other User Content removed after request-scoped storage verification. Public access-log disclosure deployed at33b10d60. Remaining App Store gate is action-time confirmation of Apple publication agreement; privacy Publish and review submission not completed. See ONARIA_STORE_PRIVACY_FOLLOWUP_2026-10-11.md for final matrix and operational evidence.
+
+
+## Final submission update — 2026-10-11 23:11 KST
+
+Supersedes the action-time agreement HOLD above. User explicitly approved Apple publication agreement and Build24 review submission. Privacy publication completed (console: SeJin Jo published moments ago). Version1.0 / Build1.0.0(24) added and final Submit for Review completed. Console confirmed one item submitted and Waiting for Review. Submission ID: d7f03fc5-6f1b-4a62-94a0-7a6464a08c34. Manual release remains selected; approval will not automatically publish the app. Screenshot: onaria-build24-submitted-20261011.jpg. No app rebuild, production change or new device test in this final submission step.

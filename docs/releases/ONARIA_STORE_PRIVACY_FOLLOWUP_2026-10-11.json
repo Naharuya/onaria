@@ -98,7 +98,7 @@
     ],
     "otherUserContentCollected": false,
     "reason": "request scoped, not stored; church affiliation covered by sensitive info",
-    "published": false
+    "published": true
   },
   "publicPolicyPatch": "Deployed from exact-commit CI artifact 33b10d60f2553c02cf3a4da6ceee1d767f4edad6; public privacy HTTP200 and added access-log fields verified",
   "tests": {
@@ -115,7 +115,7 @@
       "fail": 0
     }
   },
-  "releaseGate": "HOLD final modal publication agreement requires action-time user confirmation; privacy and review submission not run",
+  "releaseGate": "SUBMITTED / WAITING_FOR_REVIEW",
   "ci": {
     "run": 38143277829,
     "commit": "33b10d60f2553c02cf3a4da6ceee1d767f4edad6",
@@ -139,5 +139,16 @@
     "bypass": false
   },
   "buildChanged": false,
-  "accountMergeEnabled": false
+  "accountMergeEnabled": false,
+  "appStoreSubmission": {
+    "userAgreementApproved": true,
+    "date": "2026-10-11",
+    "timeZone": "Asia/Seoul",
+    "version": "1.0",
+    "build": "1.0.0(24)",
+    "status": "WAITING_FOR_REVIEW",
+    "submissionId": "d7f03fc5-6f1b-4a62-94a0-7a6464a08c34",
+    "manualRelease": true,
+    "uiConfirmation": "1 item submitted"
+  }
 }
