@@ -1,5 +1,5 @@
 from pathlib import Path
-import sys,os,json,hashlib,zipfile,subprocess,shutil,pwd,grp
+import sys,os,json,hashlib,zipfile,subprocess,shutil,pwd,grp,time
 backend=Path('/opt/onaria/backend')
 def run(args):
  r=subprocess.run(args,capture_output=True,text=True)
@@ -74,8 +74,14 @@ try:
  run(['systemctl','daemon-reload'])
  run(['systemctl','restart','onaria-backend.service']);restarted=True
  run(['systemctl','is-active','--quiet','onaria-backend.service'])
- health=json.loads(run(['curl','--fail','--silent','--max-time','10','http://127.0.0.1:8787/health']).stdout)
- if health.get('status')!='ok':raise RuntimeError('Backend health check failed')
+ health=None
+ for attempt in range(15):
+  r=subprocess.run(['curl','--fail','--silent','--max-time','2','http://127.0.0.1:8787/health'],capture_output=True,text=True)
+  if r.returncode==0:
+   health=json.loads(r.stdout)
+   if health.get('status')=='ok':break
+  time.sleep(1)
+ if not health or health.get('status')!='ok':raise RuntimeError('Backend health check failed')
  run(['systemctl','reload','nginx'])
  run(['systemctl','start','onaria-backup.service'])
  preview=json.loads(run(['node',str(backend/'scripts/retention_maintenance.js')]).stdout)
