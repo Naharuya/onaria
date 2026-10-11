@@ -1,0 +1,32 @@
+{
+  "project": "ONARIA",
+  "timeZone": "Asia/Seoul",
+  "build": "1.0.0(24)",
+  "productionCommit": "68fcac67ca8875c8512e19bef928d602040c0c38",
+  "onariaOnlyJournalRemoved": {
+    "records": 192,
+    "sha256": "4feb66cb657cf33dafa14693c662f2f2c8790ad3b6989bd822f9833e159e8b63"
+  },
+  "sharedArchiveDeletionNotRun": {
+    "files": 2,
+    "bytes": 16777216,
+    "onariaRecords": 3265,
+    "beaversRecords": 16,
+    "otherSystemOrUserRecords": 2268,
+    "allRecordsOlderThan14Days": true
+  },
+  "appPrivacyDraftChanges": {
+    "otherUserContentLinked": true,
+    "performanceDataLinked": true,
+    "tracking": false,
+    "published": false
+  },
+  "publicPolicyPatch": "Adds IP, access time, method/path, response status/size/time and stability/security purposes; not deployed",
+  "tests": {
+    "web": {
+      "pass": 10,
+      "fail": 0
+    }
+  },
+  "releaseGate": "HOLD pending explicit shared archive approval and disclosure patch deployment"
+}
