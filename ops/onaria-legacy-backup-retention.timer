@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily ONARIA legacy rollback backup retention
+
+[Timer]
+OnCalendar=*-*-* 04:37:00 Asia/Seoul
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

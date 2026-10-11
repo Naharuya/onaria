@@ -1,0 +1,14 @@
+[Unit]
+Description=ONARIA legacy journal retention preserving other projects' entries
+
+[Service]
+Type=oneshot
+User=root
+Environment=LD_LIBRARY_PATH=/opt/onaria-retention-tools/usr/lib/x86_64-linux-gnu
+ExecStart=/usr/bin/python3 /opt/onaria/backend/scripts/onaria_legacy_journal_retention.py --tool /opt/onaria-retention-tools/usr/lib/systemd/systemd-journal-remote --apply
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/journal /opt/onaria-retention-releases/legacy-journal-maintenance

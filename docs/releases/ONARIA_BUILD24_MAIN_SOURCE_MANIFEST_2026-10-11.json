@@ -1,0 +1,833 @@
+{
+  "version": "1.0.0+24",
+  "originalHead": "1aef3815c8e25022a948c4307e1c755e5cc8507b",
+  "clientSourceDifferences": [],
+  "note": "pubspec21 originally overridden to24 during release builds; integrated pubspec now24. Private signing/provider config excluded. Backend combines local authenticated flows and deployed retention fixes.",
+  "files": [
+    {
+      "path": "lib/marketing_demo.dart",
+      "sha256": "aa49c8f8844d0f2dd4d60a18ceb7cc82ab5b8209abf4e621e7a443c2799b610c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/onaria.dart",
+      "sha256": "1f6f73571dbe54088a53bb8c7e56f1325b97f00d7429174e1ed0fc586c47414b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/main.dart",
+      "sha256": "ec86f989f2ca8ec57a99aa9c78db910a3727c8f085d6ff6035f4472decee31f1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/theme_controller.dart",
+      "sha256": "aaa9a3d0e495f19c0e491e0a5559a8f82ddb4be581b08928ab5b729f6f8b06e4",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/onaria_emblem.dart",
+      "sha256": "0ffc70787824821c0ab95dad555f4d2c98478c53e46fe1f808d74a58b95cabde",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/legacy_record_import.dart",
+      "sha256": "ea77d026fa91f99ba56e4614593d03fd37160ffeeb90aabe55693f0bb968ed60",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/ai_consent.dart",
+      "sha256": "c665aaf8a14c78295c79cf296418b45d4780ba59a6679be39e0649f6a0c99bea",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/responsive_text.dart",
+      "sha256": "2809ccb311214914bbb5098b59ea82b13b9a02acd585cc085a19509c88e078f2",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/onaria_app.dart",
+      "sha256": "20adcf755408af07e19d2e9fc4ded173b8e1c03fca764c8f921b267ffb66bcf2",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/member_auth_controller.dart",
+      "sha256": "fec829fd8b3be64f82016c1da3623403cd1f1bcbc946b46a8783a2ae4f9269d7",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/kakao_auth_config.dart",
+      "sha256": "b1b0aba8fb62ba5b070638c6f944bfc68a7e3f2a55dc31c2b4082c1ac7169073",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/social_auth_config.dart",
+      "sha256": "afdad53ae22811723eba80fe2f14c6a4dd49c52aad383e0c5d5e9d3fe62f47f5",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/merged_record_reader.dart",
+      "sha256": "a478f7c6a1140ee846efb59d35b23315ea4dffc229a009a80b985b90402c800d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/api_config.dart",
+      "sha256": "78470d6dca4db4ac31682d253190cd124ba48c432699dea03cda65deb636bc59",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/member_record_cleanup.dart",
+      "sha256": "378e6b18173776f381272f5dfbb17895c95437bfad830d63e99de749dd91582b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/app_theme.dart",
+      "sha256": "aa185a4dff40ceeca5144bcf3243ceb481c5b5370d29399abaf8ea4227cb73eb",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/google_auth_config.dart",
+      "sha256": "2e22614f2b55a424653d0548345da1cefe88103d9f794aabbe2453777d2fc77e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/demo_llm_client.dart",
+      "sha256": "6e0c9b8cbe30ec53884757c3ee738470615286ef40622a3bcb1aba3c91edddb6",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/seven_day_history.dart",
+      "sha256": "5874e27a757390ebe8c50bf3774388e7f24bda478cd0cdd7ffa71a8179b46e5f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/asset_loader.dart",
+      "sha256": "5cee569719472b10b4c2882dcf63940f8d76769a0a2184d898e8e390978f9107",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/emotion_card_store.dart",
+      "sha256": "f11f3203a2f7f1270b47cde841704d24288b53214d94a3b720a4862993a8289e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/space_scaffold.dart",
+      "sha256": "be3e35381d3f3538944f1054b4a2fb8eb483cf41fea6209088d82b574b7b5879",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/verse_narration.dart",
+      "sha256": "1bfa6724701c859a6b440b567d5cab829107413c413a069128ec5a714b02ef0e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/member_record_scope.dart",
+      "sha256": "4191b7325e7a460a4495c20e49ca5dc060617a5be0ea9301fc09435263025a21",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/member_registration_store.dart",
+      "sha256": "1ef78236e18e9d1b1388df86f87d5000bf63636bb696364973a112828d342572",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/member_session_store.dart",
+      "sha256": "8aea6812f84695efb782e16f1e6a659d6601e226e5347745ffe0b23a4b063cbb",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/conversation_draft.dart",
+      "sha256": "bcccb9f8ad9b131e12e79bf758e999e29be8fb112a1dde95e5ec97009baff6d3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/mind_card_store.dart",
+      "sha256": "b721694f945efe69e7b44439f4e6c5b805a1cf6748be730b86b2f94c7dc3dc9f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/app/verse_history.dart",
+      "sha256": "39d99a2e463f1f4972d54c1580bdb20ad1bbc7bdb683f8f269c46d4694af2734",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/account_menu.dart",
+      "sha256": "548c62769fa7bb4c0d93304e53ce02fb065222fd317b749b31eb3fd4f8e28d08",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/account_merge_page.dart",
+      "sha256": "dba35f9667cc2c5671b9fe4b42d7bfa9af106e216556cec066ebed6490efcc5d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/signup_page.dart",
+      "sha256": "8726f4675992fc67af78925301e5f4de7aad9e456d7bc86f9a9e877b38442990",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/previous_device_records_page.dart",
+      "sha256": "5996a616e09439588cb0efb8f8021014db09d37b02fe74957ee39cf4fd73991d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/provider_setup_page.dart",
+      "sha256": "d5874b3022ea096edf628a35b744723848caa816c06b4dd42f8a2a3d538732f2",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/conversation_question_examples.dart",
+      "sha256": "3a4733baed3a9c627f913845918eda6c6ccca08ebd2f886387a90e53e081cb59",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/saved_cards_page.dart",
+      "sha256": "4d600242da3a71e9002c5c787ff559d47d1e6a43a68f4cb2973fec98872bf0a1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/feedback_page.dart",
+      "sha256": "4e60d2b7b2ad2cd2c003aebca93a4c623b11840588769d8d6eba4655cbfd49bd",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/merged_records_page.dart",
+      "sha256": "53e884e7aaf5b7a82a8c023c28ffe38d2dcb4584a76a5b8a507621e2f148277f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/emotion_situation_examples.dart",
+      "sha256": "68d9fbbe3d6a9c90ae18e1bb99ca92333706633d0380797d63c7029e3967b3a4",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/check_in_page.dart",
+      "sha256": "cdb7ff09f58152561604c88afc06677d13acd9ba7d4995cbaa9e685f9d2f0fc8",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/growth_page.dart",
+      "sha256": "6d50d8d171077f29fa9645bcd565be7dec0a31779849125a0e247bb91b6fb310",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/seven_day_history_page.dart",
+      "sha256": "73e80385190b3285848f97bb6b2e8154e4e6f31a5ca2e7a6cf93b3e943bf6144",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/privacy_page.dart",
+      "sha256": "87b6664067c74f51a59fa3338b934f0fd8fe318b179e8a176509ee5eac67d368",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/records_page.dart",
+      "sha256": "742a8a93086707bf74c5dddfa89cdbd93af18c05f4d3032b9f22bda70550d8b7",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/features/conversation_page.dart",
+      "sha256": "9352de51adfe41741afd12dfb2dc8454b343d79725b7fa5eb864d2727c7cf745",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/storage.dart",
+      "sha256": "68c4547093c5fdc4a3b08ef0cade8e00039f1e12c8eeac2633004fd6147184b1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/domain_events.dart",
+      "sha256": "784858cf2b758458fccbdcba106695dfb81b882b01b1a0decef50de2299a687b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/engagement_controller.dart",
+      "sha256": "c16c1d78197c01a074a43e1d064026578e06500504b9c7946ca44fc7b9466b77",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/safety_notice.dart",
+      "sha256": "ec734cb09d85e9a2c0ff34e9b7e6c5c82825f9d7c328c0b4532ecd5d24ff8c46",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/engagement_page.dart",
+      "sha256": "4626a8d9bd64a33616348c9a7fc50951864b83dc08f0388616901ccc114a26ea",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/verses/verse_repository.dart",
+      "sha256": "b6cb2024ea8e746e1465794963fe929b01949d4558ac88338d915f9f99c5e9f5",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/verses/verse_models.dart",
+      "sha256": "3d40a12f1f9fe6efe3a902b4febba6eae0db51dcf27d264803d5748474291f82",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/auth/google_login_service.dart",
+      "sha256": "a137aeb522bec08bdd43c46788755129ec9f4ea353e0da510ba904a1b44f3336",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/auth/naver_login_service.dart",
+      "sha256": "57b3c2fdd6ea1008aaac6be2191f4b8a4998f2cb48e6dd5081c6c574c6ca7bd0",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/auth/kakao_login_service.dart",
+      "sha256": "2db81a801a90082d52ee84fdebef0a3c0c8f3f18d8512156e4d916036866a9c7",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/auth/apple_android_auth_client.dart",
+      "sha256": "af1315f2dd8ef0ca92b260a0bf29072ad306c7633a4869488ff3fde0f00db72a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/safety/crisis_models.dart",
+      "sha256": "0b7408e534b376f0b4039a49cae38e27b1625efa6c8876a2fddd05e9ec9adb0c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/safety/crisis_detector.dart",
+      "sha256": "9b0efc8b8ec835b14779ef23d27bdfca1ea807b6df88eaedf7165a1cdeebbc98",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/api/llm_models.dart",
+      "sha256": "d9345040f32c606c2eb7bbb906333cdf24f8696c3d0578b6fc49a6ef16eab0b6",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/api/auth_diagnostics.dart",
+      "sha256": "8f611913598e4de76b3d71a6cbe1f7dfc875adb040ed81dc8b3ec80812a02cd4",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/api/member_api_client.dart",
+      "sha256": "b6ab8282f9d7a4d35f15ee4c06fbb495a9a6c9797bba7c2bfe0df4aafd5c5808",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/api/provider_auth_api_client.dart",
+      "sha256": "690c09922c73d8f36f99ae82c4bb620b596d08d67e96c88cb6723415152a6345",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/api/llm_api_client.dart",
+      "sha256": "b3adbcd7a9c28f9b6ea2feb6002163faf54fac702e817e53f27af951d7b4fee3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/conversation/conversation_machine.dart",
+      "sha256": "4f8369a5d7682efed5d7d60dbfbe1896a1be45b8bddea6fb4e6ceb1a2157122d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/src/conversation/conversation_models.dart",
+      "sha256": "3ebab9617e2c5652df00ddb2730559edab69388ec0f78a56a403d1013cb629f8",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/sharing/share_preview_page.dart",
+      "sha256": "e5032b379c03a34ff8651551e3567de9936f8721a9f8b7ab24817e6f477b11f1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/sharing/native_share.dart",
+      "sha256": "89fd17887c00e265ace45b4ae11bf07037b3de00a400259d9baccc1edbbf4221",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/sharing/share_card.dart",
+      "sha256": "639f32dfbb16ffb8dfebaf424c2946bcaddec6089d7ff944871f4b970e421bd3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/achievements/achievement.dart",
+      "sha256": "54d4837947116b5928b1645001b68ee7fbc389ddecf6821a310bda3f04a935c2",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/easter_eggs/easter_egg.dart",
+      "sha256": "680bdad9d525d72d3f8fe4b2f659ceb5460dbc898242d57687d41fb57f52f9d8",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/journey/journey_page.dart",
+      "sha256": "b45601358ccb546e213d1a5ba567d829dbd8c0cbbf2d67f12c433b347f246fcc",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/journey/journey.dart",
+      "sha256": "89b950f9c971f5f40fe72a6d8f204740d2b4102bf80ccac8a1a5d73c0cf21730",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/notifications/reminder_controller.dart",
+      "sha256": "b6db701a5522d2362402eada1f921c9e53e38897a71523fef496d028d2bfe38d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/notifications/notification_settings_page.dart",
+      "sha256": "89de0dbabfd13f33009066e4177604d010cab0b07a2366f97d5808a467cbb734",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/notifications/native_notifications.dart",
+      "sha256": "1f4336e99b047f2d7864a6583f0ed46f49a9941f971c2fd060811d979e50c911",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/mini_games/cross_light/cross_light_reflections.dart",
+      "sha256": "97b1315d9942faceeee1174e1c1c825fe7c1160b5062c935e91ee346eefe858a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/mini_games/cross_light/cross_light_page.dart",
+      "sha256": "5bde34eff36d68d654f4be52b6bd0e734346c8cb4ee4f49d57a499efd8f62c9e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/mini_games/cross_light/cross_light_sky.dart",
+      "sha256": "eb1ce65fdca29252fef0619e9d531f92f2d819c1d9e1cc7074cb765363d1c8df",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "lib/engagement/mini_games/cross_light/cross_light_game.dart",
+      "sha256": "fd604c04bfb68a8e4e3f5dbdbeb8e8cb7df8776c268bb52f0966fdda3b0c9d72",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "assets/images/logo.svg",
+      "sha256": "a6a1cbea797c75255e0f81a6c60b836aff02652e4d86b493e7e8b03718c37414",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "assets/prompts/system_prompt_ko.txt",
+      "sha256": "2c7254dc024d5a0723e2efd082edd934e4357e7cfb70b80d5e0f33c34c02c042",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "assets/data/bible_verses_ko.json",
+      "sha256": "ba37ce208ebaabfafc769578ebaede6b4e140d428bc1521739090b69324003fe",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/cross_light_reflections_test.dart",
+      "sha256": "dfd8018572a69e2e1f3b4d9cf636af59b7bcf60e772ec25e0f63304e6d603ccd",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/saved_cards_page_test.dart",
+      "sha256": "24fb72fb09a250d3475ddb7a3d5600bfdca2109807cca5697388ae4819d091eb",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/provider_auth_api_client_test.dart",
+      "sha256": "34c9b11057bea22bc985f54e03f90ced514100421f8c2bddf3976983284400da",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/responsive_layout_test.dart",
+      "sha256": "1538dff0f40b74b563cea8f8e74c45b45b2f87b5526866f806d66fb96e7e298a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/social_identity_flow_test.dart",
+      "sha256": "61532695e4cca39b8bac72ef7363dc6d43d4c1ea9bc495890a15e3841b444580",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/cross_light_sky_test.dart",
+      "sha256": "038c63ae4154a8fd80bee510bc96a03c0442bb414e18d9410dd81e5852794493",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/conversation_machine_test.dart",
+      "sha256": "a72724a4269d60f25c3b4ea2fa219ceaa5d44d52f32b5b1bdb897470e64297d1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/conversation_question_examples_test.dart",
+      "sha256": "df610b7bfd006433a8e2566a48660b49e43e7a5f590432b34ee58bf021467b75",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/safety_parity_test.dart",
+      "sha256": "c47a0d039ae59837692bf1a991085cd72fdb38e5633164ff5f05d669959d76db",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/yuna_narration_voice_test.dart",
+      "sha256": "562677d91137546cc85bb802e652b72cecebcc725b04fe44e112f492e550ea64",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/signup_validation_test.dart",
+      "sha256": "007670418e5b74dea559f1448cfa6ea84dc7d18bb303dc37faeeea946461324f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/theme_selection_test.dart",
+      "sha256": "ee907f75b1aeeaf3c1ffee31d45d65a56e9e2a0db49a649a19cea5137b74ea64",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/conversation_lifecycle_test.dart",
+      "sha256": "3d8e2a5d35aabb1efa4d875fdf5f813791474aa6442318e87fb220be97d10905",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/naver_login_service_test.dart",
+      "sha256": "5c7ed2a32a515054c4fb8c7024f71f3fb8da66957c7eb9965a32b2602467d719",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/verse_speech_lifecycle_test.dart",
+      "sha256": "fd1745beeef725f5f0e96c21afc1d0777398896aada22fe497a4cca70e15c01b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/member_api_client_link_test.dart",
+      "sha256": "2c92c69b82587b3e9bd77f84758b1f6abab905d7944e4fc056c427c6aacbc13d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/image_export_test.dart",
+      "sha256": "f809352d15621aacab098bca502f09e0ca4f6004a9b1dde2a15e51a0f4d4c9b0",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/cross_light_lifecycle_test.dart",
+      "sha256": "132c6e01533a5f07d4de3cd59428405478fe3f21e0fb9216ee5c53e61835a6a3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/signup_layout_test.dart",
+      "sha256": "f81dcadde6b231e7ffd3184a810710c19fc268bd9edf5dbee89c0fdca97eb55c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/cross_light_game_test.dart",
+      "sha256": "9602db0915f3eec0fe3bc4491750164af8bd49669dddc0f27518f64cc05c87db",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/widget_test.dart",
+      "sha256": "1aa3e9a94ef5646a7dda8edc93c375b9b5b9e00f535301bb5024059e9d710f48",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/auth_diagnostics_test.dart",
+      "sha256": "bbb087276e4f72a0f1964db34a4928b76ab804a0aef276fa8a848baedf22bfc6",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/member_session_store_test.dart",
+      "sha256": "7cc5102244ba68283dc6a2c08b117f8819d08562be304445a677b1b8692b6df0",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/account_menu_test.dart",
+      "sha256": "5d438926e0e4210e9dc3ea6857cbe97fd3e2d65f59d7cf7845f16c3f007a48b6",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/account_layout_test.dart",
+      "sha256": "6084c6a7221f59b02d3660dbc5ccd00ecd1bd154750ceb37681199b8b802781a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/naver_relogin_request_test.dart",
+      "sha256": "164db97a3d208e5d234a3eb0e406193ac1df49283462e36ff5a5247935001fde",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/onaria_storage_compatibility_test.dart",
+      "sha256": "4868e65d7a2790e6ba34b5073d591224b25f83973d24293c465e7ecb0baf7b03",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/daily_usage_store_test.dart",
+      "sha256": "10a2a214d20b854d3f404674b89ac99d4d3c8e8b4d11304a8c62847e78dfce09",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/cross_light_page_test.dart",
+      "sha256": "7a4c778bf76124735616adb25057f2e1868cd952ffbdf0b517a4e3170214aae3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/account_merge_test.dart",
+      "sha256": "ca714933857d2da5c5d89c4a913f1b4d53586f0e4822c74e3b77f4281bdebfa1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/conversation_examples_test.dart",
+      "sha256": "28e69dc935a783d1c85b914119dce405801239cce443114c7030fcb8d9947165",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/emotion_situation_examples_test.dart",
+      "sha256": "fffe2355f206d381a7c5f4c10bbb4c565feb83051c9d82bebde9f3ce11427fdf",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/api_config_test.dart",
+      "sha256": "2fe0e6474653c7e9da50792d9b8a78d5723caadf4360b1a57c25cd2a2223955e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/journey_test.dart",
+      "sha256": "990c16bfb8c95f24dd5c96ba8136fd288d20f6ad726622a705caa3f25945fb5c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/reminder_recovery_test.dart",
+      "sha256": "f9d443a06673c964d9bc4b1a900bcbee15072bc8a8dfe2946d44c6919d544f3f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/member_auth_controller_test.dart",
+      "sha256": "71b7933b0ff76872e2336e3396813bf3b51ffdc612c0bc305bdbacf994f51449",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/verse_speech_test.dart",
+      "sha256": "839aa3a357f374e31d33120df1621928837907133c9aff6ef000abf821f0c8df",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/social_login_completion_test.dart",
+      "sha256": "d804f6930411a82b9fa165c9026a701fd3a99d08200f16e85e737e30ce1963f7",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/api_transport_security_test.dart",
+      "sha256": "77690e457ed48bec9731a63105c76213e56bf29c6fd9fd8c54711a78c47c1c1a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/share_invitation_test.dart",
+      "sha256": "52d97fda36171514decf54189b0e1dc1496fc992224ce35588d8cea7bf592a64",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/ai_consent_test.dart",
+      "sha256": "0ed6585a968f116919950da9d4effb914338fa5dd106c2eaa9ca9ae26bab22a5",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/engagement_recovery_test.dart",
+      "sha256": "ffb74a953101fc9804b2e9864ed5b3e08136d76bf00b4f5a1e3b8e9aa79fc4e9",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/apple_android_auth_client_test.dart",
+      "sha256": "9558c299a2dfc9e30d11faf37ad98203ded150c813088f9d7eeca95cc544f2b7",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/crisis_detector_test.dart",
+      "sha256": "aa4309c12d71fbcbe06622c2ca7fd066a077f29ece36c89d20d174c3fbf81d70",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/member_record_scope_test.dart",
+      "sha256": "201cf87c9ef6bf2abb79f17bb83f0aa0938438245d355ef017373bfe767a4c38",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/journey_page_test.dart",
+      "sha256": "1b3090ee1c6638d583764348028d03cce4d7374de3de259b72bf00c54da723fb",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/backend_contract_test.dart",
+      "sha256": "b93034d3a4e8e5098aa27f887ef9daaa4521b0f6de3f6c146ff565d99863fc01",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/privacy_account_deletion_test.dart",
+      "sha256": "66e1b3ea20001f2fe1370a2e2466aac7cc0b595f660cd7fabeb39e01ab2cb772",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/emotion_card_store_test.dart",
+      "sha256": "e46fe06aa678d0be4958a4fc6e60ac2ad00b5be15abc6df1c7ae2c21a7ed5b2d",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/engagement_integration_test.dart",
+      "sha256": "2f613372a842d89540d3dfa5dbac0e01e49e9729c9e738c226601d5f22102d99",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "test/support/engagement_fakes.dart",
+      "sha256": "02973248215e80dd3ee4ad58f8f715b75838681ee05a78ce92c16df96cf68cef",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ONARIA_PATCH.md",
+      "sha256": "f9ec129cb3f8dafb024a0816e6f139d67374caa19b34b7e88b03eb4bb8d26c9a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/LICENSE",
+      "sha256": "692f5f771480f8000e29decb1497d18031ddaaf58147dbd962ed3cd67e11e90b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/README.md",
+      "sha256": "66933d5957182c6d32be9fcd219e45207c3920268cea9c56a2c716f7d7f0271e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/pubspec.yaml",
+      "sha256": "ceb917a906e757ab70002edac80d700d7d82a873a96f92d06e9b4b769aa1869b",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/bin/configure.dart",
+      "sha256": "8a2544a5cc3b65e8e5f59139261d139fe1a46b86b1336e959281ccd61ee21d83",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/naver_login_flutter.podspec",
+      "sha256": "93bc4ce444770581afa35dece11378131a9aadb9fb345e5bc2694bae123a58f1",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/consumer-rules.pro",
+      "sha256": "aa32a2cd6d16d9e9929af22b0c3f8ca624080f693069de1fc1dd900b8020e8ca",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/gradlew",
+      "sha256": "a3648413b47ef77af21d5ebc36c687c7d103aaef3e17f33de7d4f080a6f300a3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/build.gradle",
+      "sha256": "4ca188fda89a32c80a5dc1775ec6d5d27ea1f579f7ce9eff5b1fad82dad0dd1a",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/gradlew.bat",
+      "sha256": "57931b17dd228e5c24dac90e815d0bf82477e831a4618dfab4136f5446b42a9f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/settings.gradle",
+      "sha256": "932e4bf2b1bf948db32dc03be30fbbe7e5cfdb453c6d1d08c5060bdadd6d84d3",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/naver_login_flutter_platform_interface.dart",
+      "sha256": "b11fabaa245c5812db236eed93b62dd17c13862efe17c96a509f69df4f3d9842",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/naver_login_flutter_method_channel.dart",
+      "sha256": "bc441c629b9171b76f8f2f6dd9012a4c4e1ae45169ace3402ae658bed43bc54c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/naver_login_flutter.dart",
+      "sha256": "faa3bdf62e6a7aef9978e4be1f50bae3a0e6065466b4289784f60a3f1bd1074f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/utils/clock.dart",
+      "sha256": "ca19cc58cd391ab50dbbda2dc9fa193fc860109c99ffbe8cc85aad2ac5c14f57",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/interface/types/naver_token.dart",
+      "sha256": "a3cde936ae6dd3b7367967288505c7c83fed05c510f3690b75ee2c731d32d010",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/interface/types/naver_login_status.dart",
+      "sha256": "57fb12ab541d1a0399d851213d8105b7c819c21c28798855b13a8143ef5ade13",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/interface/types/naver_login_result.dart",
+      "sha256": "992ca8f0d74521d9798b584ff22769aeab974b1d1fd11ad0e78f48d2bc36a07c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/interface/types/naver_account_result.dart",
+      "sha256": "95e80c85e0d5b3874eb4a498b53383fbe5ef213f0d6eb4ab13ab63bc6987b981",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/lib/interface/types/channel_method.dart",
+      "sha256": "015550c00b2cf70ae0af15567668d09bafb9802f10e32b8c3b225e425010154f",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/src/main/AndroidManifest.xml",
+      "sha256": "7d3a9dcdfb705b1808a0e53adf9e3098509bd31c940704c2f00e723f94dd4753",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/src/main/kotlin/com/example/naver_login_flutter/FlutterNaverLoginPlugin.kt",
+      "sha256": "53cca94718d1fc57f627634faa532c49086df2166b72a16c448b0daf710ddd9e",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/src/test/kotlin/com/example/naver_login_flutter/FlutterNaverLoginPluginTest.kt",
+      "sha256": "80d0c50956d256746de47988c00b07d9a01cee6d06efd9d8d5b29dc3c9d394ca",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/gradle/wrapper/gradle-wrapper.jar",
+      "sha256": "2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/android/gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "2caec011a749b18ab9a7dea68bf7639a179a3b8316b0e35655d0a62a1d7390fd",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/Resources/PrivacyInfo.xcprivacy",
+      "sha256": "6d2da0d8d930227d428c1d9363b0ad6e3a12e2c9b68c5ce297158a7412fc8c31",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/naver_login_flutter/Package.swift",
+      "sha256": "a6cd366e672e33b255a6d5bf24e495f2d64a49d88321ba423eb6e4e8d89db087",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/naver_login_flutter/Sources/naver_login_flutter/LoginState.swift",
+      "sha256": "0a2b43a4fdd8f0dc4f37ee0478dc858c1c8e31863a459aedbe458916a158ecd4",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/naver_login_flutter/Sources/naver_login_flutter/FlutterPluginMethod.swift",
+      "sha256": "1197082c0f50bd9dfbb3f5ff6b54a394659f8b8018ed6b2836f2b534800b9347",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/ios/naver_login_flutter/Sources/naver_login_flutter/FlutterNaverLoginPlugin.swift",
+      "sha256": "6750aaebeaba587888bf1423c8df53420c48c023bc9ddbd8235a6e2c5a4cd48c",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/bin/src/ios_configurator.dart",
+      "sha256": "1f5c1802cc5d1f99e8632f5103b53a18b57ebeb33f1a25d883e5c876bb8943f5",
+      "matchesOriginalBuild24Source": true
+    },
+    {
+      "path": "third_party/naver_login_flutter/bin/src/android_configurator.dart",
+      "sha256": "aa2a83837a804349cbee4f4e1f461250c943c72cced1d500a811e2ed300250a8",
+      "matchesOriginalBuild24Source": true
+    }
+  ]
+}

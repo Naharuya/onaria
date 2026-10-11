@@ -35,7 +35,9 @@ test('member SQLite backup restores a consistent snapshot without replacing newe
   assert.equal(reader.prepare('SELECT COUNT(*) AS n FROM members').get().n, 2);
   const reopened = work.own(createMemberStore({ filename: restoredFile }));
   assert.equal(reopened.getAdminOverview().total, 1);
-  assert.throws(() => reopened.create(first), error => error.code === 'PHONE_EXISTS');
+  const sameProfilePhone = reopened.create({ ...first, name: 'Separate Identity', loginProvider: 'google', providerUserId: 'restore-second-provider' });
+  assert.notEqual(sameProfilePhone.id, 1);
+  assert.equal(reopened.getAdminOverview().total, 2);
 });
 
 test('cost SQLite restore preserves known cost, unknown usage and owner quota identity', async t => {

@@ -27,7 +27,7 @@ async function withServer(app, action) { const server = app.listen(0, '127.0.0.1
   try { await action(`http://127.0.0.1:${server.address().port}`); } finally { await new Promise(r => server.close(r)); } }
 async function login(base, provider, credential) { const response = await fetch(`${base}/v1/auth/provider/session`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ provider, credential }) });
   return { response, body: response.status === 201 ? await response.json() : null }; }
-const remove = (base, token) => fetch(`${base}/v1/account`, { method: 'DELETE', headers: token ? { 'X-Onaria-Member-Session': token } : {} });
+const remove = (base, token) => fetch(`${base}/v1/account`, { method: 'DELETE', headers: token ? { 'X-Onaria-Member-Session': token, 'content-type':'application/json' } : {}, body: JSON.stringify({reauthProvider:'google',reauthCredential:'alice'}) });
 
 test('provider login issues opaque session and deletes only verified own member', async () => {
   const { app, deleted, memberSessions } = fixture();
@@ -115,13 +115,13 @@ test('authenticated member can link a second verified provider without creating 
 
   await withServer(app, async base => {
     const appleSession = memberSessions.issue({ provider: 'apple', providerUserId: 'owner' });
-    const response = await fetch(`${base}/v1/auth/provider/signup`, {
+    const response = await fetch(`${base}/v1/account/providers`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
         'X-Onaria-Member-Session': appleSession.token,
       },
-      body: JSON.stringify({ provider: 'kakao', credential: 'kakao-owner' }),
+      body: JSON.stringify({ provider: 'kakao', credential: 'kakao-owner',reauthProvider:'apple',reauthCredential:'owner' }),
     });
     assert.equal(response.status, 200);
     const body = await response.json();
@@ -157,7 +157,7 @@ test('account overview exposes providers and current provider; unlink blocks cur
     assert.equal(body.currentProvider, 'apple');
     const current = await fetch(`${base}/v1/account/providers/apple`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': apple.token } });
     assert.equal(current.status, 409);
-    const other = await fetch(`${base}/v1/account/providers/google`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': apple.token } });
+    const other = await fetch(`${base}/v1/account/providers/google`, { method: 'DELETE', headers: { 'X-Onaria-Member-Session': apple.token, 'content-type':'application/json' }, body:JSON.stringify({reauthProvider:'apple',reauthCredential:'owner'}) });
     assert.equal(other.status, 204);
   });
 });

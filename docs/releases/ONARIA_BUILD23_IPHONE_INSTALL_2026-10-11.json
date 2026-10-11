@@ -1,0 +1,12 @@
+{
+  "device": "iPhone15",
+  "build": "23",
+  "signature": "PASS",
+  "provisioning": "PASS",
+  "installExit": 0,
+  "launchExit": 0,
+  "installedVersion": "1.0.0",
+  "installedBuild": "23",
+  "realSocialProofTest": "NOT_RUN_USER_AUTH_REQUIRED",
+  "realAccountMerge": "NOT_IMPLEMENTED"
+}

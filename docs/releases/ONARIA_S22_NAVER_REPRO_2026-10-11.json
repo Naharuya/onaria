@@ -1,0 +1,16 @@
+{
+  "device": "S22",
+  "build": 22,
+  "logoutInvoked": true,
+  "loginEntry": false,
+  "naverInvoked": false,
+  "visibleSafeLabels": [],
+  "providerSurfaceVisible": false,
+  "authE2E": "NOT VERIFIED",
+  "secondObservation": {
+    "safeLabels": [
+      "로그인"
+    ],
+    "providerSurface": false
+  }
+}

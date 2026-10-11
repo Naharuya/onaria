@@ -1,0 +1,13 @@
+{
+  "model": "S22",
+  "build": "24",
+  "launchOk": true,
+  "homeVisible": true,
+  "accountMenuState": [
+    "로그인됨 · 네이버"
+  ],
+  "optionalMergeEntryVisible": true,
+  "mergeEntryEnabled": "false",
+  "mergeEntryClickable": "false",
+  "unhandledExceptionMarkers": 0
+}

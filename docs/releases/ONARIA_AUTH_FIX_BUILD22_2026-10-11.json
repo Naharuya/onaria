@@ -1,0 +1,57 @@
+{
+  "at": "2026-10-11T08:36:29.222Z",
+  "tests": "16 PASS",
+  "analyze": "PASS",
+  "results": [
+    {
+      "apk": "/Users/ari/ARI/projects/onaria/build/app/outputs/flutter-apk/app-release.apk",
+      "packageId": "com.onaria.app",
+      "version": "1.0.0",
+      "versionCode": "22",
+      "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07",
+      "api": "https://api.onaria.ai.kr",
+      "device": "R3CT10BVG6V",
+      "model": "SM-S908N",
+      "apkSha256": "16af195d5723fa410bf6a5af193ff86afcbebb409b4b83a1316a9a268fc5f97d",
+      "install": "PASS",
+      "launch": "PASS"
+    },
+    {
+      "apk": "/Users/ari/ARI/projects/onaria/build/app/outputs/flutter-apk/app-release.apk",
+      "packageId": "com.onaria.app",
+      "version": "1.0.0",
+      "versionCode": "22",
+      "certificate": "972ae4645e3c7c93fc4d3858250de1a3af93c514386c5d6540efd51652cd3d07",
+      "api": "https://api.onaria.ai.kr",
+      "device": "RFCW1178RRE",
+      "model": "SM-A336N",
+      "apkSha256": "16af195d5723fa410bf6a5af193ff86afcbebb409b4b83a1316a9a268fc5f97d",
+      "install": "PASS",
+      "launch": "PASS"
+    }
+  ],
+  "authE2E": "NOT RUN",
+  "dataClear": false,
+  "uninstall": false,
+  "productionChange": false,
+  "smoke": [
+    {
+      "device": "S22",
+      "menuOpened": true,
+      "loginEntry": true,
+      "naverTapped": true,
+      "cleanupErrorVisible": false,
+      "providerSurfaceVisible": false,
+      "authE2E": "NOT VERIFIED"
+    },
+    {
+      "device": "A33",
+      "menuOpened": true,
+      "loginEntry": false,
+      "naverTapped": false,
+      "cleanupErrorVisible": false,
+      "providerSurfaceVisible": false,
+      "authE2E": "NOT VERIFIED"
+    }
+  ]
+}

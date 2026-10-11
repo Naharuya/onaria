@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'member_record_scope.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -123,7 +124,13 @@ class MindCardStore {
   MindCardStore({SharedPreferencesAsync? preferences})
       : _preferences = preferences ?? SharedPreferencesAsync();
 
-  static const _storageKey = 'soul_bible.mind_cards.v1';
+  static const legacyStorageKey = 'soul_bible.mind_cards.v1';
+  final RecordAccess _access = MemberRecordScope.instance.capture();
+  String get _storageKey {
+    _access.requireCurrent();
+    return _access.key(legacyStorageKey);
+  }
+
   final SharedPreferencesAsync _preferences;
 
   Future<void> save(MindCardRecord card) async {
@@ -225,6 +232,7 @@ class MindCardStore {
         // Ignore an individual record with an incompatible older schema.
       }
     }
+    _access.requireCurrent();
     return cards;
   }
 }
@@ -252,8 +260,17 @@ class DailyUsageStore {
   })  : _preferences = preferences ?? SharedPreferencesAsync(),
         tier = tier ?? MembershipConfig.current;
 
-  static const _dateKey = 'soul_bible.daily_usage.date.v1';
-  static const _countKey = 'soul_bible.daily_usage.count.v1';
+  final RecordAccess _access = MemberRecordScope.instance.capture();
+  String get _dateKey {
+    _access.requireCurrent();
+    return _access.key('soul_bible.daily_usage.date.v1');
+  }
+
+  String get _countKey {
+    _access.requireCurrent();
+    return _access.key('soul_bible.daily_usage.count.v1');
+  }
+
   final SharedPreferencesAsync _preferences;
   final MembershipTier tier;
 
@@ -262,8 +279,11 @@ class DailyUsageStore {
   Future<int> getCount() async {
     final today = _todayKey();
     final savedDate = await _preferences.getString(_dateKey);
+    _access.requireCurrent();
     if (savedDate != today) return 0;
-    return await _preferences.getInt(_countKey) ?? 0;
+    final count = await _preferences.getInt(_countKey) ?? 0;
+    _access.requireCurrent();
+    return count;
   }
 
   Future<bool> tryConsume() async {

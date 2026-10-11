@@ -1,0 +1,12 @@
+{
+  "model": "S22",
+  "device": "R3CT10BVG6V",
+  "launchOk": true,
+  "homeVisible": true,
+  "verificationGateVisible": false,
+  "accountMenuState": [
+    "로그인됨 · 네이버"
+  ],
+  "unhandledExceptionMarkers": 0,
+  "versionCode": "23"
+}

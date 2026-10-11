@@ -44,7 +44,7 @@ test('member deletion is id-scoped, idempotent and allows later re-registration'
   }
 });
 
-test('native SQLite persists members and rejects duplicate phone after reopening', () => {
+test('native SQLite persists members and treats unverified phone as non-identity profile data', () => {
   const directory = mkdtempSync(join(tmpdir(), 'soul-member-test-'));
   const filename = join(directory, 'fixture.sqlite');
   let store;
@@ -60,7 +60,13 @@ test('native SQLite persists members and rejects duplicate phone after reopening
     assert.equal(overview.total, 1);
     assert.equal(overview.recent[0].phone, '010****5678');
     assert.equal(overview.recent[0].churchName, '비공개');
-    assert.throws(() => store.create(fixture), { code: 'PHONE_EXISTS' });
+    const duplicatePhone = store.create({
+      ...fixture,
+      loginProvider: 'google',
+      providerUserId: 'google-second-account',
+    });
+    assert.notEqual(duplicatePhone.id, member.id);
+    assert.equal(duplicatePhone.phone, fixture.phone);
   } finally {
     store?.close();
     rmSync(directory, { recursive: true, force: true });

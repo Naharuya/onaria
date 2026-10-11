@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const consentVersions = Object.freeze({terms:'2026-10-07-adult',privacy:'2026-10-07'});
+
 const phone = z.preprocess(value => value == null || value === '' ? null : value,
   z.string().trim().regex(/^\+?[0-9][0-9 -]{6,19}$/, '전화번호를 확인해 주세요.')
     .transform(value => value.replaceAll('-', '').replaceAll(' ', '')).nullable());
@@ -10,6 +12,8 @@ export const memberSchema = z.object({
   termsAccepted: z.literal(true),
   privacyAccepted: z.literal(true),
   adultConfirmed: z.literal(true),
+  termsVersion: z.literal(consentVersions.terms).default(consentVersions.terms),
+  privacyVersion: z.literal(consentVersions.privacy).default(consentVersions.privacy),
   loginProvider: z.enum(['phone', 'apple', 'naver', 'kakao', 'google']).default('phone'),
   providerUserId: z.string().trim().min(1).max(200).optional(),
 });

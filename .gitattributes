@@ -1,0 +1,4 @@
+
+# Preserve archived diff context and upstream vendored whitespace verbatim.
+docs/releases/patches/*.patch -whitespace
+third_party/naver_login_flutter/** -whitespace

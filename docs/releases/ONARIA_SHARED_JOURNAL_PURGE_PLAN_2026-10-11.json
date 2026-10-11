@@ -1,0 +1,42 @@
+{
+  "status": "SUPERSEDED_NOT_EXECUTED",
+  "applyNotRun": true,
+  "allOlderThanDays": 14,
+  "totalRecords": 5549,
+  "onariaRecords": 3265,
+  "beaversRecords": 16,
+  "systemOrUserRecords": 2268,
+  "bytes": 16777216,
+  "proposedAction": "Delete exactly these two immutable archived journal files after rechecking SHA256, timestamps and counts; no global vacuum or other file deletion",
+  "irreversible": true,
+  "excludes": [
+    "member databases",
+    "application records",
+    "active journals",
+    "other journal archives",
+    "other-project service settings"
+  ],
+  "files": [
+    {
+      "name": "user-1000@66aa6bb4809646fdbf95dc317a9e72c9-0000000000010ce5-00065c0f36088908.journal",
+      "sha256": "41cdc406d584930537587c8cc6576fe7c942e65f221068ac2a98c9456beb8ad3",
+      "records": 2527,
+      "onaria": 1488,
+      "other": 1039
+    },
+    {
+      "name": "user-1000@66aa6bb4809646fdbf95dc317a9e72c9-0000000000000f79-00065bebe5ad6762.journal",
+      "sha256": "e1dbd216ab30f9e2e246836ef59993870a76b3731dc165ec63e7c0ce7175696c",
+      "records": 3022,
+      "onaria": 1777,
+      "other": 1245
+    }
+  ],
+  "replacement": {
+    "method": "verified selective journal rewrite",
+    "removedOnariaEntries": 3265,
+    "retainedOtherEntries": 2284,
+    "otherEntriesRemoved": 0,
+    "commit": "2531cd6de9752249baef6b244a0aec0b96036c90"
+  }
+}

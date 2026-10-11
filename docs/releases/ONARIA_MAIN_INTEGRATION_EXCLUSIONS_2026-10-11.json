@@ -1,0 +1,29 @@
+{
+  "preservedLocalNotCommitted": [
+    ".codex/agents/backend_auth.toml",
+    ".codex/agents/coordinator.toml",
+    ".codex/agents/flutter_device.toml",
+    ".codex/agents/qa_security.toml",
+    ".codex/agents/scheduler.toml",
+    ".codex/agents/server_deploy.toml",
+    ".codex/agents/web_admin.toml",
+    ".codex/config.toml",
+    ".codex/onaria-schedule.json",
+    "docs/ONARIA_SDGs_예비창업가_사업계획서_쉬운초안.docx",
+    "docs/business/ONARIA_SDGs_예비창업가_사업계획서_쉬운초안.docx",
+    "docs/file_management/MOVES_2026-10-10.json",
+    "docs/file_management/ONARIA_FILE_INDEX.csv",
+    "docs/file_management/ONARIA_FILE_INDEX.json",
+    "docs/file_management/ONARIA_FILE_INDEX.md",
+    "docs/file_management/update_file_index.py",
+    "docs/marketing/AUTOMATION_CHECK_2026-10-10.md",
+    "docs/marketing/blog/naver_blog_setup/ONARIA_블로그_첫소개글.txt",
+    "docs/marketing/blog/naver_blog_setup/naver_editorial.json",
+    "docs/marketing/blog/naver_blog_setup/naver_home_design.json",
+    "docs/marketing/blog/naver_blog_setup/onaria-emblem.svg.png",
+    "docs/marketing/blog/naver_blog_setup/onariabanner.png",
+    "docs/marketing/blog/naver_blog_setup/onariaprofile.png",
+    "scripts/build20_release.py"
+  ],
+  "reason": "local agent config, file inventory, marketing/business artifacts and obsolete build20 helper outside release source scope"
+}

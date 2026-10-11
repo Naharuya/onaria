@@ -4,16 +4,10 @@ import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../onaria.dart';
 import '../app/mind_card_store.dart';
+import '../app/member_record_scope.dart';
 import '../app/emotion_card_store.dart';
 import 'conversation_page.dart';
-import 'saved_cards_page.dart';
-import 'growth_page.dart';
-import 'signup_page.dart';
-import 'privacy_page.dart';
-import '../engagement/engagement_page.dart';
-import '../engagement/journey/journey_page.dart';
-import '../engagement/mini_games/cross_light/cross_light_page.dart';
-import '../engagement/notifications/notification_settings_page.dart';
+import 'account_menu.dart';
 
 class CheckInPage extends StatefulWidget {
   const CheckInPage({super.key});
@@ -43,6 +37,7 @@ class _CheckInPageState extends State<CheckInPage> {
   bool _otherEmotion = false;
   final _customEmotion = TextEditingController();
   double _intensity = 5;
+  final _recordAccess = MemberRecordScope.instance.capture();
   final _dailyUsageStore = DailyUsageStore();
   final _emotionCardStore = EmotionCardStore();
   EmotionCardStats _emotionStats =
@@ -128,71 +123,7 @@ class _CheckInPageState extends State<CheckInPage> {
                           fontWeight: FontWeight.w400,
                           letterSpacing: 4)),
                   const Spacer(),
-                  PopupMenuButton<String>(
-                    icon: Icon(Icons.menu,
-                        color: AppTheme.of(context).green, size: 24),
-                    tooltip: '메뉴',
-                    onSelected: (value) {
-                      if (value == 'growth') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const GrowthPage()));
-                      } else if (value == 'saved_cards') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const SavedCardsPage()));
-                      } else if (value == 'signup') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const SignUpPage()));
-                      } else if (value == 'engagement') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const EngagementPage()));
-                      } else if (value == 'journey') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const JourneyPage()));
-                      } else if (value == 'cross_light') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const CrossLightPage()));
-                      } else if (value == 'reminders') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const NotificationSettingsPage()));
-                      } else if (value == 'privacy') {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const PrivacyPage()));
-                      }
-                    },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'growth', child: Text('작은 성장 기록')),
-                      PopupMenuItem(value: 'journey', child: Text('7일 마음의 여정')),
-                      PopupMenuItem(
-                          value: 'engagement', child: Text('말씀과 작은 기록')),
-                      PopupMenuItem(
-                          value: 'cross_light', child: Text('십자가 미니게임')),
-                      PopupMenuItem(value: 'reminders', child: Text('알림 설정')),
-                      PopupMenuItem<String>(
-                        value: 'privacy',
-                        child: Row(children: [
-                          Icon(Icons.privacy_tip_outlined),
-                          SizedBox(width: 12),
-                          Text('계정·로그아웃·회원탈퇴'),
-                        ]),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'signup',
-                        child: Row(children: [
-                          Icon(Icons.login_outlined),
-                          SizedBox(width: 12),
-                          Text('로그인·계정 연결'),
-                        ]),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'saved_cards',
-                        child: Row(children: [
-                          Icon(Icons.bookmarks_outlined),
-                          SizedBox(width: 12),
-                          Text('저장된 카드'),
-                        ]),
-                      ),
-                    ],
-                  ),
+                  const AccountMenuButton(),
                 ]),
                 const SizedBox(height: 16),
                 const Center(child: OnariaEmblem()),
@@ -550,18 +481,26 @@ class _CheckInPageState extends State<CheckInPage> {
   }
 
   Future<void> _loadEmotionCards() async {
-    final stats = await _emotionCardStore.load();
-    if (!mounted) return;
-    setState(() => _emotionStats = stats);
+    try {
+      final stats = await _emotionCardStore.load();
+      if (!mounted || !_recordAccess.current) return;
+      setState(() => _emotionStats = stats);
+    } on StateError {
+      // Account transitions discard this screen and its old record lease.
+    }
   }
 
   Future<void> _loadDailyUsage() async {
-    final count = await _dailyUsageStore.getCount();
-    if (!mounted) return;
-    setState(() {
-      _dailyUsageCount = count;
-      _loadingUsage = false;
-    });
+    try {
+      final count = await _dailyUsageStore.getCount();
+      if (!mounted || !_recordAccess.current) return;
+      setState(() {
+        _dailyUsageCount = count;
+        _loadingUsage = false;
+      });
+    } on StateError {
+      // Do not display counts returned for an earlier account.
+    }
   }
 
   Future<void> _startConversation() async {

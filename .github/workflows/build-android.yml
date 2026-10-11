@@ -80,6 +80,8 @@ jobs:
       - name: Build test APK
         run: |
           printf 'naver.client_id=ci-fixture-id\nnaver.client_secret=ci-fixture-secret\n' > android/naver.properties
+          printf 'ONARIA_KAKAO_NATIVE_APP_KEY=ci-fixture-kakao\n' > android/kakao.properties
+          printf 'ONARIA_KAKAO_NATIVE_APP_KEY = ci-fixture-kakao\n' > ios/Flutter/Kakao.local.xcconfig
           node scripts/sync-naver-config.mjs
           flutter build apk --debug
 
@@ -119,5 +121,7 @@ jobs:
       - name: Compile iOS simulator app without signing
         run: |
           printf 'naver.client_id=ci-fixture-id\nnaver.client_secret=ci-fixture-secret\n' > android/naver.properties
+          printf 'ONARIA_KAKAO_NATIVE_APP_KEY=ci-fixture-kakao\n' > android/kakao.properties
+          printf 'ONARIA_KAKAO_NATIVE_APP_KEY = ci-fixture-kakao\n' > ios/Flutter/Kakao.local.xcconfig
           node scripts/sync-naver-config.mjs
           flutter build ios --simulator --debug --no-codesign

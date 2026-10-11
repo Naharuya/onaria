@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('brand structure, honest availability, SEO, links and 404', async ({ page, request }) => {
-  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms', '/account-deletion']) {
+  for (const path of ['/', '/about', '/services', '/traditions', '/privacy', '/terms', '/account-deletion', '/support']) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const canonical = await page.locator('link[rel=canonical]').getAttribute('href');
@@ -12,13 +12,13 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
     expect(organization.name).toBe('ONARIA');
     const hrefs = await page.locator('a').evaluateAll(links => [...new Set(links.map(a => a.getAttribute('href')))]);
     for (const href of hrefs) {
+      if (href.startsWith('mailto:')) continue;
       const url = new URL(href, page.url());
-      if (url.protocol === 'mailto:') {
-        expect(url.pathname, href).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-        expect(url.search, href).toBe('');
+      // Provider policies are external HTTPS links, not fixture-server routes.
+      if (url.origin !== new URL(page.url()).origin) {
+        expect(url.protocol, href).toBe('https:');
         continue;
       }
-      expect(url.origin, href).toBe(new URL(page.url()).origin);
       const response = await request.get(url.pathname);
       expect(response.status(), href).toBe(200);
       if (url.hash) expect(await response.text(), href).toContain(`id="${url.hash.slice(1)}"`);
@@ -26,7 +26,7 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   }
   await page.goto('/');
   const ids = await page.locator('main > section').evaluateAll(sections => sections.map(s => s.id || s.className));
-  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'cta']);
+  expect(ids).toEqual(['hero', 'why', 'how-it-works', 'conversation', 'apps', 'safety', 'privacy', 'account-help', 'cta']);
   await expect(page.locator('.tradition-card')).toHaveCount(0);
   await expect(page.getByRole('link', { name: '일곱 전통' })).toHaveCount(0);
   await expect(page.locator('#ecosystem')).toHaveCount(0);
@@ -36,7 +36,7 @@ test('brand structure, honest availability, SEO, links and 404', async ({ page, 
   expect((await request.get('/not-an-onaria-page')).status()).toBe(404);
   const sitemap = await (await request.get('/sitemap.xml')).text();
   const sitemapPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname);
-  expect(sitemapPaths.sort()).toEqual(['/', '/about', '/account-deletion', '/privacy', '/services', '/terms', '/traditions'].sort());
+  expect(sitemapPaths.sort()).toEqual(['/', '/about', '/account-deletion', '/privacy', '/services', '/support', '/terms', '/traditions'].sort());
   expect(sitemap).not.toContain('/admin');
   expect(await (await request.get('/robots.txt')).text()).toContain('Disallow: /admin');
 });

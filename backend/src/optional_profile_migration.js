@@ -1,7 +1,14 @@
 // Run explicitly against a backed-up database, never during server startup.
 export function migrateOptionalProfiles(db) {
   const columns = db.prepare('PRAGMA table_info(members)').all();
-  if (!columns.find(column => column.name === 'phone')?.notnull) return false;
+  const phoneColumn = columns.find(column => column.name === 'phone');
+  const phoneUnique = db.pragma("index_list('members')").some(index => {
+    if (!index.unique) return false;
+    const escaped = String(index.name).replaceAll("'", "''");
+    const names = db.pragma(`index_info('${escaped}')`).map(row => row.name);
+    return names.length === 1 && names[0] === 'phone';
+  });
+  if (!phoneColumn?.notnull && !phoneUnique) return false;
   const expected = ['id', 'name', 'phone', 'church_name', 'login_provider', 'provider_user_id', 'created_at', 'updated_at', 'terms_version', 'privacy_version', 'consented_at'];
   if (columns.length !== expected.length || expected.some(name => !columns.some(column => column.name === name))) {
     throw new Error('Unsupported member schema; migration requires review.');
@@ -15,7 +22,7 @@ export function migrateOptionalProfiles(db) {
     db.transaction(() => {
       db.exec(`CREATE TABLE members_optional (
         id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL,
-        phone TEXT UNIQUE, church_name TEXT NOT NULL,
+        phone TEXT, church_name TEXT NOT NULL,
         login_provider TEXT NOT NULL DEFAULT 'phone', provider_user_id TEXT,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,

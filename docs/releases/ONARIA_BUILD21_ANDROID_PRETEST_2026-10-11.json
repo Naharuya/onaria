@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "device": "S22",
+      "coldLaunch": true,
+      "menu": true,
+      "logoutVisibleAfterRelaunch": true,
+      "version21": true,
+      "accountPageEntry": true,
+      "accountPageObserved": true,
+      "backNavigation": true
+    },
+    {
+      "device": "A33",
+      "coldLaunch": true,
+      "menu": true,
+      "logoutVisibleAfterRelaunch": true,
+      "version21": true,
+      "accountPageEntry": true,
+      "accountPageObserved": true,
+      "backNavigation": true
+    }
+  ],
+  "authE2E": "NOT RUN",
+  "recordPreservation": "NOT VERIFIED",
+  "logoutPerformed": false,
+  "withdrawalPerformed": false
+}

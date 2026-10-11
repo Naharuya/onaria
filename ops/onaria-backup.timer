@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily ONARIA SQLite Backup
+
+[Timer]
+OnCalendar=*-*-* 03:17:00 Asia/Seoul
+Persistent=true
+RandomizedDelaySec=10m
+Unit=onaria-backup.service
+
+[Install]
+WantedBy=timers.target
