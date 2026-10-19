@@ -1,3 +1,4 @@
+import { emotionResponsePolicy, explicitlyRequestsVerse } from './emotion_response_policy.js';
 import { assessRequestCrisis, crisisResponse } from './crisis.js';
 
 const stageReplies = {
@@ -41,7 +42,11 @@ export function createLocalConversationService() {
   return async function generate(body, agent, memorySummary = '') {
     const safety = assessRequestCrisis(body);
     if (safety.level > 0) return crisisResponse(body.session.selectedEmotion, safety);
-    const stage = selectStage(body.session);
+    let stage = selectStage(body.session);
+    const policy = emotionResponsePolicy({ emotion: body.session.selectedEmotion,
+      intensity: body.session.emotionIntensity, customEmotion: body.session.customEmotion });
+    const deferVerse = policy.deferVerse && !explicitlyRequestsVerse(body.userMessage);
+    if (deferVerse && stage === 'verse_offer') stage = (body.session.turnCount ?? 0) >= 4 ? 'summary' : 'need';
     const reply = stageReplies[stage];
     const shouldOfferVerse = stage === 'verse_offer' && body.allowedVerseIds.length > 0;
     const shouldEndConversation = stage === 'summary';
@@ -49,6 +54,8 @@ export function createLocalConversationService() {
     const summary = memorySummary || `${emotion}한 마음과 그 배경을 차분히 살펴보고 있습니다.`;
 
     return {
+      responseMode: 'local',
+      ...(deferVerse ? { continueConversation: !shouldEndConversation } : {}),
       message: reply.message(emotion),
       question: body.session.customEmotion && reply.question
         ? `“${body.session.customEmotion}”라고 적어 주신 마음을 떠올려 볼게요. ${reply.question}`

@@ -24,6 +24,10 @@ export const requestSchema = z.object({
   }).passthrough(),
   userMessage: z.string().trim().min(1).max(2000),
   systemPromptVersion: z.string().min(1).max(40),
+  // Client catalog metadata is selection data, never citation evidence.
+  verseCandidates: z.array(z.object({
+    id: z.string().min(1).max(100), tags: z.array(z.string().max(40)).max(8),
+  }).strict()).max(8).optional(),
   allowedVerseIds: z.array(z.string().min(1).max(100)).max(100),
   locale: z.literal('ko-KR').default('ko-KR'),
   agentMode: z.enum(agentIds).default('auto'),
@@ -33,6 +37,8 @@ export const requestSchema = z.object({
 }).strict();
 
 export const responseSchema = z.object({
+  continueConversation: z.boolean().optional(),
+  responseMode: z.enum(['ai', 'local']).optional(),
   message: z.string().min(1).max(1200),
   question: z.string().max(500).nullable(),
   answerExamples: answerExamplesSchema,

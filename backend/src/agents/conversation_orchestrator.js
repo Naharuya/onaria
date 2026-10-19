@@ -22,6 +22,7 @@ export function normalizeContext(request, memorySummary) {
     emotion: body.session.selectedEmotion, intensity: body.session.emotionIntensity,
     ...(body.session.customEmotion ? { customEmotion: body.session.customEmotion } : {}),
     userMessage: body.userMessage, allowedVerseIds: body.allowedVerseIds,
+    verseCandidates: (body.verseCandidates ?? []).filter(item => body.allowedVerseIds.includes(item.id)),
     conversationState: body.session,
     memorySummary: memorySummary || body.session.conversationMemory || body.session.conversationSummary || '',
   };

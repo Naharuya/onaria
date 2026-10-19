@@ -6,6 +6,7 @@ class LlmConversationRequest {
     required this.userMessage,
     required this.systemPromptVersion,
     this.allowedVerseIds = const [],
+    this.verseCandidates = const [],
     this.locale = 'ko-KR',
     this.agentMode = 'auto',
     this.verseLanguage = 'bilingual',
@@ -16,6 +17,7 @@ class LlmConversationRequest {
   final String userMessage;
   final String systemPromptVersion;
   final List<String> allowedVerseIds;
+  final List<Map<String, dynamic>> verseCandidates;
   final String locale;
   final String agentMode;
   final String verseLanguage;
@@ -26,6 +28,7 @@ class LlmConversationRequest {
         'userMessage': userMessage,
         'systemPromptVersion': systemPromptVersion,
         'allowedVerseIds': allowedVerseIds,
+        if (verseCandidates.isNotEmpty) 'verseCandidates': verseCandidates,
         'locale': locale,
         'agentMode': agentMode,
         'verseLanguage': verseLanguage,
@@ -42,6 +45,8 @@ class LlmConversationResponse {
     required this.riskLevel,
     required this.shouldOfferVerse,
     required this.shouldEndConversation,
+    this.continueConversation = false,
+    this.responseMode,
     this.question,
     this.answerExamples = const [],
     this.secondaryEmotion,
@@ -54,6 +59,8 @@ class LlmConversationResponse {
     this.integratedInsight,
   });
 
+  final bool continueConversation;
+  final String? responseMode;
   final String message;
   final String? question;
   final List<String> answerExamples;
@@ -78,6 +85,8 @@ class LlmConversationResponse {
     }
 
     return LlmConversationResponse(
+      continueConversation: json['continueConversation'] == true,
+      responseMode: _nullableString(json['responseMode']),
       message: _requiredString(json, 'message'),
       question: _nullableString(json['question']),
       // Older servers omit this optional field. Bad suggestions cannot discard
@@ -106,6 +115,8 @@ class LlmConversationResponse {
   }
 
   Map<String, dynamic> toJson() => {
+        if (continueConversation) 'continueConversation': true,
+        if (responseMode != null) 'responseMode': responseMode,
         'message': message,
         'question': question,
         if (answerExamples.isNotEmpty) 'answerExamples': answerExamples,
@@ -141,15 +152,20 @@ class LlmConversationResponse {
     return trimmed.isEmpty ? null : trimmed;
   }
 
-  static String _stringOrEmpty(Object? value) => value is String ? value.trim() : '';
+  static String _stringOrEmpty(Object? value) =>
+      value is String ? value.trim() : '';
 
   static List<String> _stringList(Object? value) {
     if (value == null) return const [];
     if (value is! List) {
       throw const FormatException('Expected a list.');
     }
-    return value.whereType<String>().map((e) => e.trim()).where(
-      (e) => e.isNotEmpty,
-    ).toList(growable: false);
+    return value
+        .whereType<String>()
+        .map((e) => e.trim())
+        .where(
+          (e) => e.isNotEmpty,
+        )
+        .toList(growable: false);
   }
 }

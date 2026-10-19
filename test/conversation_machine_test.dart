@@ -10,6 +10,34 @@ void main() {
     emotionIntensity: 4,
   );
 
+  test('adaptive response continues beyond three turns and closes at five', () {
+    const response = LlmConversationResponse(
+      message: '지금 필요한 것을 더 살펴볼게요.',
+      question: '어떤 도움이 필요할까요?',
+      stage: ConversationStage.need,
+      detectedEmotion: EmotionType.anxiety,
+      riskLevel: 0,
+      shouldOfferVerse: false,
+      shouldEndConversation: false,
+      continueConversation: true,
+      responseMode: 'ai',
+    );
+    var session = base;
+    for (var turn = 1; turn <= 5; turn++) {
+      final result = machine.applyLlmResponse(session, response);
+      expect(
+          result.uiAction,
+          turn == 5
+              ? ConversationUiAction.end
+              : ConversationUiAction.showMessage);
+      expect(result.session.isEnded, turn == 5);
+      session = result.session;
+    }
+    final parsed = LlmConversationResponse.fromJson(response.toJson());
+    expect(parsed.continueConversation, isTrue);
+    expect(parsed.responseMode, 'ai');
+  });
+
   test('3턴 이전 말씀 점프를 차단한다', () {
     final response = LlmConversationResponse(
       message: '말씀을 살펴볼 수 있어요.',
@@ -55,9 +83,11 @@ void main() {
     var session = base;
     for (var answer = 1; answer <= 3; answer++) {
       final result = machine.applyLlmResponse(session, response);
-      expect(result.uiAction, answer == 3
-          ? ConversationUiAction.showVerseConsent
-          : ConversationUiAction.showMessage);
+      expect(
+          result.uiAction,
+          answer == 3
+              ? ConversationUiAction.showVerseConsent
+              : ConversationUiAction.showMessage);
       expect(result.session.isEnded, isFalse);
       session = result.session;
     }

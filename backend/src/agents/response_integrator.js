@@ -1,3 +1,4 @@
+import { emotionResponsePolicy, explicitlyRequestsVerse } from '../emotion_response_policy.js';
 import { responseSchema } from '../schema.js';
 import { psychologySchema } from './agent_contracts.js';
 import { toLegacyReligion } from './specialist_result.js';
@@ -16,16 +17,18 @@ export function integrateResponse({ context, psychology, religion, agent }) {
   const state = context.conversationState;
   const turn = state.turnCount ?? 0;
   const ended = turn > 5 && !state.verseAccepted && !state.selectedVerse;
-  const canOfferVerse = context.religion === 'protestant' && turn >= 2 && !ended
+  const deferVerse = emotionResponsePolicy(context).deferVerse && !explicitlyRequestsVerse(context.userMessage);
+  const canOfferVerse = !deferVerse && context.religion === 'protestant' && turn >= 2 && !ended
     && !state.verseAccepted && !state.selectedVerse && context.allowedVerseIds.length > 0;
   const stage = ended ? 'summary' : state.verseAccepted || state.selectedVerse ? 'action'
-    : canOfferVerse ? 'verse_offer' : turn >= 2 ? 'action' : turn === 0 ? 'thought' : 'need';
+    : canOfferVerse ? 'verse_offer' : deferVerse ? 'need' : turn >= 2 ? 'action' : turn === 0 ? 'thought' : 'need';
   // Preserve legacy selection of client-owned Bible IDs without generating verse text.
   // IDs are never treated as sourceContext or offered to other religions.
   return responseSchema.parse({
     message: [psychology.emotionSummary, religion.perspective, religion.guidance, ...religion.cautions].join('\n\n'),
     question: ended || canOfferVerse ? null : religion.reflectionQuestion,
     ...(!ended && !canOfferVerse && religion.answerExamples ? { answerExamples: religion.answerExamples } : {}),
+    continueConversation: !ended && !canOfferVerse,
     stage, detectedEmotion: context.emotion, secondaryEmotion: null, riskLevel: 0,
     shouldOfferVerse: canOfferVerse, verseTags: [], actionTags: stage === 'action' ? ['작은 행동'] : [],
     shouldEndConversation: ended, suggestedVerseId: canOfferVerse ? context.allowedVerseIds[0] : null,

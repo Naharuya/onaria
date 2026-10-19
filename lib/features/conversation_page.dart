@@ -12,6 +12,7 @@ import '../app/ai_consent.dart';
 import '../app/asset_loader.dart';
 import '../app/mind_card_store.dart';
 import '../app/verse_narration.dart';
+import '../app/verse_history.dart';
 import '../onaria.dart';
 import '../engagement/engagement_controller.dart';
 import '../engagement/domain_events.dart';
@@ -176,9 +177,12 @@ class _ConversationPageState extends State<ConversationPage> {
     '나에게 친한 사람에게 하듯 따뜻한 말을 한 문장 건네보기',
   ];
 
+  EmotionType get _currentEmotion => _detectedEmotion ?? widget.emotion;
+  EmotionType? _detectedEmotion;
+
   List<String> get _currentActions {
     if (_agentMode == 'clinical_reflection') return _clinicalActions;
-    return _emotionSpecificActions[widget.emotion] ??
+    return _emotionSpecificActions[_currentEmotion] ??
         ['1분간 천천히 호흡하기', '믿을 수 있는 사람에게 안부 보내기', '짧게 기도하고 마음 한 줄 적기'];
   }
 
@@ -187,13 +191,30 @@ class _ConversationPageState extends State<ConversationPage> {
     final assistant = _items.where((item) => !item.fromUser).lastOrNull;
     final question = assistant?.question;
     if (question == null) return const [];
+    final positive = const {
+      EmotionType.gratitude,
+      EmotionType.joy,
+      EmotionType.happiness,
+      EmotionType.anticipation,
+      EmotionType.admiration
+    }.contains(_currentEmotion);
+    final sameEmotion =
+        _currentEmotion == widget.emotion && _customFeeling == null;
+    final mixed = _customFeeling != null ||
+        const {EmotionType.surprise, EmotionType.overwhelmed}
+            .contains(_currentEmotion);
+    final limit = mixed
+        ? 2
+        : !positive && sameEmotion && widget.intensity >= 7
+            ? (widget.intensity >= 9 ? 1 : 2)
+            : 3;
     return conversationQuestionExamples(
       _questionText(question),
       answerExamples: assistant!.answerExamples,
       userMessage: _session.lastUserMessage ?? '',
-      emotion: widget.emotion,
-      situationExamples: emotionSituationExamples[widget.emotion] ?? const [],
-    );
+      emotion: _currentEmotion,
+      situationExamples: emotionSituationExamples[_currentEmotion] ?? const [],
+    ).take(limit).toList();
   }
 
   final _controller = TextEditingController();
@@ -273,7 +294,7 @@ class _ConversationPageState extends State<ConversationPage> {
     if (text.isEmpty ||
         _busy ||
         _session.isEnded ||
-        _session.turnCount >= _machine.maxCoreTurns) {
+        _session.turnCount >= _machine.maxCoreTurns + _machine.maxExtraTurns) {
       return;
     }
     // Crisis assistance stays local and never waits for an AI consent dialog.
@@ -306,6 +327,7 @@ class _ConversationPageState extends State<ConversationPage> {
     final assessment = customAssessment.level > typedAssessment.level
         ? customAssessment
         : typedAssessment;
+    final requestSession = _session;
     final local = _machine.applyLocalCrisis(_session, assessment, text);
     _session = local.session;
     if (assessment.isCrisis) {
@@ -326,18 +348,25 @@ class _ConversationPageState extends State<ConversationPage> {
         return;
       }
       final allowedVerses = await _verseRepository.findForEmotion(
-        widget.emotion,
+        _currentEmotion,
         limit: 100,
       );
       final consentGranted = await AiConsent.isGranted();
       if (!mounted || !consentGranted) return;
       final response = await client.send(LlmConversationRequest(
-        session: _session,
+        session: requestSession,
         userMessage: text,
         systemPromptVersion: 'ko-v1',
         externalAiConsentVersion: AiConsent.version,
         allowedVerseIds:
             allowedVerses.map((verse) => verse.id).toList(growable: false),
+        verseCandidates: allowedVerses
+            .take(8)
+            .map((verse) => <String, dynamic>{
+                  'id': verse.id,
+                  'tags': verse.tags.take(8).toList(),
+                })
+            .toList(),
         agentMode: _agentMode,
         verseLanguage: _verseLanguage,
       ));
@@ -357,10 +386,13 @@ class _ConversationPageState extends State<ConversationPage> {
       }
       _session =
           transition.session.copyWith(agentMemory: response.memorySummary);
+      _detectedEmotion = response.detectedEmotion;
       _lastAgent = response.agent;
       _clinicalReflection = response.clinicalReflection;
       _integratedInsight = response.integratedInsight;
-      final suggestedVerse = response.suggestedVerseId == null
+      final suggestedVerse = response.suggestedVerseId == null ||
+              !allowedVerses
+                  .any((verse) => verse.id == response.suggestedVerseId)
           ? null
           : await _verseRepository.getById(response.suggestedVerseId!);
       if (!mounted) return;
@@ -369,11 +401,14 @@ class _ConversationPageState extends State<ConversationPage> {
               !_session.isEnded &&
               _session.riskLevel == 0 &&
               (suggestedVerse != null || allowedVerses.isNotEmpty);
-      _suggestedVerse = suggestedVerse ?? allowedVerses.firstOrNull;
+      _suggestedVerse = response.responseMode == 'ai' ? suggestedVerse : null;
       setState(() {
-        final replyParts = <String>[response.message];
+        final replyParts = <String>[
+          if (response.responseMode == 'local') '지금은 AI 대신 준비된 안내로 이어가고 있어요.',
+          response.message,
+        ];
         if (shouldAutoShowVerse) {
-          replyParts.add('세 가지 마음 이야기를 나누었으니, 지금 마음에 머물 수 있는 말씀 한 구절을 함께 볼게요.');
+          replyParts.add('지금 나눈 마음을 떠올리며 말씀 한 구절을 함께 볼게요.');
         }
         if (transition.uiAction == ConversationUiAction.end) {
           replyParts.add('오늘 대화를 여기서 마칠게요.');
@@ -419,7 +454,33 @@ class _ConversationPageState extends State<ConversationPage> {
     final turn = _session.turnCount > previousTurn
         ? _session.turnCount
         : previousTurn + 1;
-    final complete = turn >= _machine.maxCoreTurns;
+    final positive = const {
+      EmotionType.gratitude,
+      EmotionType.joy,
+      EmotionType.happiness,
+      EmotionType.anticipation,
+      EmotionType.admiration
+    }.contains(_currentEmotion);
+    final deferReading = _customFeeling != null ||
+        const {EmotionType.overwhelmed, EmotionType.surprise}
+            .contains(_currentEmotion) ||
+        (!positive &&
+            _currentEmotion == widget.emotion &&
+            widget.intensity >= 7);
+    final complete = turn >=
+        (deferReading
+            ? _machine.maxCoreTurns + _machine.maxExtraTurns
+            : _machine.maxCoreTurns);
+    if (complete && deferReading) {
+      setState(() {
+        _session = _session.copyWith(
+            turnCount: turn, stage: ConversationStage.ended, isEnded: true);
+        _busy = false;
+        _showVerseOffer = false;
+        _items.add(const _ChatItem('AI에 연결하지 못했어요. 오늘은 여기서 쉬어 가도 괜찮아요.'));
+      });
+      return;
+    }
     setState(() {
       _session = _session.copyWith(
         turnCount: turn,
@@ -606,9 +667,9 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _acceptVerse() async {
-    final verse = _suggestedVerse ??
-        (await _verseRepository.findForEmotion(widget.emotion, limit: 1))
-            .firstOrNull;
+    final verse = await VerseHistory().choose(_suggestedVerse != null
+        ? [_suggestedVerse!]
+        : await _verseRepository.findForEmotion(_currentEmotion, limit: 100));
     if (!mounted || verse == null) return;
     _session = _machine.acceptVerse(_session, verseId: verse.id).session;
     setState(() {
@@ -619,9 +680,9 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _showVerseAutomatically() async {
-    final verse = _suggestedVerse ??
-        (await _verseRepository.findForEmotion(widget.emotion, limit: 1))
-            .firstOrNull;
+    final verse = await VerseHistory().choose(_suggestedVerse != null
+        ? [_suggestedVerse!]
+        : await _verseRepository.findForEmotion(_currentEmotion, limit: 100));
     if (!mounted || verse == null) {
       if (mounted) _showVoiceMessage('지금은 말씀을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
       return;
@@ -888,7 +949,7 @@ class _ConversationPageState extends State<ConversationPage> {
                           child: Padding(
                               padding: const EdgeInsets.only(bottom: 22),
                               child: Text(
-                                  '마음을 살피는 조용한 대화 · ${_session.turnCount}/3',
+                                  '마음을 살피는 조용한 대화 · ${_session.turnCount}/${_machine.maxCoreTurns + _machine.maxExtraTurns}',
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: AppTheme.of(context).gold,

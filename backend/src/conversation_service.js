@@ -1,3 +1,4 @@
+import { applySupportTurn } from './emotion_response_policy.js';
 import { brandEnv } from './brand_env.js';
 import { ZodError } from 'zod';
 import OpenAI from 'openai';
@@ -18,7 +19,7 @@ import { classifyTask, routeModel, routeCostRequest, applySessionTarget, costRou
 import { compactModelInput, COST_PREFIX } from './cost/prompt_context.js';
 import { createUsageLedger } from './cost/usage_ledger.js';
 import { readPricing, estimateCost } from './cost/model_pricing.js';
-import { createPsychologyAgent, createSupportTurn } from './agents/psychology_agent.js';
+import { createSupportTurn } from './agents/psychology_agent.js';
 import { reviewPsychologyIntegrity } from './agents/religious_integrity_agent.js';
 import { buildSourceContext } from './knowledge/source_context_builder.js';
 import { calculateRetrievalConfidence } from './knowledge/retrieval_confidence.js';
@@ -319,21 +320,23 @@ export function createConversationService({ env = process.env, logger = console,
           if (turn.empathy.length < 8 || turn.nextQuestion === input.session.previousAssistantQuestion) {
             const error = new Error('Response quality insufficient.'); error.code = 'COST_QUALITY'; throw error;
           }
-          result.message = turn.empathy;
-          result.detectedEmotion = turn.emotion;
-          if (result.question !== null) result.question = turn.nextQuestion;
-          if (result.question && turn.answerExamples) result.answerExamples = turn.answerExamples;
+          applySupportTurn(result, turn, context, { allowVerse: routing.tradition === 'protestant' });
           result.memorySummary = [context.memorySummary.slice(-600), turn.summary].filter(Boolean).join('\n').slice(-800);
           return responseSchema.parse(result);
         }
         if (!v1 && selectedTier === 'cheap') {
           const context = normalizeContext(input, memory);
           const routing = resolveReligion(input);
-          const reflection = reviewPsychologyIntegrity(await createPsychologyAgent({ runStructured })(context, { signal }), { religion: routing.tradition });
+          const turn = await createSupportTurn({ runStructured })(context, { signal });
+          reviewPsychologyIntegrity({ emotionSummary: turn.empathy, supportNeed: turn.summary,
+            suggestedTone: 'gentle', avoid: [turn.nextQuestion] }, { religion: routing.tradition });
           signal.throwIfAborted();
+          if (turn.empathy.length < 8 || turn.nextQuestion === input.session.previousAssistantQuestion) {
+            const error = new Error('Response quality insufficient.'); error.code = 'COST_QUALITY'; throw error;
+          }
           const result = await fallback(input, selectedAgent, memory, routing.tradition !== 'protestant');
-          result.message = reflection.emotionSummary;
-          result.memorySummary = [memory, reflection.emotionSummary].filter(Boolean).join('\n').slice(-4000);
+          applySupportTurn(result, turn, context, { allowVerse: routing.tradition === 'protestant' });
+          result.memorySummary = [memory.slice(-600), turn.summary].filter(Boolean).join('\n').slice(-800);
           return responseSchema.parse(result);
         }
         return createConversationOrchestrator({ runStructured, selectReligion, knowledgeProvider: selectedKnowledgeProvider, corpusMode, strictEvidence: v1,

@@ -61,8 +61,9 @@ class ConversationMachine {
     ConversationSession session,
     LlmConversationResponse response,
   ) {
-    final mergedRisk =
-        response.riskLevel > session.riskLevel ? response.riskLevel : session.riskLevel;
+    final mergedRisk = response.riskLevel > session.riskLevel
+        ? response.riskLevel
+        : session.riskLevel;
 
     if (mergedRisk > 0 || response.stage == ConversationStage.crisis) {
       return ConversationTransition(
@@ -135,7 +136,13 @@ class ConversationMachine {
     ConversationSession session,
     LlmConversationResponse response,
   ) {
-    // Advance after three completed user/assistant exchanges.
+    // New servers may keep exploring instead of forcing a reading at turn three.
+    if (response.continueConversation && !response.shouldOfferVerse) {
+      return response.stage == ConversationStage.verseOffer
+          ? ConversationStage.need
+          : response.stage;
+    }
+    // Preserve the legacy contract for older servers.
     if (session.turnCount + 1 >= maxCoreTurns &&
         session.selectedVerseId == null &&
         session.verseAccepted == null &&

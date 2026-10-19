@@ -11,8 +11,8 @@ export function compactModelInput(input) {
     ...rest,
     memorySummary: String(memory).slice(-800),
     recentTurns: [
-      ...(previousAssistantQuestion ? [{ role: 'assistant', content: String(previousAssistantQuestion).slice(-400) }] : []),
       ...(previousUserAnswer && previousUserAnswer !== input.userMessage ? [{ role: 'user', content: String(previousUserAnswer).slice(-600) }] : []),
+      ...(previousAssistantQuestion ? [{ role: 'assistant', content: String(previousAssistantQuestion).slice(-400) }] : []),
     ],
     conversationState: state,
     ...(input.sourceContext ? { sourceContext: input.sourceContext.slice(0, 3).map(source => ({

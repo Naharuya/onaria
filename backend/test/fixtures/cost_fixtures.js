@@ -13,7 +13,10 @@ export function costFactory(calls = []) {
   return ({ model }) => ({ runStructured: async (task, options) => {
     calls.push({ model, name: task.name });
     options.onUsage?.({ inputTokens: 1000, cachedInputTokens: 400, outputTokens: 100 });
-    return task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput();
+    return task.name === 'support_turn_v1' ? { emotion: '불안', empathy: '불안한 마음을 천천히 이야기해 주세요.',
+      nextQuestion: '지금 가장 필요한 도움은 무엇인가요?', summary: '불안과 쉼의 필요',
+      answerExamples: ['저는 잠시 쉬고 싶어요.', '저는 이야기를 나누고 싶어요.'], readyForVerse: false, suggestedVerseId: null,
+    } : task.name === 'psychology_reflection' ? psychologyOutput() : religionOutput();
   } });
 }
 export const costKnowledge = {

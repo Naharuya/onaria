@@ -103,10 +103,15 @@ test('stage 9: provider failure returns HTTP 200 with the legacy local response'
 
 test('stage 9: legacy verse ID selection survives enabling orchestration', async () => {
   const generate = createConversationService({ env, openAiFactory: () => ({ runStructured: fakeStructured([]) }) });
-  const payload = body(); payload.session.turnCount = 2;
+  const payload = body(); payload.session.turnCount = 2; payload.session.emotionIntensity = 4;
   await withServer(generate, async (post) => {
     const json = await (await post(payload)).json();
     assert.equal(json.stage, 'verse_offer'); assert.equal(json.shouldOfferVerse, true);
     assert.equal(json.suggestedVerseId, 'PHP_4_6_7');
+    payload.session.emotionIntensity = 9;
+    const deferred = await (await post(payload)).json();
+    assert.equal(deferred.shouldOfferVerse, false);
+    assert.equal(deferred.continueConversation, true);
+    assert.equal(deferred.stage, 'need');
   });
 });

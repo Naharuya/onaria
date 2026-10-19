@@ -24,9 +24,14 @@ List<String> conversationQuestionExamples(
   final difficult = RegExp(r'걱정|불안|두려|힘들|힘든|슬프|슬펐|슬픈|서운|잘못|괴로|외로|화가|기쁘지|행복하지');
   final positive = !difficult.hasMatch('$q $userMessage') &&
       (const {
-        EmotionType.joy, EmotionType.happiness, EmotionType.gratitude,
-        EmotionType.anticipation, EmotionType.admiration, EmotionType.overwhelmed,
-      }.contains(emotion) || RegExp(r'기뻐|기뻤|기쁨|기쁜|기뻐요|기뻐서|기뻐했|기쁘|행복|즐거|즐겁|감사|고마|설레|감탄|벅차').hasMatch(userMessage));
+            EmotionType.joy,
+            EmotionType.happiness,
+            EmotionType.gratitude,
+            EmotionType.anticipation,
+            EmotionType.admiration,
+          }.contains(emotion) ||
+          RegExp(r'기뻐|기뻤|기쁨|기쁜|기뻐요|기뻐서|기뻐했|기쁘|행복|즐거|즐겁|감사|고마|설레|감탄')
+              .hasMatch(userMessage));
   final together = RegExp(r'함께|친구|가족|사람|웃고|웃으며').hasMatch(userMessage);
   final supplied = answerExamples
       .map((value) => value.trim())
@@ -39,6 +44,7 @@ List<String> conversationQuestionExamples(
       .toSet()
       .take(3)
       .toList();
+  if (supplied.isNotEmpty) return supplied;
   const choices = {
     '위로': '지금은 그냥 위로받고 싶어요.',
     '이해': '제 마음을 누군가 알아줬으면 좋겠어요.',
@@ -50,7 +56,6 @@ List<String> conversationQuestionExamples(
     offered.sort((a, b) => q.indexOf(a).compareTo(q.indexOf(b)));
     return offered.map((word) => choices[word]!).toList();
   }
-  if (supplied.isNotEmpty) return supplied;
   // Unrecognized explicit choices must never be answered with generic text.
   if (RegExp(r'중에서|중 무엇|중 어떤|중 어느|아니면').hasMatch(q)) {
     return const [];
@@ -90,7 +95,9 @@ List<String> conversationQuestionExamples(
   if (RegExp(r'(마음에 남|기억에 남).*(무엇|어떤)|(무엇|어떤).*(마음에 남|기억에 남)').hasMatch(q)) {
     if (positive) {
       return [
-        together ? '저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요.' : '저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요.',
+        together
+            ? '저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요.'
+            : '저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요.',
         '저는 마음이 따뜻해지던 순간이 기억에 남아요.',
         '저는 저도 모르게 미소 짓던 순간이 기억에 남아요.',
       ];
@@ -104,7 +111,9 @@ List<String> conversationQuestionExamples(
   if (RegExp(r'어떤 생각|무슨 생각|떠오른 생각|떠오르는 생각').hasMatch(q)) {
     if (positive) {
       return [
-        together ? '저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.' : '저는 이런 순간을 오래 기억하고 싶다고 생각했어요.',
+        together
+            ? '저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.'
+            : '저는 이런 순간을 오래 기억하고 싶다고 생각했어요.',
         '저는 오늘 이 순간이 참 소중하다고 생각했어요.',
         '저는 이 기쁜 마음을 나누고 싶다고 생각했어요.',
       ];

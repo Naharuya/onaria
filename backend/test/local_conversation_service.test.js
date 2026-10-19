@@ -10,7 +10,7 @@ function body(turnCount, overrides = {}) {
     session: {
       sessionId: 'local-test',
       selectedEmotion: '불안',
-      emotionIntensity: 7,
+      emotionIntensity: 4,
       turnCount,
       ...overrides,
     },

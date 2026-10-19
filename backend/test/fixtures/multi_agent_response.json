@@ -13,5 +13,6 @@
   "agent": "integrated",
   "memorySummary": "발표를 앞두고 마음이 복잡하시군요. 필요: 안정과 쉼",
   "clinicalReflection": null,
-  "integratedInsight": null
+  "integratedInsight": null,
+  "continueConversation": true
 }

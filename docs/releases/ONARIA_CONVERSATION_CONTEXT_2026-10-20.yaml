@@ -1,0 +1,36 @@
+PROJECT: ONARIA
+BASE_COMMIT: 75579eddaa83803a6d36ad026bf6e0476470b37a
+ISSUE_FOUND:
+  - Current input replaced the prior user answer in conversation requests.
+  - Model history reversed the prior answer and follow-up question.
+  - Three turns forced scripture even when the user needed more conversation.
+  - Generic suggestions could override examples authored with the actual question.
+PRIORITY: P1 core conversation
+IMPLEMENTED:
+  - Snapshot prior session before local crisis update; preserve safety-first execution.
+  - Keep previous user answer, assistant follow-up, current input in chronological order.
+  - Generate empathy, question, examples and reading readiness in one support call.
+  - Continue adaptive support beyond three turns, with a five-turn app limit.
+  - Calibrate difficult feelings at 1-3, 4-6, 7-8 and 9-10; reduce examples at high intensity.
+  - Savor positive emotions; clarify mixed feelings; do not transfer old intensity to a new emotion.
+  - Defer reading during strong difficult or mixed feelings unless explicitly requested.
+  - Select existing local verse IDs using at most eight candidates with tags, without generating scripture.
+  - Reject suggested IDs outside the submitted local catalog; rotate local fallback readings by existing history.
+  - Identify prepared local fallback responses in the UI.
+PRIVACY_AND_CONTENT:
+  - No new conversation persistence, credentials, databases or scripture ingestion.
+  - Candidate tags are selection metadata and never citation evidence.
+  - Existing consent, crisis detection, provider gates, content checks and cost quotas remain active.
+TEST:
+  backend: 525 passed, isolated fake providers; no paid calls
+  flutter_full: 198 passed, 1 skipped before final mixed-feeling filter adjustment
+  flutter_final_filter_and_history: 3 passed
+  static_analysis: 0 errors, 0 warnings, 49 informational findings
+  installer_regression: 15 passed, 1 skipped; no device installation
+DEPLOYMENT:
+  status: Source change only; production and installed apps unchanged
+  order: Deploy the compatible backend before distributing the app that sends verseCandidates
+  ai_activation: Existing server configuration and consent still required; not changed here
+  real_provider_quality: NOT RUN; synthetic regression is not live-model validation
+  content_limit: Rotation cannot provide variety when only one eligible local verse exists
+CI: Verify the exact pushed commit in GitHub Actions; no device workflow dispatch

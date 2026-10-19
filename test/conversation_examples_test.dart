@@ -42,7 +42,7 @@ class _ExampleClient implements LlmApiClient {
     return LlmConversationResponse(
       message: '이야기해 주셔서 고마워요.', question: questions.isEmpty ? '그때 어떤 생각이 들었나요.' : questions[requests.length - 1],
       answerExamples: answerExamples.isEmpty ? const [] : answerExamples[requests.length - 1],
-      stage: ConversationStage.thought, detectedEmotion: EmotionType.admiration,
+      stage: ConversationStage.thought, detectedEmotion: request.session.selectedEmotion,
       riskLevel: 0, shouldOfferVerse: false, shouldEndConversation: false,
     );
   }
@@ -85,8 +85,7 @@ void main() {
         }
         await tester.pumpAndSettle();
         if (turn == 1) {
-          for (final answer in ['지금은 그냥 위로받고 싶어요.', '제 마음을 누군가 알아줬으면 좋겠어요.',
-            '아무 생각 없이 잠시 쉬고 싶어요.', '다시 움직일 수 있는 용기가 필요해요.']) {
+          for (final answer in ['지금은 그냥 위로받고 싶어요.', '제 마음을 누군가 알아줬으면 좋겠어요.']) {
             expect(find.text(answer), findsOneWidget);
           }
           expect(find.text('누군가 판단하지 않고 제 이야기를 들어주면 좋겠어요.'), findsNothing);
@@ -130,6 +129,8 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(client.requests.last.userMessage, example);
+    expect(client.requests.last.session.lastUserMessage, client.requests.first.userMessage);
+    expect(client.requests.first.session.lastUserMessage, isNull);
     expect(find.widgetWithText(OutlinedButton, '저는 기쁘고 즐거운 마음이 가장 컸어요.'), findsOneWidget);
   });
   testWidgets('server-authored examples handle unfamiliar questions and send on tap', (tester) async {
