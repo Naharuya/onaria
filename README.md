@@ -162,9 +162,14 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 - 실제 기록이 있는 Android 휴대폰은 [안전한 Release 설치](docs/ANDROID_RELEASE_UPDATE.md)를 사용하세요. `flutter run`이나 CI Debug APK로 정식 앱을 덮어쓰지 마세요.
 - https://api.onaria.ai.kr/ (공식 Production API)
 - 앱 환경 설정과 release 검증: [APP_PRODUCTION_API.md](docs/APP_PRODUCTION_API.md)
-- ip : 104.105.128.84
-- os : Rocky 9
-- SSH 접속: `ssh soul-bible-server` (로컬 `~/.ssh/config`와 전용 키 필요)
+- 현재 운영 서버: `ari-prod-01`
+- 공인 IP: `1.201.113.102`
+- OS: Ubuntu
+- Web/TLS front: nginx 1.24.0
+- SSH 사용자: `ubuntu`; 전용 키는 로컬 비밀 저장소에서 관리하며 Git에 저장하지 않습니다.
+- 2026-09-21 확인 기준 DNS `onaria.ai.kr`, `www.onaria.ai.kr`, `api.onaria.ai.kr` 모두 `1.201.113.102`를 가리킵니다.
+- Let’s Encrypt 인증서 `onaria.ai.kr`의 SAN에는 위 세 호스트가 모두 포함되며, 현재 `www`와 루트 HTTPS는 200 응답을 확인했습니다.
+- 이전 Cafe24 `104.105.128.84` / Rocky / Apache 정보는 현재 운영 기준이 아닙니다.
 - 비밀번호와 API 키는 문서나 Git에 저장하지 말고 서버의 비밀 환경변수로 관리
 
 명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `$ARI_ROOT/projects/onaria`입니다.
