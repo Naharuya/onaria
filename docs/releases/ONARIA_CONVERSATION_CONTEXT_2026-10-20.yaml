@@ -23,8 +23,7 @@ PRIVACY_AND_CONTENT:
   - Existing consent, crisis detection, provider gates, content checks and cost quotas remain active.
 TEST:
   backend: 525 passed, isolated fake providers; no paid calls
-  flutter_full: 198 passed, 1 skipped before final mixed-feeling filter adjustment
-  flutter_final_filter_and_history: 3 passed
+  flutter_full: 201 passed, 1 skipped after mixed-feeling fallback correction
   static_analysis: 0 errors, 0 warnings, 49 informational findings
   installer_regression: 15 passed, 1 skipped; no device installation
 DEPLOYMENT:
@@ -33,4 +32,4 @@ DEPLOYMENT:
   ai_activation: Existing server configuration and consent still required; not changed here
   real_provider_quality: NOT RUN; synthetic regression is not live-model validation
   content_limit: Rotation cannot provide variety when only one eligible local verse exists
-CI: Verify the exact pushed commit in GitHub Actions; no device workflow dispatch
+CI: Verify the final pushed commit in GitHub Actions; initial mixed-feeling fallback regression corrected and full local suite rerun; no device workflow dispatch

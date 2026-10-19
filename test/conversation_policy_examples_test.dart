@@ -11,6 +11,12 @@ void main() {
             answerExamples: ['저는 오늘 일을 이해받고 싶어요.']),
         ['저는 오늘 일을 이해받고 싶어요.']);
   });
+  test('ambiguous fallback does not assume blame or distress', () {
+    final examples = conversationQuestionExamples('어떤 생각이 들었나요?',
+        emotion: EmotionType.overwhelmed);
+    expect(examples.join(), isNot(matches(r'잘못|힘들|걱정')));
+    expect(examples.join(), contains('아직'));
+  });
   test('overwhelmed feeling keeps both pleasant and burdensome example choices',
       () {
     expect(

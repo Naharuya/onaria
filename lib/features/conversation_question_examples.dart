@@ -60,6 +60,41 @@ List<String> conversationQuestionExamples(
   if (RegExp(r'중에서|중 무엇|중 어떤|중 어느|아니면').hasMatch(q)) {
     return const [];
   }
+  // Mixed feelings need balanced answers rather than an automatic negative
+  // thought/body template when the user has not described distress.
+  if (const {EmotionType.overwhelmed, EmotionType.surprise}.contains(emotion) &&
+      !positive &&
+      !difficult.hasMatch('$q $userMessage')) {
+    if (RegExp(r'어떤 생각|무슨 생각|떠오른 생각|떠오르는 생각').hasMatch(q)) {
+      return const [
+        '저는 뜻밖의 일이라 잠시 생각할 시간이 필요했어요.',
+        '저는 기쁘면서도 잘 해낼 수 있을지 생각했어요.',
+        '저는 아직 제 생각을 정리하고 있어요.'
+      ];
+    }
+    if (RegExp(r'(몸|신체).*(어떤|어떻|느껴|느끼)|(어떤|어떻).*(몸|신체)').hasMatch(q)) {
+      return const [
+        '저는 가슴이 두근거려요.',
+        '저는 몸에 힘이 들어가는 느낌이에요.',
+        '저는 몸의 느낌이 아직 뚜렷하지 않아요.'
+      ];
+    }
+    if (RegExp(r'마음에 남|기억에 남').hasMatch(q) && !q.contains('장면')) {
+      return const [
+        '저는 뜻밖의 소식을 듣던 순간이 기억에 남아요.',
+        '저는 여러 마음이 함께 들었던 순간이 남아요.',
+        '저는 잠시 멈춰 바라보던 순간이 남아요.'
+      ];
+    }
+    if (RegExp(r'어떤 마음|어떤 감정|무슨 감정|(마음|감정|기분)(은|이)?\s*(어떤가|어떠|무엇)')
+        .hasMatch(q)) {
+      return const [
+        '저는 기쁘고 설레는 쪽에 가까워요.',
+        '저는 부담스러운 쪽에 가까워요.',
+        '저는 여러 마음이 섞여 아직 잘 모르겠어요.'
+      ];
+    }
+  }
   // Match the actual question, including the app/server's alternate wording.
   // Time and memorable-moment questions need their own direct answers.
   if (RegExp(r'(마음|감정|기분).*(언제부터)|(언제부터).*(마음|감정|기분)').hasMatch(q)) {
