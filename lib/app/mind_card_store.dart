@@ -1,3 +1,4 @@
+import 'record_preferences.dart';
 import 'dart:convert';
 import 'member_record_scope.dart';
 
@@ -122,7 +123,7 @@ class MindCardRecord {
 
 class MindCardStore {
   MindCardStore({SharedPreferencesAsync? preferences})
-      : _preferences = preferences ?? SharedPreferencesAsync();
+      : _preferences = RecordPreferences(preferences: preferences);
 
   static const legacyStorageKey = 'soul_bible.mind_cards.v1';
   final RecordAccess _access = MemberRecordScope.instance.capture();
@@ -257,7 +258,7 @@ class DailyUsageStore {
   DailyUsageStore({
     SharedPreferencesAsync? preferences,
     MembershipTier? tier,
-  })  : _preferences = preferences ?? SharedPreferencesAsync(),
+  })  : _preferences = RecordPreferences(preferences: preferences),
         tier = tier ?? MembershipConfig.current;
 
   final RecordAccess _access = MemberRecordScope.instance.capture();

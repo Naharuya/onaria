@@ -1,0 +1,164 @@
+{
+  "project": "onaria",
+  "brand": "ONARIA",
+  "recordedAt": "2026-11-01T09:45:09.500967+00:00",
+  "status": "WEB_AND_BACKEND_DEPLOYED_VERIFIED",
+  "authorization": "User explicitly requested production deployment of all changes in this conversation.",
+  "publicWeb": "https://onaria.ai.kr/webapp/",
+  "backend": {
+    "project": "onaria",
+    "backup": "/var/backups/ari-common-deployment/onaria-20261101T092651Z",
+    "previousBackend": "/opt/onaria/backend",
+    "archiveSha256": "1b17460e568e3d6ab07af8a0e2295364aadbce5f75bbbce1f7b91a284d53cd03",
+    "environmentPreserved": true,
+    "dataReset": false,
+    "status": "DEPLOYED_HEALTHY",
+    "health": {
+      "status": "ok",
+      "version": "1.0.0",
+      "build": "20"
+    }
+  },
+  "web": {
+    "status": 200,
+    "mainSha256": "306e3497efe9dff84f44c119221753f020808786f30d6cd09e82716cb0453803",
+    "root": "/opt/onaria/deployments/webapp/2623b45a59fe4710",
+    "channel": "prod",
+    "rightsRoutesVerified": true
+  },
+  "publicBrowser": {
+    "project": "onaria",
+    "url": "https://onaria.ai.kr/webapp/",
+    "result": "PASS",
+    "status": 200,
+    "title": "ONARIA",
+    "koreanSemantics": true,
+    "horizontalOverflow": false,
+    "pageErrors": []
+  },
+  "endpointChecks": [
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/health",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "cacheControl": null,
+      "metadata": {
+        "status": "ok",
+        "version": "1.0.0",
+        "build": "20"
+      }
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/account-deletion",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "cacheControl": "public, max-age=60",
+      "metadata": null
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/data-controls",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "cacheControl": "no-store",
+      "metadata": null
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/v1/privacy/rights",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "cacheControl": "no-store",
+      "metadata": {
+        "version": "ari-data-rights-v1",
+        "app": "ONARIA",
+        "localStorage": "device",
+        "serverRecords": "account-only",
+        "accountDeletionPath": "/account-deletion",
+        "dataControlsPath": "/data-controls",
+        "supportEmail": "vjsjv7003@gmail.com",
+        "privacyPath": "/privacy",
+        "automaticCrossAppDeletion": false,
+        "automaticDeviceSync": false
+      }
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/v1/admin/common/standard",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "cacheControl": "no-store",
+      "metadata": null
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/.env",
+      "status": 404,
+      "expected": 404,
+      "passed": true,
+      "cacheControl": null,
+      "metadata": null
+    },
+    {
+      "project": "onaria",
+      "url": "https://onaria.ai.kr/admin/common",
+      "status": 200,
+      "expected": 200,
+      "passed": true,
+      "cacheControl": "public, max-age=0",
+      "metadata": null
+    }
+  ],
+  "releaseArtifacts": [
+    {
+      "file": "onaria-web.tar.gz",
+      "sha256": "2623b45a59fe4710858a39ae1e9fecde6f9882557cfe83bd69661143a7a65241",
+      "bytes": 19707737
+    },
+    {
+      "file": "onaria-backend.tar.gz",
+      "sha256": "1b17460e568e3d6ab07af8a0e2295364aadbce5f75bbbce1f7b91a284d53cd03",
+      "bytes": 1227226
+    }
+  ],
+  "environmentReplaced": false,
+  "databaseReset": false,
+  "existingSigningKeysChanged": false,
+  "nativeInstalled": false,
+  "storeUploadPerformed": false,
+  "storeSubmissionPerformed": false,
+  "storePublicReleasePerformed": false,
+  "adminEnabled": "Existing authentication preserved; public requests require authentication.",
+  "deletionCompletionVerifierConnected": false,
+  "backupEvidenceInspectorConnected": false,
+  "actualUserAccountDeletionPerformed": false,
+  "externalMessagesSent": false,
+  "ciRun": false,
+  "commitCreated": false,
+  "pushed": false,
+  "localCodeHash": {
+    "backend/src/common_admin.js": "fe9d776867a4562fefb5a1405501dea7dda2787049cb9600d6f654357d6ec0c7",
+    "lib/language_text.dart": "209dfff69f855ec9303d5c54320b49db9f0bbee9ad6b4913b5c8491d4c51741b",
+    "lib/data_rights.dart": "eeeeb0a250e61d10b00dfd6e97cb9d2f729294f0bb25ec5385120f6d19c105c4"
+  },
+  "rollback": "Use the recorded private code/unit backup. Never overwrite live user databases with a pre-deployment snapshot.",
+  "fontFix": {
+    "scope": "Web-only Korean font fallback; native font selection preserved",
+    "license": "SIL OFL, included in assets/fonts/OFL-NotoSansKR.txt",
+    "analysis": "PASS"
+  },
+  "adminAuthenticationSmoke": {
+    "project": "onaria",
+    "status": "NO_OWNER_TOKEN_CONFIGURED",
+    "credentialsCreated": false
+  },
+  "adminOwnerTokenConfigured": false,
+  "adminLoginOperational": "NOT VERIFIED: no owner token configured; named administrator accounts not inspected."
+}

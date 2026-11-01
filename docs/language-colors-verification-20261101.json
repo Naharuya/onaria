@@ -1,0 +1,47 @@
+{
+  "project": "onaria",
+  "date": "2026-11-01",
+  "scope": "reader and saved-content presentation, including Flutter Web",
+  "changedFiles": [
+    "lib/language_text.dart",
+    "lib/features/saved_cards_page.dart",
+    "lib/features/merged_records_page.dart",
+    "lib/features/conversation_page.dart",
+    "lib/engagement/engagement_page.dart",
+    "lib/engagement/journey/journey_page.dart",
+    "test/language_text_test.dart",
+    "docs/LANGUAGE_COLORS_20261101.md",
+    "AGENTS.md"
+  ],
+  "korean": "inherits original style; no fixed color",
+  "english": {
+    "light": "#526F82",
+    "dark": "#9BB4C6"
+  },
+  "han": {
+    "light": "#87684E",
+    "dark": "#C6AA8B"
+  },
+  "contrast": "adaptive minimum 4.5 against theme surface and surfaceContainerHighest",
+  "selectedFlutterTests": {
+    "passed": 6,
+    "status": "PASS"
+  },
+  "analysis": "PASS",
+  "unicodeFinal": "PASS",
+  "androidTestDebug": "PASS",
+  "webTest": "PASS",
+  "iosBinaryThisChange": "NOT RUN; shared Flutter presentation only; no native integration changed",
+  "deviceInstalled": false,
+  "productionDeployed": false,
+  "backendChanged": false,
+  "commitPush": false,
+  "sourceSha256": {
+    "lib/language_text.dart": "209dfff69f855ec9303d5c54320b49db9f0bbee9ad6b4913b5c8491d4c51741b",
+    "lib/features/saved_cards_page.dart": "9061c7370940e900b0887e57bd937e31268fd68e28eccd2ee12025bbc9dc49de",
+    "lib/features/merged_records_page.dart": "7eaa3312439d180eece1209215882f76f24d0a2950127158d6c01c7e7bd3efee",
+    "lib/features/conversation_page.dart": "b29388f32871342cb94c8d890d15a4dd37f210cbd02a79d46142e556f1479f32",
+    "lib/engagement/engagement_page.dart": "f257a2ea54522c06808e69038e7694d6a7ac8fde0b44d6b7a3468fa7d5c02f86",
+    "lib/engagement/journey/journey_page.dart": "ce1deefd71101f717b152039b9e290ef15d431b889766c7318810170606b42db"
+  }
+}

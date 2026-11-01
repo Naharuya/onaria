@@ -4,14 +4,36 @@ const button = (href, text, secondary = false) => `<a class="button${secondary ?
 export const traditions = [['Protestant', '개신교'], ['Catholic', '가톨릭'], ['Buddhism', '불교'], ['Judaism', '유대교'], ['Islam', '이슬람'], ['Hinduism', '힌두교'], ['Confucianism', '유교']];
 export const about = () => `<section id="why" class="section split">${sectionTitle('02 / WHY ONARIA', '마음을 이해하는 일은,<br>다름을 존중하는 일.', '같은 하루를 살아도, 마음에 남는 것은 저마다 다릅니다.')}<div class="prose"><p class="lead">ONARIA는 AI와의 안전한 마음대화로 나를 돌아보고,<br>현재의 감정과 상황을 성경 말씀과 작은 실천으로 연결하는 신앙 기반 마음관리 서비스입니다.</p><p>신앙적 답을 서둘러 강요하기보다 마음을 먼저 듣습니다. 기술은 말씀과 공동체로 다시 연결되는 시간을 돕고, 선택과 판단은 언제나 사람에게 남습니다.</p><a class="text-link" href="/about">우리의 생각 <span aria-hidden="true">→</span></a></div></section>`;
 const steps = [
-  ['Emotion', '마음 선택', '오늘 마음은 어떤가요? 감정과 강도를 고르고, 이름 붙이기 어려운 마음은 직접 적어 보세요.'],
-  ['Conversation', '마음대화', '선택한 마음에 맞는 상황 예시를 참고해 이야기를 시작합니다. 다음 질문과 예시는 대화의 맥락에 맞춰 달라집니다.'],
-  ['Scripture & action', '말씀과 작은 실천', '마음을 돌아본 뒤 성경 말씀과 오늘 가능한 작은 실천을 만납니다. 원하는 기록은 마음카드로 기기에 저장합니다.'],
+  [
+    "Emotion",
+    "감정 확인",
+    "오늘 마음은 어떤가요? 감정과 강도를 고르고, 이름 붙이기 어려운 마음은 직접 적어 보세요."
+  ],
+  [
+    "Conversation",
+    "마음 대화",
+    "상황과 생각을 돌아봅니다. 외부 AI 전송은 기존 동의와 제공 조건을 따릅니다."
+  ],
+  [
+    "Scripture",
+    "말씀",
+    "출처를 확인하며 말씀을 읽습니다. 원하지 않으면 말씀 없이 작은 실천으로 이어갈 수 있습니다."
+  ],
+  [
+    "Small action",
+    "작은 실천",
+    "지금의 마음과 상황에서 할 수 있는 작은 행동을 고릅니다."
+  ],
+  [
+    "Mind card",
+    "카드·기록",
+    "마음카드를 저장하고 기록을 돌아봅니다. 공유와 미니게임은 선택 경로입니다."
+  ]
 ];
-export const flow = () => `<section id="how-it-works" class="section flow-section">${sectionTitle('03 / HOW IT WORKS', '마음에서 시작하는 세 걸음.', '마음 선택 → 마음대화 → 말씀과 작은 실천. 서두르지 않고 나의 속도로 이어갑니다.')}<ol class="journey">${steps.map(([en, ko, text], i) => `<li><details${i === 0 ? ' open' : ''}><summary><span class="step-number" aria-hidden="true">0${i + 1}</span><span><span class="step-en" lang="en">${en}</span><span class="step-name">${ko}</span></span><span class="step-toggle" aria-hidden="true">+</span></summary><p>${text}</p></details></li>`).join('')}</ol></section>`;
+export const flow = () => `<section id="how-it-works" class="section flow-section">${sectionTitle('03 / HOW IT WORKS', '마음에서 시작하는 다섯 걸음.', '감정 확인 → 마음 대화 → 말씀 → 작은 실천 → 카드·기록. 나의 속도로 이어갑니다.')}<ol class="journey">${steps.map(([en, ko, text], i) => `<li><details${i === 0 ? ' open' : ''}><summary><span class="step-number" aria-hidden="true">0${i + 1}</span><span><span class="step-en" lang="en">${en}</span><span class="step-name">${ko}</span></span><span class="step-toggle" aria-hidden="true">+</span></summary><p>${text}</p></details></li>`).join('')}</ol></section>`;
 export const services = () => `<section id="conversation" class="section split conversation-section">${sectionTitle('04 / AI CONVERSATION', '말할 수 있는 만큼.<br>당신의 속도로.', 'ONARIA가 지향하는 AI는 마음을 단정하는 답변자가 아니라, 스스로 돌아보도록 질문하는 대화 상대입니다.')}<div class="reflection-panel"><p class="eyebrow">A MOMENT TO REFLECT</p><h3>지금, 어떤 마음인가요?</h3><p>감정에서 시작해 상황과 생각을 돌아보고,<br>오늘 할 수 있는 작은 행동으로 이어집니다.</p><div class="reflection-line" aria-hidden="true"></div><p class="note">현재 개발 앱의 경험을 소개합니다.<br>이 홈페이지에서는 AI 대화를 실행하지 않습니다.</p></div></section>`;
 export const seven = () => `<section id="paths" class="section traditions">${sectionTitle('05 / SEVEN PATHS', '일곱 개의 길.<br>동등한 존중.', '어느 전통도 다른 전통의 위에 놓지 않습니다. 출처와 맥락을 지키며, 각자의 언어로 성찰할 수 있는 경험을 준비합니다.')}<div class="tradition-grid">${traditions.map(([en, ko]) => `<article class="tradition-card"><span class="path-light" aria-hidden="true"></span><h3>${ko}</h3><p lang="en">${en}</p><span class="status">준비 중</span></article>`).join('')}</div><p class="note">전통별 서비스의 정식 공개 전입니다. 현재 ONARIA에서는 성경 기반의 흐름을 테스트하며, 이는 일곱 전통 전체의 출시를 의미하지 않습니다.</p></section>`;
-export const apps = () => `<section id="apps" class="section app-section"><div>${sectionTitle('06 / ONARIA', '마음에서 시작하는<br>성경 기반의 성찰.', 'ONARIA는 감정 체크인, AI 마음대화, 말씀 연결, 작은 실천과 기록을 하나의 모바일 경험으로 연결합니다.')}<p class="availability">Closed Beta 준비 중<br>Android · iOS 앱 검증 중 · 웹은 서비스 안내</p><p class="note">현재 핵심 기능과 안전성을 검증하고 있습니다.<br>일반 공개 스토어 출시 전이며, 이 웹에서는 로그인이나 마음대화를 실행하지 않습니다.</p></div><div class="mind-card"><span class="eyebrow">ONARIA / EXPERIENCE</span><h3>마음이 머문 자리를<br>한 장에 담다.</h3><ol class="mind-stages">${['Emotion', 'Conversation', 'Scripture', 'Small Action', 'Mind Card'].map((text, i) => `<li><span aria-hidden="true">0${i + 1}</span><span lang="en">${text}</span></li>`).join('')}</ol><p class="note">기능 흐름 소개 · 실제 사용자 기록이 아닙니다</p></div></section>`;
+export const apps = () => `<section id="apps" class="section app-section"><div>${sectionTitle('06 / ONARIA', '마음에서 시작하는<br>성경 기반의 성찰.', 'ONARIA는 감정 체크인, AI 마음대화, 말씀 연결, 작은 실천과 기록을 하나의 모바일 경험으로 연결합니다.')}<p class="availability">Android · iOS · Web<br>설치한 버전의 기능과 안내를 확인해 주세요.</p><p class="note">현재 핵심 기능과 안전성을 검증하고 있습니다.<br>이 소개 페이지에서는 로그인이나 마음대화를 실행하지 않습니다.</p></div><div class="mind-card"><span class="eyebrow">ONARIA / EXPERIENCE</span><h3>마음이 머문 자리를<br>한 장에 담다.</h3><ol class="mind-stages">${['Emotion', 'Conversation', 'Scripture', 'Small Action', 'Mind Card'].map((text, i) => `<li><span aria-hidden="true">0${i + 1}</span><span lang="en">${text}</span></li>`).join('')}</ol><p class="note">기능 흐름 소개 · 실제 사용자 기록이 아닙니다</p></div></section>`;
 export const safety = () => `<section id="safety" class="section trust-section">${sectionTitle('07 / SAFETY & TRUST', '기술보다 먼저,<br>사람을 생각합니다.', '빠른 답변보다 지켜야 할 원칙이 있습니다.')}<div class="trust-grid">${[
   ['Safety First', '위험한 순간에는 현실의 도움부터', '위기 신호가 있는 경우 외부 AI 호출을 기다리지 않고 안전 안내를 우선합니다. AI 응답을 기다리기보다 현실의 긴급 지원이 필요한 순간이 있습니다.'],
   ['Privacy by Design', '필요한 정보만, 신중하게', '대화 맥락과 사용량은 목적에 맞게 처리합니다. 데이터 처리 범위와 출시 전 확정할 사항을 공개합니다.'],

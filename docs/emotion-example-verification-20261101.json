@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-01",
+  "project": "onaria",
+  "scope": "Authored example union, 5-slot refill and session-only personal topic cards",
+  "validation": {
+    "analysis": 0,
+    "acceptanceTests": 0,
+    "webBuild": 0,
+    "apkBuild": 0
+  },
+  "acceptanceTests": 10,
+  "sourceSha256": {
+    "lib/common_emotion_examples.dart": "cffda6b3dee22748dd3d54f57a5f32fc3dae1e13234c670b1f3a1db943beb6ff",
+    "lib/personal_keywords.dart": "2626b1acce7123c1c7b87336d41dcd366637286dfdb06abc3eb5869964f7977c",
+    "lib/personal_keyword_panel.dart": "1dbeead2610a5065bbf0647e86409cbee2c868505425da7aca158e17b6061be2",
+    "lib/all_emotion_examples.dart": "5533e73593380d37f5e382b29ab41a7a72405a61bfda813c41d79fe986da089c"
+  },
+  "sourceCardAssignments": 244,
+  "commonConversationExamples": 342,
+  "personalTopics": 12,
+  "promotionThreshold": 3,
+  "productionDeployment": "NOT RUN",
+  "deviceInstallation": "NOT RUN",
+  "iOSBuild": "NOT RUN",
+  "storeSubmission": "NOT RUN",
+  "commit": "NOT RUN",
+  "push": "NOT RUN",
+  "note": "Web and Android debug artifacts carry TEST display channel. Never installed over established Release apps. This evidence does not validate unfinished publication workflow."
+}

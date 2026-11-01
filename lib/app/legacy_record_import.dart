@@ -1,3 +1,4 @@
+import 'record_preferences.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'member_record_scope.dart';
@@ -6,7 +7,7 @@ import 'member_record_scope.dart';
 /// verification is available. Legacy records and damaged entries stay intact.
 class LegacyRecordImport {
   LegacyRecordImport({SharedPreferencesAsync? preferences})
-      : preferences = preferences ?? SharedPreferencesAsync();
+      : preferences = RecordPreferences(preferences: preferences);
   final SharedPreferencesAsync preferences;
   static const listKeys = [
     'soul_bible.mind_cards.v1',

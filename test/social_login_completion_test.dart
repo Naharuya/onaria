@@ -12,6 +12,8 @@ import 'package:onaria/src/auth/naver_login_service.dart';
 class GoogleStub extends GoogleSignInPlatform {
   int initializations = 0;
   bool pending = false;
+  int authentications = 0;
+  Completer<AuthenticationResults>? delayed;
   @override
   Future<void> init(InitParameters params) async {
     initializations++;
@@ -23,7 +25,8 @@ class GoogleStub extends GoogleSignInPlatform {
   bool supportsAuthenticate() => true;
   @override
   Future<AuthenticationResults> authenticate(AuthenticateParameters params) {
-    if (pending) return Completer<AuthenticationResults>().future;
+    authentications++;
+    if (pending) return (delayed = Completer<AuthenticationResults>()).future;
     return Future.value(const AuthenticationResults(
       user:
           GoogleSignInUserData(email: 'synthetic@example.invalid', id: 'test'),
@@ -64,6 +67,25 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 91));
     await check;
+
+    final attemptsBeforeRetry = stub.authentications;
+    final retry = expectLater(
+        GoogleLoginService().authenticate(),
+        throwsA(isA<GoogleLoginException>()
+            .having((e) => e.message, 'message', contains('진행 중'))));
+    await tester.pump();
+    // A retry must reject immediately, without opening a second native UI.
+    await tester.pump(const Duration(seconds: 91));
+    await retry;
+    expect(stub.authentications, attemptsBeforeRetry);
+    stub.pending = false;
+    stub.delayed!.complete(const AuthenticationResults(
+      user:
+          GoogleSignInUserData(email: 'synthetic@example.invalid', id: 'test'),
+      authenticationTokens: AuthenticationTokenData(idToken: 'late-token'),
+    ));
+    await tester.pump();
+    expect(await GoogleLoginService().authenticate(), 'synthetic-token');
   });
 
   testWidgets('Naver ends a lost native callback with a recoverable message',

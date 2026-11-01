@@ -1,0 +1,125 @@
+{
+  "project": "onaria",
+  "scope": "current local development candidate; no store approval claim",
+  "currentCommit": "40cd65851553238c426b32f5af2639e76f24f64b",
+  "backend": {
+    "tests": 538,
+    "passed": 538,
+    "failed": 0
+  },
+  "relatedFlutter": {
+    "passed": 21,
+    "status": "PASS"
+  },
+  "android": {
+    "status": "PASS",
+    "artifact": {
+      "project": "onaria",
+      "label": "application-label:'ONARIA TEST'",
+      "package": "package: name='com.onaria.app' versionCode='28' versionName='1.0.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'",
+      "backup": [
+        "A: android:allowBackup(0x01010280)=(type 0x12)0x0"
+      ],
+      "installed": false
+    }
+  },
+  "web": {
+    "status": "PASS"
+  },
+  "iosSimulator": {
+    "status": "PASS"
+  },
+  "publicUrls": [
+    {
+      "url": "https://onaria.ai.kr/account-deletion",
+      "http": 200,
+      "sha256": "a53af130640b6541750232e4e05d29f33cef4196abdcadf916d79b29dbdb1257",
+      "commonCandidateVisible": false,
+      "hasEmailLink": true
+    },
+    {
+      "url": "https://onaria.ai.kr/privacy",
+      "http": 200,
+      "sha256": "fb9ca805cf4eabd8f00cebac729ea82cd0e14922186c0aabaa39cc22a1ed3036",
+      "commonCandidateVisible": false,
+      "hasEmailLink": true
+    }
+  ],
+  "productionDeployed": false,
+  "deviceInstalled": false,
+  "storeFormsChanged": false,
+  "submitted": false,
+  "remainingReleaseEvidence": [
+    "published candidate deletion URL and policy match",
+    "actual provider reauth and Apple token revocation using synthetic/test account",
+    "server backup deletion and restore drill",
+    "final signed SDK privacy archive and App Privacy/Data safety forms for this exact build"
+  ],
+  "separateStorageContract": "scoped device/browser records; not automatic cross-device sync",
+  "officialReferences": [
+    "https://developer.apple.com/help/app-review/guideline-reference/5-1-1-account-deletion/",
+    "https://support.google.com/googleplay/android-developer/answer/13327111?hl=en",
+    "https://developer.apple.com/app-store/app-privacy-details/",
+    "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en"
+  ],
+  "deviceValidationPassed": false,
+  "storeFormsVerified": false,
+  "extendedFlutter": {
+    "status": "PASS",
+    "passed": 27
+  },
+  "broadSweep": {
+    "status": "STOPPED_AFTER_REGRESSIONS_DISCOVERED",
+    "context": "early cross-test async queue and long-page lookup failures fixed; affected consent/layout/dialogue/speech/journey/notification tests rechecked in final focused and extended suites; not a full-suite PASS claim"
+  },
+  "browser": {
+    "project": "onaria",
+    "status": "PASS",
+    "checks": [
+      "public-email-deletion-resource",
+      "mobile-no-horizontal-overflow",
+      "fresh-browser-isolation",
+      "app-data-management-navigation",
+      "local-delete-confirmation-cancel",
+      "confirmed-local-delete-empty-synthetic-scope",
+      "desktop-resize",
+      "no-pageerror"
+    ],
+    "productionNetworkBlocked": true,
+    "visualTextAudit": "NOT_VERIFIED_WITH_EXTERNAL_FALLBACK_FONTS_BLOCKED",
+    "scopeNote": "Interaction/accessibility checks on synthetic empty local storage, not a production or real-account deletion test."
+  },
+  "analysis": {
+    "status": "PASS",
+    "styleInfos": 70
+  },
+  "sourceSha256": {
+    "android/app/src/main/AndroidManifest.xml": "99b3a6903a4a8317eb0d12d1a8e7d67198b87be71a870501d80aaca030e3e1e8",
+    "backend/public/data-rights.html": "71d1db7eb9ed2d8355a4ead054331d3c74ec4adee46224f7d318e33648bea1bf",
+    "backend/src/app.js": "60cc628cb3f36455db846ca30c77011ab6b7670181c0c4698ecff9a8f38b1a45",
+    "backend/src/privacy/data_rights.js": "12a47f8e41f51a3ac224a730025146e245bc4834707571d015709eccef8ea376",
+    "backend/src/website.js": "34217c78c92273d46e45aced27c788c6c95a7052f2e324bc4eca8a24159d33a4",
+    "backend/test/common_data_rights.test.js": "3179e59db0b3820eaf0c94850dfd158dcde9cc0e67f30c38ab33fe03f23a8ff1",
+    "lib/app/ai_consent.dart": "5956dd7d184b1cf348b8e251ed7c154907391e29df4098bc93f346938a6d45fc",
+    "lib/app/conversation_draft.dart": "6e960d9969d0a028098c0fcd53738bcc41b0675c386e404bf67f8db23171f40b",
+    "lib/app/emotion_card_store.dart": "0ccaee4d8205d906899fe722717d905d2a16ae0741c2792af4662ff5236d634c",
+    "lib/app/legacy_record_import.dart": "f6b90d94051f59d3c518abecd72ce65ca6a48fa392d22ef811b533cb05ced2f4",
+    "lib/app/member_record_scope.dart": "0dc7a34559897025abe5256a1a09655ea220a211d80b6a473a6065a2a866c966",
+    "lib/app/mind_card_store.dart": "bfc05aa2cfe69b733977a692bdb77a1e6dc425c93954d42f67c15e505748e598",
+    "lib/app/record_preferences.dart": "f1df57ba9df0a4549a769d3ec20a99913c85578494025480f2fd471c33c77643",
+    "lib/app/verse_history.dart": "408953b2fa703b6469d089f4e6cd67aeb8a26c22e8800ea07be420a802004fa4",
+    "lib/data_rights.dart": "eeeeb0a250e61d10b00dfd6e97cb9d2f729294f0bb25ec5385120f6d19c105c4",
+    "lib/engagement/storage.dart": "29a04f5b36a466d709ef31b0eaddcb88fc715446d30538704d662433048b9522",
+    "lib/features/privacy_page.dart": "82efe421344d38290b6a7c11b86d6eb0d0c958dce6c0b3bcb8145a4b828d9529",
+    "scripts/verify-data-rights.py": "20fdcb1b932d06a16e5b4250597cb0292319af7e693b200f02626732eb33348f",
+    "test/account_layout_test.dart": "f5cb18ad03051f6f105c692f0c840c427dd054f65cab8520910177cd2718a0fe",
+    "test/data_rights_deletion_test.dart": "569322dc319753a21a62ba2f2ea363346fc788ef861895c3ebed8f369b1dd100",
+    "backend/src/privacy/data_rights_profile.json": "89eea736dbcb6bf8d069d89f7cbff533afda164ec1459612571ff1f7e20508b1"
+  },
+  "sourceReview": {
+    "whitespaceCheck": "PASS",
+    "secretPatternCheck": "PASS",
+    "commonNoticeParity": "PASS",
+    "commonPolicyParity": "PASS"
+  }
+}

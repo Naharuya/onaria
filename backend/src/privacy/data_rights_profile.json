@@ -1,0 +1,9 @@
+{
+  "app": "ONARIA",
+  "origin": "https://onaria.ai.kr",
+  "supportEmail": "vjsjv7003@gmail.com",
+  "privacyPath": "/privacy",
+  "localStorage": "device",
+  "serverRecords": "account-only",
+  "notes": "기기 카드·실천·여정·초안과 서버 회원정보는 별도 관리합니다."
+}

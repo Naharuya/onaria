@@ -9,6 +9,7 @@ class GoogleLoginService {
 
   final GoogleSignIn _signIn;
   static Future<void>? _initialization;
+  static Future<GoogleSignInAccount>? _pendingAuthentication;
 
   Future<String> authenticate() async {
     if (!GoogleAuthConfig.enabled) {
@@ -28,8 +29,23 @@ class GoogleLoginService {
       if (!_signIn.supportsAuthenticate()) {
         throw const GoogleLoginException('이 기기에서는 Google 로그인을 사용할 수 없습니다.');
       }
-      final account =
-          await _signIn.authenticate().timeout(const Duration(seconds: 90));
+      if (_pendingAuthentication != null) {
+        throw const GoogleLoginException(
+            '이전 Google 인증이 진행 중이에요. 로그인 창을 닫고 잠시 기다려 주세요.');
+      }
+      // A caller timeout does not cancel the native SDK. Hold the shared slot
+      // until its real callback settles, including after this caller times out.
+      final attempt = _signIn.authenticate();
+      _pendingAuthentication = attempt;
+      void release() {
+        if (identical(_pendingAuthentication, attempt)) {
+          _pendingAuthentication = null;
+        }
+      }
+
+      unawaited(attempt.then<void>((_) => release(),
+          onError: (Object _, StackTrace __) => release()));
+      final account = await attempt.timeout(const Duration(seconds: 90));
       final idToken = account.authentication.idToken;
       if (idToken == null || idToken.isEmpty) {
         throw const GoogleLoginException('Google 인증 정보를 확인하지 못했습니다.');

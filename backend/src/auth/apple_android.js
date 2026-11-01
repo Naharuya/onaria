@@ -10,7 +10,14 @@ const ttl = 5 * 60 * 1000;
 // Short-lived state and opaque proofs live only in this process. Restarting
 // invalidates pending logins without changing any existing member session.
 export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verify,
-  now = Date.now, random = () => randomBytes(32).toString('base64url'), capacity = 500 } = {}) {
+  now = Date.now, random = () => randomBytes(32).toString('base64url'), capacity = 500, onFailure = () => {} } = {}) {
+  const reject = reason => {
+    try { onFailure(reason); } catch { /* Diagnostics never change authentication. */ }
+    const error = new IdentityError();
+    error.appleAndroidReason = reason;
+    return error;
+  };
+
   const pending = new Map();
   const proofs = new Map();
   let redirect;
@@ -34,10 +41,13 @@ export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verif
       return { state, nonce, clientId: serviceId, redirectUri: redirect.href };
     },
     async callback(body) {
-      requireReady(); sweep();
-      if (!body || typeof body.state !== 'string' || !safeId.test(body.state)) throw new IdentityError();
+      requireReady();
+      if (!body || typeof body.state !== 'string' || !safeId.test(body.state)) throw reject('state_invalid');
+      const original = pending.get(body.state);
+      const expired = original && original.expires <= now();
+      sweep();
       const challenge = pending.get(body.state);
-      if (!challenge) throw new IdentityError();
+      if (!challenge) throw reject(expired ? 'state_expired' : 'state_unknown');
       pending.delete(body.state); // callbacks are one-use, including failures
       if (body.error === 'access_denied') return intent({ state: body.state, error: 'access_denied' });
       if (typeof body.id_token !== 'string' || typeof body.code !== 'string'
@@ -71,7 +81,14 @@ export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verif
         try { res.json(api.challenge()); } catch (error) { next(error); }
       });
       router.post('/callback', express.urlencoded({ extended: false, limit: '16kb', parameterLimit: 8 }), async (req, res, next) => {
-        try { res.redirect(303, await api.callback(req.body)); } catch (error) { next(error); }
+        try { res.redirect(303, await api.callback(req.body)); } catch (error) {
+          if (error instanceof IdentityError && error.appleAndroidReason) {
+            const expired = error.appleAndroidReason === 'state_expired';
+            res.status(error.status || 401).type('html').send('<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Apple 인증 다시 시작</title><body><main><h1>' + (expired ? '인증 확인 시간이 지났어요' : 'Apple 인증 요청을 확인하지 못했어요') + '</h1><p>이 창을 닫고 ONARIA 앱에서 Apple 로그인을 다시 시작해 주세요.</p><p>인증은 완료되지 않았으며 이 응답으로 새 회원은 생성되지 않았어요.</p></main></body></html>');
+            return;
+          }
+          next(error);
+        }
       });
       return router;
     },
@@ -79,9 +96,10 @@ export function createAppleAndroidAuth({ serviceId = '', redirectUri = '', verif
   return api;
 }
 
-export function createRuntimeAppleAndroidAuth({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+export function createRuntimeAppleAndroidAuth({ env = process.env, fetchImpl = globalThis.fetch, logger = console } = {}) {
   const serviceId = env.ONARIA_APPLE_SERVICE_ID?.trim() || '';
   return createAppleAndroidAuth({ serviceId,
+    onFailure: reason => logger.warn?.('apple_android_rejected', { reason }),
     redirectUri: env.ONARIA_APPLE_REDIRECT_URI?.trim() || `https://api.onaria.ai.kr${callbackPath}`,
     verify: serviceId ? async (token, nonce) => {
       const verify = createIdentityVerifier({ issuer: 'https://appleid.apple.com', audience: serviceId,

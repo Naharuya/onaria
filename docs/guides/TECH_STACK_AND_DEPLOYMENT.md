@@ -1,5 +1,7 @@
 # onaria 기술스택 및 배포 가이드
 
+> 이 문서는 2026-09-04 초기 구현·배포 이력입니다. “DB/계정 없음”, 과거 서버 경로, applicationId 변경·새 키 생성은 현재 실행 지침이 아닙니다. 현재 소스는 SQLite 회원·세션·사용량·삭제 명부를 사용합니다. 현재 작업은 [공식 API](../APP_PRODUCTION_API.md), [데이터 보존 Release 업데이트](../ANDROID_RELEASE_UPDATE.md), [작업 기록](../releases/ONARIA_AUDIT_REPAIR_2026-10-24.md)을 먼저 확인하고 기존 package·승인 서명을 유지합니다.
+
 작성 기준: 2026-09-04, 저장소 현재 구현
 
 ## 1. 전체 구성

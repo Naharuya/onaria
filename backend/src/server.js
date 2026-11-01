@@ -1,3 +1,10 @@
+import {createPublicationService} from './content_release_service.js';
+import {createPublicationRepository} from './content_release_repository.js';
+import {createAdminAccounts} from './admin_accounts.js';
+import {createAuditLog} from './audit_log.js';
+import {dirname as adminDirname,join as adminJoin} from 'node:path';
+import {mkdirSync as adminMkdir,chmodSync as adminChmod} from 'node:fs';
+import {createAdminRepository} from './common_admin_repository.js';
 import 'dotenv/config';
 import { createApp } from './app.js';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +32,16 @@ const deletionManifest = createDeletionManifest({ filename: process.env.DELETION
 deletionManifest.reapply(memberStore);
 const appleAndroidAuth = createRuntimeAppleAndroidAuth();
 const providerIdentity = createRuntimeProviderIdentity();
+const commonAdminDir=adminJoin(adminDirname((process.env.MEMBER_DB_PATH || fileURLToPath(new URL('../data/members.sqlite',import.meta.url)))),'admin-control');
+adminMkdir(commonAdminDir,{recursive:true,mode:0o700});
+adminChmod(commonAdminDir,0o700);
+const adminAccounts=createAdminAccounts({filename:adminJoin(commonAdminDir,'accounts.sqlite')});
+const audit=createAuditLog({filename:adminJoin(commonAdminDir,'audit.sqlite')});
+const adminRepository=createAdminRepository({filename:adminJoin(commonAdminDir,'operations.sqlite')});
+const publicationRepository=createPublicationRepository({filename:adminJoin(commonAdminDir,'content-publications.sqlite'),requireExisting:process.env.CONTENT_APPROVAL_REQUIRE_EXISTING==='true'});
 const app = createApp({
+  contentReleaseRepository:publicationRepository,
+  adminAccounts,audit,adminRepository,
   appleRevocation: createRuntimeAppleRevocation({ verify: providerIdentity, androidAuth: appleAndroidAuth,
     androidVerify: process.env.ONARIA_APPLE_SERVICE_ID ? (() => {
       const verify = createOidcProviderVerifier({ provider: 'apple', issuer: 'https://appleid.apple.com',
@@ -52,5 +68,7 @@ const app = createApp({
 });
 const host = process.env.HOST || '0.0.0.0';
 const server = app.listen(port, host, () => console.log(`onaria backend listening on ${host}:${port} (${generate.mode})`));
+server.on('close',()=>publicationRepository.close());
+server.on('close',()=>{adminAccounts.close();audit.close();adminRepository.close();});
 server.on('close', () => { usageLedger.close?.(); memberStore.close(); memberSessions.close?.(); deletionManifest.close?.(); });
 for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close());

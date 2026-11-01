@@ -1,0 +1,10 @@
+{
+  "name": "ONARIA",
+  "channels": [
+    "dev",
+    "test",
+    "prod"
+  ],
+  "scope": "display-label-only",
+  "preserveApplicationId": true
+}

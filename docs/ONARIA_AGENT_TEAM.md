@@ -45,3 +45,16 @@ Codex에서 프로젝트를 다시 열고 총괄에게 전문 역할을 명시�
 에이전트 설정이나 일정 파일에 저장하지 않는다.
 
 공식 형식: https://learn.chatgpt.com/docs/agent-configuration/subagents
+
+## 후속 확인 일정
+
+### 2026-11-05 — MPS-01 / DRON 대화·검토 화면 다시 확인
+
+- 등록일: 2026-10-29 (Asia/Seoul).
+- 요청: 7일 뒤 이 대화창을 다시 열어 MPS-01 / DRON v0.5.3 작업을 이어서 확인한다. 실행 시각은 미지정.
+- 상태: 대기. 문서에 기록했으며 자동 알림·창 열기 예약은 등록하지 않았다.
+- 찾을 대화: MPS-01 / DRON v0.5.3 검토자 로그인 세션 개발 대화. 대화 URL은 확보되지 않았으므로 대화 목록에서 해당 내용을 찾아 연다.
+- 관련 검토 화면: http://127.0.0.1:8766 (Mac mini의 DRON 로컬 검토 서버 실행 필요).
+- 현재 운영 문서: `/Users/ari/ARI/projects/DRON/docs/review-workflow-v0.5.3.md`.
+- 상태 보고서: `/Users/ari/ARI/projects/DRON/docs/status-v0.5.3.md`.
+- 이 항목은 후속 확인 기록이며 자동 코드 변경·로그인·사람 승인·비행·구매·배포를 지시하지 않는다.

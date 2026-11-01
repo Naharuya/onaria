@@ -1,0 +1,17 @@
+{
+  "project": "onaria",
+  "date": "2026-11-01",
+  "typographyTests": "PASS",
+  "typographyTestCount": 4,
+  "changedFilesAnalysisExitCode": 0,
+  "careRegression": "PASS",
+  "productionDeployment": "NOT RUN",
+  "nativeBuild": "NOT RUN",
+  "device": "NOT RUN",
+  "browserVisualInspection": "NOT RUN",
+  "ci": "NOT RUN",
+  "commit": "NOT RUN",
+  "push": "NOT RUN",
+  "sourceSha256": "ba54c14d54ad86f157003e4a4127e6c7d11d526444eced3bc61d31f739d41b3c",
+  "careRegressionTestCount": 6
+}

@@ -1,7 +1,8 @@
+import '../common_emotion_examples.dart';
 import '../src/conversation/conversation_models.dart';
 
 // 사용자 입력을 저장하거나 자동 생성하지 않는 검토된 상황 예시.
-const emotionSituationExamples = <EmotionType, List<String>>{
+const originalEmotionSituationExamples = <EmotionType, List<String>>{
   EmotionType.anxiety: [
     '내일 있을 중요한 일이 자꾸 걱정돼요.',
     '미래가 불투명해서 마음이 불안하고 떨려요.',
@@ -130,4 +131,11 @@ const emotionSituationExamples = <EmotionType, List<String>>{
     '가까운 사람이 다른 사람을 더 챙기는 것 같아 서운해요.',
     '비교하는 마음 뒤에 제가 원하는 것이 무엇인지 살펴보고 싶어요.',
   ],
+};
+
+final emotionSituationExamples = <EmotionType, List<String>>{
+  for (final emotion in EmotionType.values)
+    emotion: commonEmotionExamples[emotion.label] ??
+        originalEmotionSituationExamples[emotion] ??
+        const [],
 };

@@ -1,10 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import 'app_theme.dart';
 
-/// A static star field keeps the atmosphere quiet and avoids animation overhead.
+/// A static light halo connects the native app to the Quiet Light website.
 class SpaceScaffold extends StatelessWidget {
   const SpaceScaffold({super.key, this.appBar, required this.body});
 
@@ -55,45 +53,35 @@ class _SpacePainter extends CustomPainter {
               palette.green.withValues(alpha: 0)
             ],
           ).createShader(rect));
-    final random = math.Random(27);
-    // Fine stars and a lavender nebula echo the reference without bitmap scaling.
-    canvas.drawRect(rect, Paint()..shader = RadialGradient(
-      center: const Alignment(.65, -.35), radius: .85,
-      colors: [palette.gold.withValues(alpha: .13), palette.cream.withValues(alpha: 0)],
-    ).createShader(rect));
-    for (var i = 0; i < 180; i++) {
-      final point = Offset(
-          random.nextDouble() * size.width, random.nextDouble() * size.height);
-      final radius = i % 9 == 0 ? 1.5 : 0.65;
-      final paint = Paint()
-        ..color =
-            palette.ink.withValues(alpha: 0.15 + random.nextDouble() * 0.35);
-      canvas.drawCircle(point, radius, paint);
-      if (i % 19 == 0) {
-        canvas.drawLine(point - const Offset(3, 0), point + const Offset(3, 0),
-            paint..strokeWidth = 0.6);
-        canvas.drawLine(
-            point - const Offset(0, 3), point + const Offset(0, 3), paint);
-      }
-    }
-    canvas.save();
-    canvas.translate(size.width * 0.9, size.height * 0.18);
-    canvas.rotate(-0.5);
+    // Quiet Light: a soft static halo echoes the website without video decoding,
+    // motion sensitivity, extra network traffic, or an idle animation ticker.
+    final center = Offset(size.width * .84, size.height * .24);
+    final halo = Rect.fromCenter(
+        center: center, width: size.width * .88, height: size.width * 1.08);
     canvas.drawOval(
-        Rect.fromCenter(center: Offset.zero, width: 240, height: 90),
+        halo,
         Paint()
-          ..color = palette.green.withValues(alpha: 0.16)
+          ..color = palette.green.withValues(alpha: .13)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1);
-    canvas.restore();
-    final horizon = Rect.fromLTWH(-size.width * .35, size.height * .92,
-        size.width * 1.7, size.height * .45);
-    canvas.drawOval(horizon, Paint()..shader = LinearGradient(
-      begin: Alignment.topCenter, end: Alignment.bottomCenter,
-      colors: [palette.gold.withValues(alpha: .14), palette.cream],
-    ).createShader(horizon));
-    canvas.drawOval(horizon, Paint()..color = palette.green.withValues(alpha: .22)
-      ..style = PaintingStyle.stroke..strokeWidth = 1.2);
+          ..strokeWidth = 22
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 18));
+    canvas.drawOval(
+        halo,
+        Paint()
+          ..color = palette.green.withValues(alpha: .18)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2);
+    canvas.drawRect(
+        rect,
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              palette.cream.withValues(alpha: .08),
+              palette.cream.withValues(alpha: .9)
+            ],
+          ).createShader(rect));
   }
 
   @override

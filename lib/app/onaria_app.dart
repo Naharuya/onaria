@@ -1,3 +1,4 @@
+import '../responsive_typography.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 
@@ -112,6 +113,8 @@ class _OnariaAppState extends State<OnariaApp> with WidgetsBindingObserver {
                   title: 'ONARIA',
                   navigatorKey: _navigator,
                   debugShowCheckedModeBanner: false,
+                  builder: (context, child) =>
+                      ResponsiveTypography(child: child!),
                   theme: AppTheme.forColor(color),
                   home: widget.homeOverride ??
                       (MemberRecordScope.instance.locked

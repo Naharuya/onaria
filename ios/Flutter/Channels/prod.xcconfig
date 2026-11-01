@@ -1,0 +1,2 @@
+// Display label only; no signing or server overrides.
+ARI_APP_DISPLAY_NAME = ONARIA

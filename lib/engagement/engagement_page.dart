@@ -1,3 +1,4 @@
+import '../language_text.dart';
 import 'package:flutter/material.dart';
 import '../app/space_scaffold.dart';
 import '../src/verses/verse_models.dart';
@@ -18,73 +19,81 @@ class EngagementPage extends StatelessWidget {
     return SpaceScaffold(
       appBar: AppBar(title: Text(savedOnly ? '저장한 말씀' : '말씀과 작은 기록')),
       body: controller.error != null
-          ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ? Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text(controller.error!),
-              TextButton(onPressed: controller.load, child: const Text('다시 시도')),
+              TextButton(
+                  onPressed: controller.load, child: const Text('다시 시도')),
             ]))
           : !controller.ready
               ? const Center(child: CircularProgressIndicator())
               : Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 620),
-                    child: ListView(padding: const EdgeInsets.all(20), children: [
-                  if (!savedOnly)
-                    ListTile(
-                      leading: const Icon(Icons.light_mode_outlined),
-                      title: const Text('십자가 빛 모으기'),
-                      subtitle: const Text('여섯 단어로 완성하는 작은 십자가'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              builder: (_) => const CrossLightPage())),
-                    ),
-                  if (!savedOnly)
-                    ListTile(
-                      leading: const Icon(Icons.route_outlined),
-                      title: const Text('7일 마음의 여정'),
-                      subtitle: Text(controller.journey == null
-                          ? '편할 때 시작하고, 하루씩 이어가요.'
-                          : '${controller.journey!.checkins.length} / 7일 기록'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                              builder: (_) => const JourneyPage())),
-                    ),
-                  if (!savedOnly && today != null) ...[
-                    const Text('오늘의 말씀',
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold)),
-                    _verseCard(context, controller, today),
-                    const SizedBox(height: 24),
-                  ],
-                  const Text('저장한 말씀',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  if (controller.savedVerseIds.isEmpty)
-                    const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Text('곁에 두고 싶은 말씀을 저장해 보세요.')),
-                  for (final verse in controller.catalog
-                      .where((v) => controller.savedVerseIds.contains(v.id)))
-                    _verseCard(context, controller, verse),
-                  if (!savedOnly) ...[
-                    const SizedBox(height: 24),
-                    const Text('작은 발자취',
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold)),
-                    if (controller.achievements.isEmpty)
-                      const Text('나를 돌보는 순간들이 이곳에 남아요.'),
-                    for (final achievement in controller.achievements)
-                      ListTile(
-                          leading: const Icon(Icons.auto_awesome),
-                          title: Text(achievement.label)),
-                    for (final egg in controller.eggs)
-                      ListTile(
-                          leading: const Icon(Icons.light_mode_outlined),
-                          title: Text(egg.label),
-                          subtitle: Text(egg.message)),
-                  ],
-                ]))),
+                      constraints: const BoxConstraints(maxWidth: 620),
+                      child: ListView(
+                          padding: const EdgeInsets.all(20),
+                          children: [
+                            if (!savedOnly)
+                              ListTile(
+                                leading: const Icon(Icons.light_mode_outlined),
+                                title: const Text('십자가 빛 모으기'),
+                                subtitle: const Text('여섯 단어로 완성하는 작은 십자가'),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                        builder: (_) =>
+                                            const CrossLightPage())),
+                              ),
+                            if (!savedOnly)
+                              ListTile(
+                                leading: const Icon(Icons.route_outlined),
+                                title: const Text('7일 마음의 여정'),
+                                subtitle: Text(controller.journey == null
+                                    ? '편할 때 시작하고, 하루씩 이어가요.'
+                                    : '${controller.journey!.checkins.length} / 7일 기록'),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                        builder: (_) => const JourneyPage())),
+                              ),
+                            if (!savedOnly && today != null) ...[
+                              const Text('오늘의 말씀',
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
+                              _verseCard(context, controller, today),
+                              const SizedBox(height: 24),
+                            ],
+                            const Text('저장한 말씀',
+                                style: TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.bold)),
+                            if (controller.savedVerseIds.isEmpty)
+                              const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 16),
+                                  child: Text('곁에 두고 싶은 말씀을 저장해 보세요.')),
+                            for (final verse in controller.catalog.where(
+                                (v) => controller.savedVerseIds.contains(v.id)))
+                              _verseCard(context, controller, verse),
+                            if (!savedOnly) ...[
+                              const SizedBox(height: 24),
+                              const Text('작은 발자취',
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
+                              if (controller.achievements.isEmpty)
+                                const Text('나를 돌보는 순간들이 이곳에 남아요.'),
+                              for (final achievement in controller.achievements)
+                                ListTile(
+                                    leading: const Icon(Icons.auto_awesome),
+                                    title: Text(achievement.label)),
+                              for (final egg in controller.eggs)
+                                ListTile(
+                                    leading:
+                                        const Icon(Icons.light_mode_outlined),
+                                    title: Text(egg.label),
+                                    subtitle: Text(egg.message)),
+                            ],
+                          ]))),
     );
   }
 
@@ -100,7 +109,7 @@ class EngagementPage extends StatelessWidget {
                 Text(verse.reference,
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text(verse.text),
+                LanguageText(verse.text),
                 const SizedBox(height: 8),
                 Text(verse.reflectionQuestion),
                 Wrap(spacing: 8, children: [

@@ -1,7 +1,7 @@
+import 'record_preferences.dart';
 import 'dart:convert';
 import 'member_record_scope.dart';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../onaria.dart';
 
 class ConversationDraft {
@@ -44,7 +44,7 @@ class ConversationDraft {
           const CrisisDetector().assess(customEmotion ?? '').isCrisis) {
         throw StateError('Safety input is not saved as a draft');
       }
-      return SharedPreferencesAsync().setString(
+      return RecordPreferences().setString(
           access.key(_key),
           jsonEncode({
             'text': text,
@@ -59,7 +59,7 @@ class ConversationDraft {
     final access = MemberRecordScope.instance.capture();
     return _serial(() {
       access.requireCurrent();
-      return SharedPreferencesAsync().remove(access.key(_key));
+      return RecordPreferences().remove(access.key(_key));
     });
   }
 
@@ -67,7 +67,7 @@ class ConversationDraft {
     final access = MemberRecordScope.instance.capture();
     if (_pending != null) await _pending;
     access.requireCurrent();
-    final raw = await SharedPreferencesAsync().getString(access.key(_key));
+    final raw = await RecordPreferences().getString(access.key(_key));
     access.requireCurrent();
     if (raw == null) return null;
     try {

@@ -40,11 +40,10 @@ PC 방화벽의 ADB 허용 여부를 확인합니다. Android 10 이하는 이 �
 
 공식 안내: https://developer.android.com/tools/adb#connect-to-a-device-over-wi-fi
 
-이 패키지는 Flutter 테스트 소스입니다. Android 휴대전화에 설치하려면 Flutter와
-Android Studio가 설치된 PC에서 아래 명령을 실행해 테스트 APK를 생성합니다.
+기존 Android/iOS/Web 프로젝트를 유지한 채 아래 명령으로 로컬 QA를 수행합니다.
+Debug APK는 에뮬레이터·별도 테스트 기기용 컴파일 산출물입니다. 기록이 있는 정식 앱의 업데이트는 위 Release 절차를 따릅니다.
 
 ```bash
-flutter create --platforms=android,ios,web .
 flutter pub get
 flutter test
 flutter build apk --debug

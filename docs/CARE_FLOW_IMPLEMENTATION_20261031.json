@@ -1,0 +1,151 @@
+{
+  "project": "onaria",
+  "contractVersion": 1,
+  "stages": [
+    "emotion",
+    "conversation",
+    "content",
+    "practice",
+    "card"
+  ],
+  "entrypoint": "lib/main.dart",
+  "contentLabel": "말씀",
+  "conversationMode": "기존 앱 전용 AI 프록시; 비연결 시 명시적 로컬 안내",
+  "recordStorage": "기기 저장; 기존 회원별 기록·삭제 경계 유지",
+  "sharedRuntimeDependencies": false,
+  "verification": {
+    "analyze": {
+      "exitCode": 0,
+      "seconds": 38.6,
+      "log": "/tmp/common-flow-onaria-analyze.log",
+      "status": "PASS",
+      "logSha256": "926a816fcf892c082d610aad5616a922ad0865d97ec6320e7b4225de27f6d67b"
+    },
+    "flutter": {
+      "exitCode": 0,
+      "seconds": 253.8,
+      "log": "/tmp/common-flow-onaria-flutter.log",
+      "status": "PASS",
+      "logSha256": "6c292f2d4283af9b0aabcd1dc6e26dc209654f4f5a33aedd3156b4f08046a219",
+      "passed": 213,
+      "skipped": 1,
+      "failed": 0
+    },
+    "backend": {
+      "exitCode": 0,
+      "seconds": 117.1,
+      "log": "/tmp/common-flow-onaria-backend-final.log",
+      "concurrency": 2,
+      "status": "PASS",
+      "logSha256": "89577c7ad78694e547149b9b42d7077e0997b65a4167a07918ee4fbb4e18c663",
+      "tests": 529,
+      "pass": 529,
+      "fail": 0,
+      "skipped": 0
+    },
+    "additionalBoundaryTests": {
+      "passed": 3,
+      "status": "PASS"
+    }
+  },
+  "checkedAt": "2026-10-31T06:28:01.450985+00:00",
+  "sourceCommit": "40cd65851553238c426b32f5af2639e76f24f64b",
+  "sourceVersion": "1.0.0+28",
+  "sourceFingerprints": {
+    "lib/care_flow.dart": "c78b811188b615607255996035889e77629a0798fc29d4e65356b9a243894d23",
+    "test/common_care_flow_test.dart": "81ecde988af76c8f8fbe5095c364e54b8261095e63ef032d806754ef4efddc63",
+    "test/common_care_flow_navigation_test.dart": "0960c9d7c1031d1532173d8f17041441e8db216a665f535d50b6a78d513f0f71",
+    "lib/features/check_in_page.dart": "5c144a544cf5aba1cb6cf1d0b4b692ca6f7a69d24185ff7d20567027808b4170",
+    "lib/features/conversation_page.dart": "6e2bb26433c8214db3d7a19b3f36ddbf26bd7f1ad34a2f97c5d8d8f925f966a8",
+    "test/common_care_flow_budget_test.dart": "6874d3a977648790ecbbdaa5ea659cc1783d80abf9a215771ddfff613eb7b84a",
+    "backend/public/website/redesign-20261030/index.html": "15a2251be212cbe2d61f11d8dd17af6ce0bb829d51db4e286ebac57d26d309ae",
+    "backend/src/website_content.js": "4fdde01eeaae5ed88cfddc75763bf758eee8b32e8e6c232d06041bd73f0d0d08",
+    "backend/test/onaria_web.test.js": "91df863797c2c71bf8d6ae006244dd620b22827c4e3de6e016e45d7a538649d3"
+  },
+  "builds": {
+    "web": {
+      "exitCode": 0,
+      "seconds": 447.9,
+      "log": "/tmp/common-flow-onaria-web.log",
+      "channel": "TEST",
+      "installed": false
+    },
+    "androidDebug": {
+      "exitCode": 0,
+      "seconds": 207.3,
+      "log": "/tmp/common-flow-onaria-androidDebug.log",
+      "channel": "TEST",
+      "installed": false
+    },
+    "iosSimulator": {
+      "exitCode": 0,
+      "seconds": 571.1,
+      "log": "/tmp/common-flow-onaria-iosSimulator.log",
+      "channel": "TEST",
+      "installed": false
+    }
+  },
+  "changedFiles": [
+    "lib/care_flow.dart",
+    "test/common_care_flow_test.dart",
+    "test/common_care_flow_navigation_test.dart",
+    "lib/features/check_in_page.dart",
+    "lib/features/conversation_page.dart",
+    "test/common_care_flow_budget_test.dart",
+    "backend/public/website/redesign-20261030/index.html",
+    "backend/src/website_content.js",
+    "backend/test/onaria_web.test.js",
+    "AGENTS.md",
+    "README.md",
+    "docs/COMMON_CARE_FLOW.md",
+    "docs/COMMON_CARE_FLOW_REVIEW_20261031.md",
+    "docs/CARE_FLOW_IMPLEMENTATION_20261031.json",
+    "ONARIA_STATUS.md"
+  ],
+  "storeSubmittedByThisWork": false,
+  "liveProviderCallsByThisWork": false,
+  "initialValidation": {
+    "analyze": {
+      "exitCode": 0,
+      "seconds": 38.6,
+      "log": "/tmp/common-flow-onaria-analyze.log"
+    },
+    "flutter": {
+      "exitCode": 0,
+      "seconds": 253.8,
+      "log": "/tmp/common-flow-onaria-flutter.log"
+    },
+    "backend": {
+      "exitCode": 1,
+      "seconds": 64.5,
+      "log": "/tmp/common-flow-onaria-backend.log"
+    }
+  },
+  "status": "PASS_LOCAL_VERIFICATION",
+  "artifactIdentityReadback": {
+    "expectedPackage": "com.onaria.app",
+    "expectedDisplayName": "ONARIA TEST",
+    "releaseSignatureVerification": "NOT_RUN_DEBUG_AND_SIMULATOR_ONLY",
+    "web": {
+      "name": "ONARIA TEST",
+      "shortName": "ONARIA TEST",
+      "status": "PASS"
+    },
+    "androidDebug": {
+      "package": "com.onaria.app",
+      "label": "ONARIA TEST",
+      "versionCode": "28",
+      "sha256": "f855f773e09bacea0f9fb93255e393381fd8532be932885fe6705ba40947b760",
+      "status": "PASS"
+    },
+    "iosSimulator": {
+      "bundleId": "com.onaria.app",
+      "displayName": "ONARIA TEST",
+      "build": "28",
+      "status": "PASS"
+    }
+  },
+  "productionDeployedByThisWork": false,
+  "deviceInstalledByThisWork": false,
+  "workingTreeDirty": true
+}

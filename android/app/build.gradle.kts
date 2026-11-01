@@ -43,6 +43,18 @@ require(kakaoNativeAppKey.isNotEmpty()) {
     "Configure ONARIA_KAKAO_NATIVE_APP_KEY in ignored android/kakao.properties"
 }
 
+// ARI app display channel: labels only; identifiers, credentials and servers stay independent.
+val ariAppChannel = providers.gradleProperty("ariAppChannel").orNull
+require(ariAppChannel == null || ariAppChannel in listOf("dev", "test", "prod")) {
+    "ariAppChannel must be dev, test or prod"
+}
+val ariBaseAppName = "ONARIA"
+fun ariDisplayName(channel: String) = ariBaseAppName + when (channel) {
+    "dev" -> " DEV"
+    "test" -> " TEST"
+    else -> ""
+}
+
 android {
     namespace = "com.onaria.app"
     compileSdk = flutter.compileSdkVersion
@@ -59,6 +71,7 @@ android {
     }
 
     defaultConfig {
+        manifestPlaceholders["ariAppDisplayName"] = ariDisplayName(ariAppChannel ?: "prod")
         applicationId = "com.onaria.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -104,3 +117,7 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// Direct debug builds remain visibly DEV; labelled Release builds use the explicit channel.
+android.buildTypes.getByName("debug").manifestPlaceholders["ariAppDisplayName"] =
+    ariDisplayName(ariAppChannel ?: "dev")

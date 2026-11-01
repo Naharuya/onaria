@@ -7,10 +7,15 @@
 | 목적 | 기준 문서 |
 | --- | --- |
 | 프로젝트 소개·실행 | [README](../README.md) |
-| 현재 구현 상태·남은 문제 | [ONARIA_STATUS](../ONARIA_STATUS.md) |
+| 2026-09-11 기능별 검증 스냅샷 | [ONARIA_STATUS](../ONARIA_STATUS.md) |
+| Build24 소스 통합 기록 | [ONARIA_MAIN_INTEGRATION](releases/ONARIA_MAIN_INTEGRATION_2026-10-11.md) |
 | 다음 작업의 순서·보류한 작업 | [ONARIA_ROADMAP](../ONARIA_ROADMAP.md) |
 | 완료를 판단하는 기준 | [ONARIA_GATES](../ONARIA_GATES.md) |
 | 0.4.1 수정·검증·배포 기록 | [릴리즈 점검](releases/APP_REVIEW_2026-09-11.md) |
+
+## 확정된 제품·데이터 목적
+
+- [선택적 답변 평가와 반복 문구 개선 정책](FEEDBACK_ADAPTIVE_PHRASE_POLICY_2026-10-24.md) — 2026-10-24 사용자 결정. 반복 답변 문구의 능동적 추가 저장을 지원하는 목적과 실제 구현 확인 범위를 구분합니다.
 
 ## 개발 지침
 
@@ -43,6 +48,6 @@
 
 ## 문서 갱신 원칙
 
-현재 상태는 STATUS, 실행 순서는 ROADMAP, 완료 기준은 GATES에서 관리합니다. 버전별 테스트·설치 증거는 `releases/`, 과거 작업 이력은 `archive/`, 반복해서 참고하는 지침은 `guides/`에 둡니다. 루트에 같은 역할의 새 보고서를 계속 추가하지 않습니다.
+STATUS는 현재 2026-09-11 스냅샷이며 최신 전체 현황으로 갱신되지 않았습니다. 소스 버전은 `pubspec.yaml`, 이후 변경·검증은 해당 `releases/` 기록과 실제 대상 버전의 실행 증거를 함께 확인합니다. 실행 순서는 ROADMAP, 완료 기준은 GATES에서 관리합니다. 버전별 테스트·설치 증거는 `releases/`, 과거 작업 이력은 `archive/`, 반복해서 참고하는 지침은 `guides/`에 둡니다. 루트에 같은 역할의 새 보고서를 계속 추가하지 않습니다.
 
 이번 정리에서는 루트 Markdown 21개 중 17개를 이동했습니다(과거 보고서 12개, 지침 4개, 릴리즈 기록 1개). 앱 소스·환경 설정·서명키·DB·APK는 정리 대상으로 변경하거나 삭제하지 않았습니다.

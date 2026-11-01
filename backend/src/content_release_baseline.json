@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "project": "onaria",
+  "generatedAt": 1793527749668,
+  "basis": "Existing publicly distributed exact artifact; no new professional/rights approval is asserted.",
+  "entries": [
+    {
+      "reference": "PHP_4_6_7",
+      "kind": "source_quote",
+      "contentHash": "97513048ac6c129f5b9904daa1bbbd12337be59f5a5d86aa29a64c097742d4f7",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "ISA_41_10",
+      "kind": "source_quote",
+      "contentHash": "8945004c5748dfeb507577c5c2953ae85f0e9748c8d4eaf22523812a6ec8467b",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "PSA_23_4",
+      "kind": "source_quote",
+      "contentHash": "812498cc2d217cb697d906a51710da3c3838b1871ba4b4c194e2850283a32d3d",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "HEB_13_5",
+      "kind": "source_quote",
+      "contentHash": "caaba852244cca267aad8f5529d5ecf8e3fc7cc1af683e7462298b5fb6db5258",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "MAT_11_28",
+      "kind": "source_quote",
+      "contentHash": "397d6be2a762e4f042dad4d1e15a153235fc0bdfc4f83540f0845847c3d0ea6e",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "ISA_40_31",
+      "kind": "source_quote",
+      "contentHash": "8c0c33ff359986a0957042e5ce38a33f57a7e96ae6d1a45f09a12975210e07d9",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "JAS_1_19_20",
+      "kind": "source_quote",
+      "contentHash": "772d31fcaddb36ac335044aeb616ae568a0065553587697a004bc6be4bfb790c",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "PRO_15_1",
+      "kind": "source_quote",
+      "contentHash": "9d7be7be56c29c38b9c221fa4d78efc03b235d2fbd3237e283c0050567bbdc6f",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "PSA_34_18",
+      "kind": "source_quote",
+      "contentHash": "4b2cf6745822706516b9a54e76408bf1a3ea4e4cbcdef4fdbe76d8539ed89ff5",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "JHN_14_27",
+      "kind": "source_quote",
+      "contentHash": "f618a6a7e851b90c75945f98f1c1f63bd2a2fc6fa05725bb699f1b595c0c4302",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "PRO_3_5_6",
+      "kind": "source_quote",
+      "contentHash": "79c1fbf8157c1a8246047d87e2be5a774b1772dbe41c1ffd0536e4de2b685727",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "JAS_1_5",
+      "kind": "source_quote",
+      "contentHash": "18a74155bd70148e3ad73c3308505dde7abf69df7744e41733fab602e72101d5",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "1TH_5_18",
+      "kind": "source_quote",
+      "contentHash": "fd2c091c5b85bf21f2eeb752f713df06195433840a44142a6202757d4bae96c6",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    },
+    {
+      "reference": "PSA_100_4",
+      "kind": "source_quote",
+      "contentHash": "5e402890e7303df4d51bb2198db8bcee1e46cd5a903efc0bfca87726327b4ce3",
+      "state": "existing_distribution",
+      "offlineSeconds": 604800,
+      "issuedAt": 1793527749668,
+      "expiresAt": 1794132549668
+    }
+  ],
+  "blockedIds": []
+}

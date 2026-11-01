@@ -5,12 +5,13 @@ import 'package:onaria/src/conversation/conversation_models.dart';
 import 'package:onaria/src/safety/crisis_detector.dart';
 
 void main() {
-  test('모든 기본 카드에 안전하고 서로 다른 상황 예시 여섯 개 제공', () {
+  test('모든 기본 카드에 안전하고 서로 다른 통합 상황 예시와 원문 보존', () {
     expect(emotionSituationExamples.keys.toSet(), EmotionType.values.toSet());
     for (final emotion in EmotionType.values) {
       final examples = emotionSituationExamples[emotion]!;
-      expect(examples, hasLength(6));
-      expect(examples.toSet(), hasLength(6));
+      expect(examples.length, greaterThanOrEqualTo(6));
+      expect(examples, containsAll(originalEmotionSituationExamples[emotion]!));
+      expect(examples.toSet(), hasLength(examples.length));
       for (final example in examples) {
         expect(const CrisisDetector().assess(example).isCrisis, isFalse);
       }

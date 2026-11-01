@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -69,6 +70,7 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.surface,
       fontFamily: 'sans-serif',
+      fontFamilyFallback: kIsWeb ? const ['AriWebKorean'] : null,
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: scheme.onSurface,

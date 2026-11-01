@@ -8,6 +8,16 @@ export const agentIds = ['auto', 'bible_ko', 'bible_en', 'clinical_reflection', 
 
 export const requestSchema = z.object({
   session: z.object({
+    personalizationContext: z.object({
+      version: z.literal(1),
+      historyCompacted: z.boolean().optional(),
+      emotion: z.string().max(100),
+      intensity: z.number().int().min(1).max(10),
+      situation: z.string().max(2000),
+      desiredHelp: z.enum(['unspecified','rest','connection','order','savor']),
+      alreadyAnswered: z.array(z.string().max(2000)).max(5),
+      askedQuestions: z.array(z.string().max(1000)).max(5),
+    }).strict().optional(),
     sessionId: z.string().min(1).max(128),
     selectedEmotion: z.enum(emotions),
     customEmotion: z.string().trim().max(100).optional(),

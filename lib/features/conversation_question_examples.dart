@@ -42,7 +42,7 @@ List<String> conversationQuestionExamples(
           !RegExp(r'[?？\n]|https?:|\d+\s*[:장절]').hasMatch(value) &&
           !const CrisisDetector().assess(value).isCrisis)
       .toSet()
-      .take(3)
+      .take(5)
       .toList();
   if (supplied.isNotEmpty) return supplied;
   const choices = {

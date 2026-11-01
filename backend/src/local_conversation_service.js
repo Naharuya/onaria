@@ -1,3 +1,4 @@
+import { personalizedReply } from './care_personalization.js';
 import { emotionResponsePolicy, explicitlyRequestsVerse } from './emotion_response_policy.js';
 import { assessRequestCrisis, crisisResponse } from './crisis.js';
 
@@ -48,6 +49,7 @@ export function createLocalConversationService() {
     const deferVerse = policy.deferVerse && !explicitlyRequestsVerse(body.userMessage);
     if (deferVerse && stage === 'verse_offer') stage = (body.session.turnCount ?? 0) >= 4 ? 'summary' : 'need';
     const reply = stageReplies[stage];
+    const common = body.session.personalizationContext ? personalizedReply(body, agent.id === 'clinical_reflection' ? '상황과 생각, 감정과 필요를 구분해 살펴볼게요.' : '기독교의 사랑과 돌봄을 떠올리며, 말씀 읽기는 선택할 수 있어요.') : null;
     const shouldOfferVerse = stage === 'verse_offer' && body.allowedVerseIds.length > 0;
     const shouldEndConversation = stage === 'summary';
     const emotion = body.session.selectedEmotion;
@@ -56,8 +58,8 @@ export function createLocalConversationService() {
     return {
       responseMode: 'local',
       ...(deferVerse ? { continueConversation: !shouldEndConversation } : {}),
-      message: reply.message(emotion),
-      question: body.session.customEmotion && reply.question
+      message: common && ['thought','need'].includes(stage) ? common.message : reply.message(emotion),
+      question: common && ['thought','need'].includes(stage) ? common.question : body.session.customEmotion && reply.question
         ? `“${body.session.customEmotion}”라고 적어 주신 마음을 떠올려 볼게요. ${reply.question}`
         : reply.question,
       stage,

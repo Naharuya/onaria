@@ -158,10 +158,27 @@ test('session cost percentiles group calls without exposing identifiers or treat
 
 test('homepage matches app flow, account boundaries, consent and Bible source without release promises', async t => {
   const base = await serve(t); const html = await (await fetch(base + '/')).text();
-  for (const text of ['마음 선택 → 마음대화 →', '네이버 · Google · 카카오 · Apple', '같은 휴대폰 번호만으로 자동 연결하지', '계정 관리 → 회원탈퇴', 'Apple 본인확인', '회원탈퇴와 기기 기록 삭제는 별개', '개역한글판', 'World English Bible(WEB)', 'eBible.org', '허용한 경우에만 외부 AI', '외부 AI 호출을 기다리지 않고', '일반 공개 스토어 출시 전']) assert.ok(html.includes(text), text);
-  assert.doesNotMatch(html, /NIV|지금 다운로드|전체 데이터 1년 자동 파기 완료/);
-  assert.equal((html.match(/class="step-number"/g) || []).length, 3);
+  // The redesign summarizes the same five stages as the current native app.
+  const stages = ['emotion', 'conversation', 'content', 'practice', 'card'];
+  let last = -1;
+  for (const stage of stages) {
+    const at = html.indexOf('data-care-step="' + stage + '"');
+    assert.ok(at > last, 'ordered stage: ' + stage);
+    last = at;
+  }
+  assert.equal((html.match(/data-care-step="/g) || []).length, 5);
+  for (const text of ['감정 확인', '마음 대화', '말씀', '작은 실천', '카드·기록',
+      '개역한글판', 'World English Bible(WEB)', 'eBible.org', '동의한 뒤',
+      '외부 AI 호출을 기다리지 않고', '공유와 미니게임은 선택']) {
+    assert.ok(html.includes(text), text);
+  }
+  assert.doesNotMatch(html, /NIV|지금 다운로드|전체 데이터 1년 자동 파기 완료|일반 공개 스토어 출시 전/);
   assert.match(html, /href="\/account-deletion"/);
+  assert.match(html, /href="\/privacy"/);
+  const services = await (await fetch(base + '/services')).text();
+  assert.equal((services.match(/class="step-number"/g) || []).length, 5);
+  assert.ok(services.includes('감정 확인 → 마음 대화 → 말씀 → 작은 실천 → 카드·기록'));
+
 });
 
 test('support page is public, canonical and links account/privacy/help paths', async t => {

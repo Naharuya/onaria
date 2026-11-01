@@ -39,7 +39,9 @@ powershell -ExecutionPolicy Bypass -File scripts/install-onaria-release.ps1 -Dev
 
 APK 경로는 `build/app/outputs/flutter-apk/`, AAB는 `build/app/outputs/bundle/debug/`다. CI 테스트 artifact는 정식 앱 업데이트용이 아니다. CI에는 Release 개인키를 추가하지 않았다. 실제 버전과 달랐던 고정 이름 `onaria-v0.4.0-test-apk`는 `onaria-debug-apk`로 변경했다.
 
-검증된 공개 인증서 SHA-256:
+현재 설치기의 공개 인증서 pin은 `scripts/android-release.mjs`의 `releaseCert`를 따른다. 2026-10-06 Android Apple 연결 기록에서 기존 설치 APK와 기존 키의 동일 인증서를 확인한 뒤 pin을 갱신했으며, 아래 값은 그 이전 검증 이력이다. 설치된 APK와 빌드된 APK가 현재 pin과 다르면 설치를 중단하고 원인을 확인한다. 키 교체·다운그레이드·삭제로 우회하지 않는다.
+
+과거 검증 당시 공개 인증서 SHA-256 (현재 pin으로 사용하지 않음):
 
 - Release: `692eabafe55986612f5aa3d475cea16e0e5e7db20ce2e09219a2f536f7e8f6bb`
 - 현재 PC Debug: `79b4e37bb38e5f61f826c4ae6374c30a889604465e6b37148d38ff2f63441ab3`

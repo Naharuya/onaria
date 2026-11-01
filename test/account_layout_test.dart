@@ -25,8 +25,17 @@ void main() {
     expect(logout, findsOneWidget);
     expect(find.text('로그인 상태입니다. 연결된 계정 정보를 불러오지 못해도 로그아웃할 수 있어요.'),
         findsOneWidget);
-    expect(tester.getTopLeft(logout).dy,
-        lessThan(tester.getTopLeft(deleteRecords).dy));
+    final logoutY = tester.getTopLeft(logout).dy;
+    await tester.scrollUntilVisible(deleteRecords, 300,
+        scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(deleteRecords);
+    await tester.pumpAndSettle();
+    final offset = tester
+        .state<ScrollableState>(find.byType(Scrollable).first)
+        .position
+        .pixels;
+    expect(logoutY, lessThan(tester.getTopLeft(deleteRecords).dy + offset));
+    expect(deleteRecords.hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

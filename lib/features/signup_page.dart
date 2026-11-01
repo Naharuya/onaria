@@ -59,6 +59,19 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (_) {/* Optional hint never gates authentication. */}
   }
 
+  int _consentStep = 0;
+  final _consentAnchor = GlobalKey();
+
+  void _revealConsentStep() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _consentAnchor.currentContext;
+      if (mounted && target != null) {
+        Scrollable.ensureVisible(target,
+            alignment: 0, duration: const Duration(milliseconds: 200));
+      }
+    });
+  }
+
   bool _busy = false;
   bool _termsAccepted = false;
   bool _privacyAccepted = false;
@@ -181,58 +194,95 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          CheckboxListTile(
-                            contentPadding: EdgeInsets.zero,
-                            value: _adultConfirmed,
-                            onChanged: _busy
-                                ? null
-                                : (value) => setState(
-                                    () => _adultConfirmed = value ?? false),
-                            title: const Text('만 18세 이상입니다. (필수)'),
-                            controlAffinity: ListTileControlAffinity.leading,
-                          ),
-                          CheckboxListTile(
-                            contentPadding: EdgeInsets.zero,
-                            value: _termsAccepted,
-                            onChanged: _busy
-                                ? null
-                                : (value) => setState(
-                                    () => _termsAccepted = value ?? false),
-                            title: const Text('이용약관에 동의합니다. (필수)'),
-                            controlAffinity: ListTileControlAffinity.leading,
-                          ),
-                          TextButton(
-                            onPressed: () => launchUrl(
-                                Uri.parse('https://onaria.ai.kr/terms'),
-                                mode: LaunchMode.externalApplication),
-                            child: const Text('이용약관 보기'),
-                          ),
-                          CheckboxListTile(
-                            contentPadding: EdgeInsets.zero,
-                            value: _privacyAccepted,
-                            onChanged: _busy
-                                ? null
-                                : (value) => setState(
-                                    () => _privacyAccepted = value ?? false),
-                            title: const Text('개인정보 처리 안내에 동의합니다. (필수)'),
-                            controlAffinity: ListTileControlAffinity.leading,
-                          ),
-                          TextButton(
-                            onPressed: () => launchUrl(
-                                Uri.parse('https://onaria.ai.kr/privacy'),
-                                mode: LaunchMode.externalApplication),
-                            child: const Text('개인정보 처리 안내 보기'),
-                          ),
-                          const SizedBox(height: 20),
-                          FilledButton.icon(
-                            onPressed: _busy ? null : _completeProviderSignUp,
-                            icon: const Icon(Icons.check),
-                            label: Text(
-                              _busy
-                                  ? '처리 중...'
-                                  : '${_providerLabel(_pendingProvider)}로 가입 완료',
+                          Text(
+                              '동의 ${_consentStep < 3 ? _consentStep + 1 : 3}/3',
+                              key: _consentAnchor,
+                              semanticsLabel: '회원가입 동의 단계'),
+                          if (_consentStep > 0)
+                            TextButton(
+                                key: const ValueKey('consent-previous'),
+                                onPressed: _busy
+                                    ? null
+                                    : () {
+                                        setState(() => _consentStep--);
+                                        _revealConsentStep();
+                                      },
+                                child: const Text('이전 동의 항목')),
+                          if (_consentStep == 0) ...[
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: _adultConfirmed,
+                              onChanged: _busy
+                                  ? null
+                                  : (value) => setState(() {
+                                        _adultConfirmed = value ?? false;
+                                        if (value == true) _consentStep = 1;
+                                        _revealConsentStep();
+                                      }),
+                              title: const Text('만 18세 이상입니다. (필수)'),
+                              controlAffinity: ListTileControlAffinity.leading,
                             ),
-                          ),
+                          ],
+                          if (_consentStep == 1) ...[
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: _termsAccepted,
+                              onChanged: _busy
+                                  ? null
+                                  : (value) => setState(() {
+                                        _termsAccepted = value ?? false;
+                                        if (value == true) _consentStep = 2;
+                                        _revealConsentStep();
+                                      }),
+                              title: const Text('이용약관에 동의합니다. (필수)'),
+                              controlAffinity: ListTileControlAffinity.leading,
+                            ),
+                            TextButton(
+                              onPressed: () => launchUrl(
+                                  Uri.parse('https://onaria.ai.kr/terms'),
+                                  mode: LaunchMode.externalApplication),
+                              child: const Text('이용약관 보기'),
+                            ),
+                          ],
+                          if (_consentStep == 2) ...[
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: _privacyAccepted,
+                              onChanged: _busy
+                                  ? null
+                                  : (value) => setState(() {
+                                        _privacyAccepted = value ?? false;
+                                        if (value == true) _consentStep = 3;
+                                        _revealConsentStep();
+                                      }),
+                              title: const Text('개인정보 처리 안내에 동의합니다. (필수)'),
+                              controlAffinity: ListTileControlAffinity.leading,
+                            ),
+                            TextButton(
+                              onPressed: () => launchUrl(
+                                  Uri.parse('https://onaria.ai.kr/privacy'),
+                                  mode: LaunchMode.externalApplication),
+                              child: const Text('개인정보 처리 안내 보기'),
+                            ),
+                          ],
+                          if (_consentStep == 3)
+                            const Text('필수 동의를 모두 확인했어요. 회원가입 버튼을 눌러 완료해 주세요.'),
+                          const SizedBox(height: 20),
+                          if (_consentStep == 3)
+                            FilledButton.icon(
+                              onPressed: _busy ||
+                                      !_adultConfirmed ||
+                                      !_termsAccepted ||
+                                      !_privacyAccepted
+                                  ? null
+                                  : _completeProviderSignUp,
+                              icon: const Icon(Icons.check),
+                              label: Text(
+                                _busy
+                                    ? '처리 중...'
+                                    : '${_providerLabel(_pendingProvider)}로 회원가입',
+                              ),
+                            ),
                           const SizedBox(height: 8),
                           TextButton(
                             onPressed: _busy

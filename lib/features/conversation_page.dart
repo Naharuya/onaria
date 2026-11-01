@@ -1,3 +1,10 @@
+import '../personal_keywords.dart';
+import '../language_text.dart';
+import '../care_composer_frame.dart';
+import '../care_personalization.dart';
+import '../common_emotion_examples.dart';
+import '../all_emotion_examples.dart';
+import '../care_flow.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -38,26 +45,44 @@ class ConversationPage extends StatefulWidget {
       {super.key,
       required this.emotion,
       required this.intensity,
+      this.keywordLearning,
       this.customEmotion,
       this.apiClient,
-      this.mindCardStore});
+      this.mindCardStore,
+      this.animateComposerBorder = true});
+  final bool animateComposerBorder;
   final MindCardStore? mindCardStore;
   final LlmApiClient? apiClient;
   final String? customEmotion;
   final EmotionType emotion;
   final int intensity;
+  final PersonalKeywordLearning? keywordLearning;
 
   @override
   State<ConversationPage> createState() => _ConversationPageState();
 }
 
 class _ConversationPageState extends State<ConversationPage> {
+  final _exampleDeck = ConversationExampleDeck();
+  late final _keywordLearning =
+      widget.keywordLearning ?? PersonalKeywordLearning();
+
   String? get _customFeeling {
     final text = widget.customEmotion?.trim();
     return text == null || text.isEmpty ? null : text;
   }
 
+  late final _personalization = CarePersonalization(
+      emotion: _customFeeling ?? widget.emotion.label,
+      intensity: widget.intensity);
+
   String _feelingQuestion(int turn) {
+    if (turn > 0) {
+      final question = _personalization.question(turn);
+      return _customFeeling == null
+          ? question
+          : '“$_customFeeling”라고 적어 주신 마음을 떠올려 볼게요. $question';
+    }
     final feeling = _customFeeling;
     if (feeling == null) {
       return turn == 0
@@ -181,40 +206,52 @@ class _ConversationPageState extends State<ConversationPage> {
   EmotionType? _detectedEmotion;
 
   List<String> get _currentActions {
+    final helpEmotion = switch (_personalization.desiredHelp) {
+      'rest' => EmotionType.exhaustion,
+      'connection' => EmotionType.loneliness,
+      'order' => EmotionType.complexity,
+      'savor' => EmotionType.gratitude,
+      _ => null,
+    };
+    if (helpEmotion != null && _agentMode != 'clinical_reflection') {
+      return List.unmodifiable({
+        ...?_emotionSpecificActions[helpEmotion],
+        ...?_emotionSpecificActions[widget.emotion]
+      });
+    }
+
     if (_agentMode == 'clinical_reflection') return _clinicalActions;
     return _emotionSpecificActions[_currentEmotion] ??
         ['1분간 천천히 호흡하기', '믿을 수 있는 사람에게 안부 보내기', '짧게 기도하고 마음 한 줄 적기'];
   }
 
   List<String> get _currentExamplePrompts {
-    if (_busy || _session.isEnded) return const [];
+    if (_busy || _session.isEnded || _session.riskLevel > 0) return const [];
     final assistant = _items.where((item) => !item.fromUser).lastOrNull;
     final question = assistant?.question;
     if (question == null) return const [];
-    final positive = const {
-      EmotionType.gratitude,
-      EmotionType.joy,
-      EmotionType.happiness,
-      EmotionType.anticipation,
-      EmotionType.admiration
-    }.contains(_currentEmotion);
-    final sameEmotion =
-        _currentEmotion == widget.emotion && _customFeeling == null;
-    final mixed = _customFeeling != null ||
-        const {EmotionType.surprise, EmotionType.overwhelmed}
-            .contains(_currentEmotion);
-    final limit = mixed
-        ? 2
-        : !positive && sameEmotion && widget.intensity >= 7
-            ? (widget.intensity >= 9 ? 1 : 2)
-            : 3;
-    return conversationQuestionExamples(
+    final starting = _session.lastUserMessage == null;
+    final card = _customFeeling ?? _currentEmotion.label;
+    if (starting) {
+      final personal = _keywordLearning.examples(card);
+      return _exampleDeck.next(
+          question: _questionText(question),
+          primary: personal.isNotEmpty
+              ? personal
+              : commonCardExamples(card, intensity: widget.intensity),
+          emotion: card,
+          personal: personal,
+          starting: true);
+    }
+    final primary = conversationQuestionExamples(
       _questionText(question),
       answerExamples: assistant!.answerExamples,
       userMessage: _session.lastUserMessage ?? '',
       emotion: _currentEmotion,
       situationExamples: emotionSituationExamples[_currentEmotion] ?? const [],
-    ).take(limit).toList();
+    ).take(5).toList();
+    return _exampleDeck.next(
+        question: _questionText(question), primary: primary, emotion: card);
   }
 
   final _controller = TextEditingController();
@@ -284,12 +321,13 @@ class _ConversationPageState extends State<ConversationPage> {
     if (_client case final ProxyLlmApiClient proxy) {
       if (widget.apiClient == null) proxy.close();
     }
+    _personalization.clear();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _send() async {
+  Future<void> _send({bool fromExample = false}) async {
     final text = _controller.text.trim();
     if (text.isEmpty ||
         _busy ||
@@ -336,6 +374,14 @@ class _ConversationPageState extends State<ConversationPage> {
       return;
     }
 
+    if (fromExample) _exampleDeck.select(text);
+    _keywordLearning.observe(text,
+        emotion: _customFeeling ?? _currentEmotion.label,
+        safe: true,
+        fromExample: fromExample);
+    _personalization.accept(text,
+        question: requestSession.lastAssistantQuestion ?? '');
+
     final turnBeforeRequest = _session.turnCount;
     _responseDelayed = false;
     _responseWaitTimer = Timer(const Duration(seconds: 4), () {
@@ -347,14 +393,20 @@ class _ConversationPageState extends State<ConversationPage> {
         await _continueWithoutServer(turnBeforeRequest);
         return;
       }
-      final allowedVerses = await _verseRepository.findForEmotion(
-        _currentEmotion,
-        limit: 100,
-      );
+      final allowedVerses = requestSession.turnCount < 2
+          ? <BibleVerse>[]
+          : await _verseRepository
+              .findForEmotion(
+                _currentEmotion,
+                limit: 100,
+              )
+              .timeout(const Duration(seconds: 3),
+                  onTimeout: () => <BibleVerse>[]);
       final consentGranted = await AiConsent.isGranted();
       if (!mounted || !consentGranted) return;
       final response = await client.send(LlmConversationRequest(
         session: requestSession,
+        personalizationContext: _personalization.toJson(),
         userMessage: text,
         systemPromptVersion: 'ko-v1',
         externalAiConsentVersion: AiConsent.version,
@@ -396,11 +448,12 @@ class _ConversationPageState extends State<ConversationPage> {
           ? null
           : await _verseRepository.getById(response.suggestedVerseId!);
       if (!mounted) return;
-      final shouldAutoShowVerse =
-          transition.uiAction == ConversationUiAction.showVerseConsent &&
-              !_session.isEnded &&
-              _session.riskLevel == 0 &&
-              (suggestedVerse != null || allowedVerses.isNotEmpty);
+      final shouldAutoShowVerse = transition.uiAction ==
+              ConversationUiAction.showVerseConsent &&
+          _session.turnCount < _machine.maxCoreTurns + _machine.maxExtraTurns &&
+          !_session.isEnded &&
+          _session.riskLevel == 0 &&
+          (suggestedVerse != null || allowedVerses.isNotEmpty);
       _suggestedVerse = response.responseMode == 'ai' ? suggestedVerse : null;
       setState(() {
         final replyParts = <String>[
@@ -445,7 +498,7 @@ class _ConversationPageState extends State<ConversationPage> {
     if (_busy || _session.isEnded) return;
     _controller.text = prompt;
     FocusScope.of(context).unfocus();
-    await _send();
+    await _send(fromExample: true);
   }
 
   Future<void> _continueWithoutServer(int previousTurn) async {
@@ -474,10 +527,12 @@ class _ConversationPageState extends State<ConversationPage> {
     if (complete && deferReading) {
       setState(() {
         _session = _session.copyWith(
-            turnCount: turn, stage: ConversationStage.ended, isEnded: true);
+            turnCount: turn,
+            stage: ConversationStage.verseOffer,
+            isEnded: false);
         _busy = false;
-        _showVerseOffer = false;
-        _items.add(const _ChatItem('AI에 연결하지 못했어요. 오늘은 여기서 쉬어 가도 괜찮아요.'));
+        _showVerseOffer = true;
+        _items.add(const _ChatItem('AI에 연결하지 못했지만 말씀을 읽거나 작은 실천을 선택할 수 있어요.'));
       });
       return;
     }
@@ -490,7 +545,10 @@ class _ConversationPageState extends State<ConversationPage> {
       _busy = false;
       _showVerseOffer = complete;
       _items.add(_ChatItem(
-        '서버에 연결하지 못해 AI 답변을 받지 못했어요. 적어 주신 내용으로 다음 단계를 이어갈게요.',
+        '서버에 연결하지 못해 AI 답변을 받지 못했어요. ' +
+            _personalization.bridge(_agentMode == 'clinical_reflection'
+                ? '상황과 생각, 감정과 필요를 구분해 살펴볼게요.'
+                : '기독교의 사랑과 돌봄을 떠올리며, 말씀 읽기는 선택할 수 있어요.'),
         question: complete ? null : _feelingQuestion(turn),
       ));
     });
@@ -666,11 +724,27 @@ class _ConversationPageState extends State<ConversationPage> {
     }
   }
 
+  bool get _canAdvanceFlow =>
+      CareFlow.canAdvance(
+          riskLevel: _session.riskLevel, busy: _busy, current: mounted) &&
+      _session.stage != ConversationStage.crisis;
+
+  void _continueToContent() {
+    if (!_canAdvanceFlow) return;
+    setState(() {
+      _session = _session.copyWith(
+          stage: ConversationStage.verseOffer, isEnded: false);
+      _showVerseOffer = true;
+    });
+    _scrollDown();
+  }
+
   Future<void> _acceptVerse() async {
+    if (!_canAdvanceFlow) return;
     final verse = await VerseHistory().choose(_suggestedVerse != null
         ? [_suggestedVerse!]
         : await _verseRepository.findForEmotion(_currentEmotion, limit: 100));
-    if (!mounted || verse == null) return;
+    if (!mounted || !_canAdvanceFlow || verse == null) return;
     _session = _machine.acceptVerse(_session, verseId: verse.id).session;
     setState(() {
       _verse = verse;
@@ -680,10 +754,11 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   Future<void> _showVerseAutomatically() async {
+    if (!_canAdvanceFlow) return;
     final verse = await VerseHistory().choose(_suggestedVerse != null
         ? [_suggestedVerse!]
         : await _verseRepository.findForEmotion(_currentEmotion, limit: 100));
-    if (!mounted || verse == null) {
+    if (!mounted || !_canAdvanceFlow || verse == null) {
       if (mounted) _showVoiceMessage('지금은 말씀을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
       return;
     }
@@ -696,6 +771,7 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   void _declineVerse() {
+    if (!_canAdvanceFlow) return;
     _session = _machine.declineVerse(_session).session;
     setState(() {
       _showVerseOffer = false;
@@ -705,12 +781,13 @@ class _ConversationPageState extends State<ConversationPage> {
   }
 
   void _continueAfterVerse() {
+    if (!_canAdvanceFlow) return;
     setState(() => _showActions = true);
     _scrollDown();
   }
 
   Future<void> _chooseAction(String action) async {
-    if (_showSummary) return;
+    if (_showSummary || !_canAdvanceFlow) return;
     _session = _machine.selectAction(_session).session;
     setState(() {
       _chosenAction = action;
@@ -729,7 +806,7 @@ class _ConversationPageState extends State<ConversationPage> {
       createdAt: now,
       title: _cardTitle,
       dateLabel: '${now.year}년 ${now.month}월 ${now.day}일',
-      emotion: widget.emotion.label,
+      emotion: _customFeeling ?? _currentEmotion.label,
       intensity: widget.intensity,
       verseReference: _verse?.reference ?? '',
       verseText: _verse?.text ?? '',
@@ -747,8 +824,9 @@ class _ConversationPageState extends State<ConversationPage> {
 
   Future<void> _shareMindCard() => _saveMindCard(share: true);
 
-  Future<void> _saveMindCard({bool share = false}) async {
-    if (_savingCard || _chosenAction == null) return;
+  Future<void> _saveMindCard(
+      {bool share = false, bool directToRecords = false}) async {
+    if (_savingCard || _chosenAction == null || !_canAdvanceFlow) return;
     final engagement = EngagementScope.maybeOf(context);
     final route = ModalRoute.of(context);
     setState(() => _savingCard = true);
@@ -773,6 +851,11 @@ class _ConversationPageState extends State<ConversationPage> {
             engagement?.catalog ?? [],
           )),
         ));
+      } else if (directToRecords) {
+        await _stopVerseSpeech();
+        if (!mounted || route?.isCurrent == false || !_canAdvanceFlow) return;
+        Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+            builder: (_) => GrowthPage(store: _mindCardStore)));
       } else {
         await _stopVerseSpeech();
         if (!mounted || route?.isCurrent == false) return;
@@ -889,6 +972,28 @@ class _ConversationPageState extends State<ConversationPage> {
                   const TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
         ]),
         actions: [
+          if (!_busy &&
+              !_session.isEnded &&
+              _session.riskLevel == 0 &&
+              !_showActions &&
+              !_showSummary &&
+              !_showVerseOffer &&
+              _verse == null)
+            AllEmotionExamples(
+                isExcluded: _exampleDeck.wasSelected,
+                compact: true,
+                emotion: _customFeeling ?? _currentEmotion.label,
+                examples: [
+                  ..._keywordLearning
+                      .examples(_customFeeling ?? _currentEmotion.label),
+                  ...commonEmotionExamples[
+                          _customFeeling ?? _currentEmotion.label] ??
+                      commonGenericSituationExamples
+                ].where((text) => !_exampleDeck.wasSelected(text)).toList(),
+                onSelected: (text) {
+                  if (!_busy && !_session.isEnded && _session.riskLevel == 0)
+                    _selectExample(text);
+                }),
           PopupMenuButton<String>(
             icon: const Icon(Icons.tune_rounded),
             tooltip: '대화 에이전트와 말씀 언어',
@@ -936,6 +1041,14 @@ class _ConversationPageState extends State<ConversationPage> {
                   controller: _scrollController,
                   padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
                   children: [
+                    if (_session.riskLevel == 0 &&
+                        _session.stage != ConversationStage.crisis)
+                      CareFlowProgress(
+                          step: CareFlow.step(
+                              summary: _showSummary,
+                              actions: _showActions,
+                              content: _verse != null || _showVerseOffer),
+                          contentLabel: '말씀'),
                     if (_showSummary)
                       _summaryCard()
                     else if (_showActions)
@@ -957,6 +1070,17 @@ class _ConversationPageState extends State<ConversationPage> {
                                       letterSpacing: 0.5)))),
                       ..._items.map(_bubble),
                       if (_busy) _typing(),
+                      if (_session.isEnded && _session.riskLevel == 0)
+                        _panel(children: [
+                          const Text('대화는 여기서 마쳤어요. 원하시면 다음 단계를 선택해 주세요.'),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                              onPressed: _continueToContent,
+                              child: const Text('말씀 선택으로 이어가기')),
+                          TextButton(
+                              onPressed: _declineVerse,
+                              child: const Text('말씀 없이 작은 실천 선택하기')),
+                        ]),
                     ],
                   ],
                 ),
@@ -999,6 +1123,8 @@ class _ConversationPageState extends State<ConversationPage> {
                                       width: (constraints.maxWidth - 16)
                                           .clamp(160.0, 320.0),
                                       child: OutlinedButton.icon(
+                                        key: ValueKey(
+                                            'conversation-example-$prompt'),
                                         onPressed: _busy || _session.isEnded
                                             ? null
                                             : () => _selectExample(prompt),
@@ -1054,61 +1180,78 @@ class _ConversationPageState extends State<ConversationPage> {
                               ),
                             ]),
                           ),
-                        Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                  child: TextField(
-                                      controller: _controller,
-                                      enabled: !_busy && !_session.isEnded,
-                                      minLines: 1,
-                                      maxLines: 4,
-                                      textInputAction: TextInputAction.send,
-                                      onSubmitted: (_) => _send(),
-                                      decoration: const InputDecoration(
-                                          hintText: '마음을 편하게 적어 주세요',
-                                          filled: false))),
-                              const SizedBox(width: 10),
-                              IconButton.filled(
-                                onPressed:
-                                    _busy || _session.isEnded ? null : _send,
-                                icon: const Icon(Icons.arrow_upward_rounded),
-                                tooltip: '보내기',
-                                style: IconButton.styleFrom(
-                                    minimumSize: const Size(56, 56)),
-                              ),
-                              const SizedBox(width: 8),
-                              Semantics(
-                                button: true,
-                                label: '음성으로 마음 말하기',
-                                child: Material(
-                                  color: _isListening
-                                      ? AppTheme.of(context).coral
-                                      : AppTheme.of(context).accentFill,
-                                  elevation: 5,
-                                  shadowColor: _isListening
-                                      ? AppTheme.of(context).coral
-                                      : AppTheme.of(context).green,
-                                  shape: const CircleBorder(),
-                                  child: InkWell(
-                                    onTap: _busy || _session.isEnded
+                        CareComposerFrame(
+                            active: widget.animateComposerBorder && !_busy,
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                      child: TextField(
+                                          controller: _controller,
+                                          enabled: !_busy && !_session.isEnded,
+                                          minLines: 1,
+                                          style: const TextStyle(
+                                              fontSize: 16, height: 1.5),
+                                          maxLines: 4,
+                                          textInputAction: TextInputAction.send,
+                                          onSubmitted: (_) => _send(),
+                                          decoration: const InputDecoration(
+                                              isDense: true,
+                                              constraints:
+                                                  BoxConstraints(minHeight: 48),
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 12),
+                                              hintText: '마음을 편하게 적어 주세요',
+                                              border: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              filled: false))),
+                                  const SizedBox(width: 4),
+                                  IconButton.filled(
+                                    onPressed: _busy || _session.isEnded
                                         ? null
-                                        : _toggleVoiceInput,
-                                    customBorder: const CircleBorder(),
-                                    child: SizedBox(
-                                      width: 56,
-                                      height: 56,
-                                      child: Icon(
-                                          _isListening
-                                              ? Icons.stop_rounded
-                                              : Icons.mic_rounded,
-                                          color: Colors.white,
-                                          size: 28),
+                                        : _send,
+                                    icon:
+                                        const Icon(Icons.arrow_upward_rounded),
+                                    tooltip: '보내기',
+                                    style: IconButton.styleFrom(
+                                        fixedSize: const Size(48, 48)),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Semantics(
+                                    button: true,
+                                    label: '음성으로 마음 말하기',
+                                    child: Material(
+                                      color: _isListening
+                                          ? AppTheme.of(context).coral
+                                          : AppTheme.of(context).accentFill,
+                                      elevation: 0,
+                                      shadowColor: _isListening
+                                          ? AppTheme.of(context).coral
+                                          : AppTheme.of(context).green,
+                                      shape: const CircleBorder(),
+                                      child: InkWell(
+                                        onTap: _busy || _session.isEnded
+                                            ? null
+                                            : _toggleVoiceInput,
+                                        customBorder: const CircleBorder(),
+                                        child: SizedBox(
+                                          width: 48,
+                                          height: 48,
+                                          child: Icon(
+                                              _isListening
+                                                  ? Icons.stop_rounded
+                                                  : Icons.mic_rounded,
+                                              color: Colors.white,
+                                              size: 28),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ]),
+                                ])),
                       ]),
                 ),
             ]),
@@ -1237,7 +1380,7 @@ class _ConversationPageState extends State<ConversationPage> {
                 fontWeight: FontWeight.w800,
                 color: AppTheme.of(context).ink)),
         const SizedBox(height: 12),
-        Text('“${verse.text}”',
+        LanguageText('“${verse.text}”',
             style: const TextStyle(
                 fontSize: 17, height: 1.8, fontStyle: FontStyle.italic),
             textAlign: TextAlign.center),
@@ -1256,7 +1399,7 @@ class _ConversationPageState extends State<ConversationPage> {
                   fontWeight: FontWeight.w700,
                   color: AppTheme.of(context).muted)),
           const SizedBox(height: 6),
-          Text(verse.englishText,
+          LanguageText(verse.englishText,
               style: TextStyle(
                   fontSize: 15,
                   height: 1.6,
@@ -1341,33 +1484,86 @@ class _ConversationPageState extends State<ConversationPage> {
         Text(_cardClosingMessage,
             textAlign: TextAlign.center,
             style: TextStyle(height: 1.6, color: AppTheme.of(context).muted)),
-        const SizedBox(height: 18),
-        FilledButton.icon(
-          onPressed: _savingCard ? null : _saveMindCard,
-          icon: _savingCard
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.bookmark_add_outlined),
-          label: const Text('마음 카드 저장하기'),
-        ),
-        const SizedBox(height: 8),
-        OutlinedButton.icon(
-          onPressed: _savingCard ? null : _shareMindCard,
-          icon: const Icon(Icons.ios_share),
-          label: const Text('마음 카드 공유하기'),
-        ),
-        const SizedBox(height: 8),
-        const Text('공유하면 마음 카드도 이 기기에 함께 저장돼요.', textAlign: TextAlign.center),
-        const SizedBox(height: 8),
-        OutlinedButton(
-          onPressed: () => Navigator.of(context).pop(),
-          style:
-              OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          child: const Text('대화 마치기'),
-        ),
+        _cardActions(),
       ]);
+
+  Future<void> _openOptionalGame() async {
+    final route = ModalRoute.of(context);
+    await _stopVerseSpeech();
+    if (!mounted ||
+        route?.isCurrent == false ||
+        !_canAdvanceFlow ||
+        _savingCard) return;
+    await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(builder: (_) => const CrossLightPage()));
+  }
+
+  Widget _cardActions() {
+    final style = const ButtonStyle(
+      minimumSize: WidgetStatePropertyAll(Size(double.infinity, 48)),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      alignment: Alignment.center,
+    );
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: FilledButtonTheme(
+        data: FilledButtonThemeData(style: style),
+        child: OutlinedButtonTheme(
+          data: OutlinedButtonThemeData(style: style),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              key: const ValueKey('care-card-actions'),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton(
+                    key: const ValueKey('care-save-records'),
+                    onPressed: _savingCard
+                        ? null
+                        : () => _saveMindCard(directToRecords: true),
+                    child: const Text('카드 저장하고 기록 보기')),
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: _savingCard ? null : _saveMindCard,
+                  icon: _savingCard
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.bookmark_add_outlined),
+                  label: const Text('마음 카드 저장하기'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _savingCard ? null : _shareMindCard,
+                  icon: const Icon(Icons.ios_share),
+                  label: const Text('마음 카드 공유하기'),
+                ),
+                const SizedBox(height: 12),
+                const Text('공유하면 마음 카드도 이 기기에 함께 저장돼요.',
+                    textAlign: TextAlign.center),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  key: const ValueKey('care-optional-game'),
+                  onPressed: _savingCard ? null : _openOptionalGame,
+                  icon: const Icon(Icons.sports_esports_outlined),
+                  label:
+                      const Text('십자가 빛 모으기 (선택)', textAlign: TextAlign.center),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52)),
+                  child: const Text('대화 마치기'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _summaryRow(String label, String value) => Padding(
       padding: const EdgeInsets.only(bottom: 13),

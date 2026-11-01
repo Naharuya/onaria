@@ -1,4 +1,10 @@
-# ONARIA MVP v0.4.1 테스트 버전
+> 2026-11-01 기록·삭제 공통 기준: [DATA_RIGHTS_STANDARD](docs/DATA_RIGHTS_STANDARD.md), [현재 비교·적용 및 남은 증거](docs/DATA_RIGHTS_REVIEW_20261101.md). 이전 philosophy 비교나 준비 문서는 현재 SORUA/운영 완료 증거가 아닙니다.
+
+> 공통 사용자 흐름과 현재 앱별 차이: [COMMON_CARE_FLOW](docs/COMMON_CARE_FLOW.md). 검증 결과는 docs/CARE_FLOW_IMPLEMENTATION_20261031.json에 기록합니다.
+
+# ONARIA
+
+> 소스 기준: `pubspec.yaml`은 `1.0.0+24` (2026-10-24 로컬 점검). 아래 초기 MVP 설명과 과거 검증 상태는 현재 운영·기기·CI 결과를 뜻하지 않습니다. Build24 소스 통합 기록은 [릴리스 기록](docs/releases/ONARIA_MAIN_INTEGRATION_2026-10-11.md)을 참고하세요.
 
 개발 문서는 [문서 안내](docs/README.md)에서 찾을 수 있습니다. [현재 상태](ONARIA_STATUS.md), [작업 순서](ONARIA_ROADMAP.md), [완료 기준](ONARIA_GATES.md)을 기준으로 확인하고, 과거 보고서는 개발 이력으로 참고합니다.
 
@@ -24,8 +30,7 @@
 모든 회원은 하루 사용 횟수 제한 없이 대화를 시작할 수 있습니다.
 오늘 사용한 횟수는 안내용으로만 표시하며, 대화 시작을 제한하지 않습니다.
 
-전화번호 회원가입 화면과 API는 구현되어 있으나, 현재 외부 서버 연결은 확인이 필요합니다. 네이버·카카오·Google OAuth는
-아직 준비 중으로 표시됩니다.
+현재 소스에는 Apple·Google·네이버·카카오 인증 및 제공자 기반 회원 API가 있습니다. 실제 공급자 설정·로그인·서버 연결은 대상 환경에서 별도로 검증해야 합니다. 아래 초기 MVP 사용 흐름과 버전별 기록을 현재 실기기 검증 완료로 해석하지 않습니다.
 
 ## 처음 실행하기
 
@@ -86,10 +91,7 @@ npm test
 npm start
 ```
 
-회원가입 정보는 백엔드의 `data/members.sqlite` SQLite 데이터베이스에 저장됩니다.
-앱 첫 화면에서 전화번호, 이름, 교회명을 입력하면 `POST /v1/auth/signup`으로
-연결됩니다. 네이버·카카오·Google OAuth 버튼은 아직 준비 중이며, 현재는 전화번호
-회원가입만 실제로 동작합니다.
+회원정보는 백엔드의 `data/members.sqlite` SQLite 데이터베이스에 저장됩니다. 현재 앱의 소셜 가입은 서버에서 제공자 자격증명을 검증하는 `POST /v1/auth/provider/signup` 경로를 사용합니다. 초기 MVP의 `POST /v1/auth/signup` 계약과 현재 소셜 가입 흐름을 구분합니다. 실제 제공자 로그인과 운영 연결은 별도 검증 대상입니다.
 
 API 키는 Flutter나 Git에 넣지 말고 백엔드의 `.env` 또는 배포 서비스의 비밀
 환경변수로만 설정하세요. 상태 확인 주소는 `GET http://localhost:8787/health`,
@@ -131,9 +133,7 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 
 ## 중요한 제한
 
-현재 `bible_verses_ko.json`의 `text`는 개발용 요약 문구입니다.
-정식 성경 본문이 아니며, 출시 전 합법적으로 사용할 수 있는 번역본 라이선스를
-확인한 뒤 교체해야 합니다.
+현재 `bible_verses_ko.json`에는 선별 말씀 14개와 한·영 출처 메타데이터가 있습니다. 전체 성경 본문이 아닙니다. 한국어 개역한글·영어 WEB 대조와 자료 출처 기록은 [콘텐츠 출시 Gate](docs/APP_STORE_CONTENT_RELEASE_GATE.md)를 참고하며, 새 번역·본문 추가 시 해당 사용권과 인용 무결성을 별도로 검토합니다.
 
 위기 감지 정규식은 1차 방어선입니다. 오탐과 누락이 가능하므로 다음을 병행하세요.
 
@@ -162,9 +162,9 @@ LLM 제공자 API 키를 Flutter 앱에 직접 넣지 마세요. 프록시에서
 - 실제 기록이 있는 Android 휴대폰은 [안전한 Release 설치](docs/ANDROID_RELEASE_UPDATE.md)를 사용하세요. `flutter run`이나 CI Debug APK로 정식 앱을 덮어쓰지 마세요.
 - https://api.onaria.ai.kr/ (공식 Production API)
 - 앱 환경 설정과 release 검증: [APP_PRODUCTION_API.md](docs/APP_PRODUCTION_API.md)
-- ip : 104.105.128.84
-- os : Rocky 9
-- SSH 접속: `ssh soul-bible-server` (로컬 `~/.ssh/config`와 전용 키 필요)
+- 과거 Cafe24 IP·Rocky·SSH 별칭을 현재 운영 대상으로 사용하지 않습니다. [호스팅 이전 준비](docs/ONARIA_HOSTING_MIGRATION_PREP_2026-10-19.md)와 승인된 운영 인벤토리를 먼저 확인하세요. 해당 문서의 운영 조회 결과도 작성 당시 증거입니다.
 - 비밀번호와 API 키는 문서나 Git에 저장하지 말고 서버의 비밀 환경변수로 관리
 
 명칭·저장 데이터·환경변수 호환 및 유지 식별자는 [ONARIA 명칭 전환](docs/ONARIA_NAMING_MIGRATION.md)을 참고합니다. 로컬 작업 경로는 `$ARI_ROOT/projects/onaria`입니다.
+
+관리자 공통 구조·권한·운영 연결 범위: [공통 기준](docs/ADMIN_COMMON_STANDARD.md).

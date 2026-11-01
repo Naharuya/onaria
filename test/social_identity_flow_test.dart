@@ -171,4 +171,44 @@ void main() {
     expect(find.text('기존 ONARIA 계정으로 본인 확인'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets('signup advances one consent at a time and never submits early',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    var submissions = 0;
+    await open(tester, (request) async {
+      if (request.url.path.endsWith('/session')) return unknown();
+      submissions++;
+      final body = jsonDecode(request.body) as Map<String, dynamic>;
+      expect(body['adultConfirmed'], true);
+      return http.Response(
+          jsonEncode({
+            'member': {'id': 7},
+            'sessionToken': 'B' * 43,
+            'expiresInSeconds': 3600
+          }),
+          201);
+    }, textScale: 1.6);
+    await tap(tester, '네이버로 계속하기');
+    await tap(tester, '새 계정 만들기');
+    expect(find.text('이용약관에 동의합니다. (필수)'), findsNothing);
+    expect(find.text('네이버로 회원가입'), findsNothing);
+    await tap(tester, '만 18세 이상입니다. (필수)');
+    expect(find.text('만 18세 이상입니다. (필수)'), findsNothing);
+    expect(find.text('개인정보 처리 안내에 동의합니다. (필수)'), findsNothing);
+    await tap(tester, '이용약관에 동의합니다. (필수)');
+    expect(submissions, 0);
+    expect(find.text('네이버로 회원가입'), findsNothing);
+    await tap(tester, '개인정보 처리 안내에 동의합니다. (필수)');
+    expect(find.text('네이버로 회원가입'), findsOneWidget);
+    await tap(tester, '이전 동의 항목');
+    await tap(tester, '개인정보 처리 안내에 동의합니다. (필수)');
+    expect(find.text('네이버로 회원가입'), findsNothing);
+    expect(submissions, 0);
+    await tap(tester, '개인정보 처리 안내에 동의합니다. (필수)');
+    await tap(tester, '네이버로 회원가입');
+    expect(submissions, 1);
+    expect(sessions.token, 'B' * 43);
+    expect(tester.takeException(), isNull);
+  });
 }

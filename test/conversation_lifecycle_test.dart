@@ -40,7 +40,7 @@ void main() {
     await AiConsent.withdraw();
     final client = _PendingClient();
     await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
-      home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
+      home: ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '내일 발표가 걱정돼요.');
     await tester.tap(find.byTooltip('보내기'));
@@ -57,10 +57,10 @@ void main() {
 
   testWidgets('slow responses show waiting state and render immediately on arrival', (tester) async {
     rootBundle.clear();
-    await tester.runAsync(() => rootBundle.loadString('assets/data/bible_verses_ko.json'));
+    await tester.runAsync(() => Future.wait([rootBundle.loadString('assets/data/bible_verses_ko.json'), rootBundle.loadString('assets/data/content_release_baseline.json')]));
     final client = _PendingClient();
     await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
-      home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
+      home: ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '내일 발표가 걱정돼요.');
     await tester.tap(find.byTooltip('보내기'));
@@ -89,7 +89,7 @@ void main() {
   testWidgets('local high risk stops before the client and never shows fallback', (tester) async {
     final client = _PendingClient();
     await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
-      home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
+      home: ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '죽고싶어요');
     await tester.tap(find.byTooltip('보내기'));
@@ -104,10 +104,10 @@ void main() {
 
   testWidgets('server risk opens fixed support before raw model text or verse lookup', (tester) async {
     rootBundle.clear();
-    await tester.runAsync(() => rootBundle.loadString('assets/data/bible_verses_ko.json'));
+    await tester.runAsync(() => Future.wait([rootBundle.loadString('assets/data/bible_verses_ko.json'), rootBundle.loadString('assets/data/content_release_baseline.json')]));
     final client = _PendingClient();
     await tester.pumpWidget(MaterialApp(theme: AppTheme.light,
-      home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
+      home: ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5, apiClient: client)));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '마음이 힘들어요');
     await tester.tap(find.byTooltip('보내기'));
@@ -132,11 +132,11 @@ void main() {
   for (final fail in [false, true]) {
     testWidgets('leaving chat before ${fail ? 'failure' : 'response'} is safe', (tester) async {
       rootBundle.clear();
-      await tester.runAsync(() => rootBundle.loadString('assets/data/bible_verses_ko.json'));
+      await tester.runAsync(() => Future.wait([rootBundle.loadString('assets/data/bible_verses_ko.json'), rootBundle.loadString('assets/data/content_release_baseline.json')]));
       final client = _PendingClient();
       await tester.pumpWidget(MaterialApp(
         theme: AppTheme.light,
-        home: ConversationPage(emotion: EmotionType.anxiety, intensity: 5, apiClient: client),
+        home: ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5, apiClient: client),
       ));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), '내일 발표가 걱정돼요.');
@@ -167,7 +167,7 @@ void main() {
   testWidgets('invalid API configuration explains unavailable AI and continues locally', (tester) async {
     await tester.pumpWidget(MaterialApp(
       theme: AppTheme.light,
-      home: const ConversationPage(emotion: EmotionType.anxiety, intensity: 5),
+      home: const ConversationPage(animateComposerBorder: false, emotion: EmotionType.anxiety, intensity: 5),
     ));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), '내일 발표가 걱정돼요.');

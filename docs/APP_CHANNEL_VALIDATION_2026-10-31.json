@@ -1,0 +1,16 @@
+{
+  "app": "onaria",
+  "name": "ONARIA",
+  "staticChannels": "PASS: DEV/TEST/PROD",
+  "identitySigningPreservation": "PASS",
+  "filesCompared": [
+    "android/app/build.gradle.kts",
+    "android/app/src/main/AndroidManifest.xml",
+    "ios/Runner/Info.plist"
+  ],
+  "nativeAndroid": "NOT VERIFIED: ONARIA manifest task timed out; remaining native jobs stopped",
+  "nativeIos": "NOT VERIFIED: ONARIA settings queries timed out; remaining native jobs stopped",
+  "device": "NOT RUN",
+  "deployment": "NOT RUN",
+  "commitPush": "NOT RUN: hold"
+}

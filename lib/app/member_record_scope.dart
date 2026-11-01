@@ -6,9 +6,10 @@ class MemberRecordScope extends ChangeNotifier {
   static final instance = MemberRecordScope();
   int? _memberId;
   bool _locked = false;
+  bool _deleting = false;
   int _generation = 0;
   int? get memberId => _memberId;
-  bool get locked => _locked;
+  bool get locked => _locked || _deleting;
   int get generation => _generation;
 
   void lock() => _change(null, true);
@@ -20,8 +21,27 @@ class MemberRecordScope extends ChangeNotifier {
 
   void _change(int? id, bool locked) {
     if (_memberId == id && _locked == locked) return;
+    _deleting = false;
     _memberId = id;
     _locked = locked;
+    _generation++;
+    notifyListeners();
+  }
+
+  int beginRecordDeletion() {
+    if (locked) throw StateError('Records unavailable');
+    _deleting = true;
+    return ++_generation;
+  }
+
+  void requireDeletion(int generation) {
+    if (!_deleting || generation != _generation)
+      throw StateError('Account changed');
+  }
+
+  void finishRecordDeletion(int generation) {
+    if (!_deleting || generation != _generation) return;
+    _deleting = false;
     _generation++;
     notifyListeners();
   }

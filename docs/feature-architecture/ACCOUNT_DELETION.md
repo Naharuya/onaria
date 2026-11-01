@@ -1,5 +1,11 @@
 # Feature: 회원탈퇴 / 계정 삭제
 
+> 아래 본문은 2026-10-02 구현 시점의 구조·검증 이력입니다. `pending`·`향후`·15분 메모리 세션 설명은 현재 소스 상태가 아닙니다. 2026-10-24 로컬 소스 대조에서 `backend/src/server.js`는 SQLite 회원 세션과 삭제 명부를 연결하고, `backend/src/app.js`의 `DELETE /v1/account`는 검증된 세션·재인증, Apple 연결 시 철회, 삭제 명부 및 연결 세션 폐기 경로를 구현합니다. `backend/src/auth/member_session.js`의 기본 유효기간은 30일이며 파일 경로 없는 메모리 모드도 지원합니다. 앱은 `lib/app/member_session_store.dart`에서 secure storage를 사용합니다.
+>
+> 현재 구조는 [Apple 삭제](../APPLE_ACCOUNT_DELETION.md), [인증 생애주기 기록](../releases/ONARIA_AUTH_LIFECYCLE_AUDIT_2026-10-11.md), [보유·파기 기록](../releases/ONARIA_RETENTION_IMPLEMENTATION_2026-10-11.md)을 함께 확인합니다. 이번 점검에서 실행한 백엔드 테스트는 `orchestrator.test.js`·`retention_maintenance.test.js` 15 PASS이며, 삭제 API 전체·Flutter·운영·실기기·CI 재검증을 의미하지 않습니다.
+
+## 2026-10-02 구조·검증 이력
+
 - Status: DB + provider verification + opaque member session + closed self-delete API + app/web pre-auth UI implemented; provider console credentials and mobile OAuth SDK binding pending
 - Last verified: 2026-10-02
 - Baseline commit: 6b01d67 (work after baseline is uncommitted)

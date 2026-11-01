@@ -1,4 +1,8 @@
-# onaria 기능·사업 검증 현황
+> 2026-10-31 기본 사용자 흐름의 최신 기준은 [COMMON_CARE_FLOW](docs/COMMON_CARE_FLOW.md)입니다. 아래 과거 단계 설명과 현재 실행 동선을 구분합니다.
+
+# onaria 기능·사업 검증 현황 — 2026-09-11 스냅샷
+
+> 이 문서는 2026-09-11 당시의 기능별 검증 스냅샷입니다. 현재 소스 버전은 `pubspec.yaml`의 `1.0.0+24` (2026-10-24 로컬 확인)이며, [Build24 소스 통합 기록](docs/releases/ONARIA_MAIN_INTEGRATION_2026-10-11.md)과 [보유·파기 구현 기록](docs/releases/ONARIA_RETENTION_IMPLEMENTATION_2026-10-11.md)을 함께 참고하세요. 해당 기록의 과거 PASS·운영·기기 결과도 이번 점검에서 재실행한 증거가 아닙니다. 아래의 “현재”·“최신”은 스냅샷 작성 시점을 가리킵니다.
 
 문서 연결: **현재 상태** · [진행 순서](ONARIA_ROADMAP.md) · [완료 판정 기준](ONARIA_GATES.md).
 

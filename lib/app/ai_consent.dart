@@ -1,6 +1,6 @@
+import 'record_preferences.dart';
 import 'package:flutter/material.dart';
 import 'member_record_scope.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Version changes require a fresh decision; no conversation content is stored.
 class AiConsent {
@@ -18,11 +18,10 @@ class AiConsent {
       '허용하지 않으면 이 대화를 서버에 보내지 않아요. 계정과 기록 관리에서 언제든 허용을 철회할 수 있어요.';
 
   static Future<bool> isGranted() async =>
-      await SharedPreferencesAsync().getString(preferenceKey) == version;
+      await RecordPreferences().getString(preferenceKey) == version;
   static Future<void> grant() =>
-      SharedPreferencesAsync().setString(preferenceKey, version);
-  static Future<void> withdraw() =>
-      SharedPreferencesAsync().remove(preferenceKey);
+      RecordPreferences().setString(preferenceKey, version);
+  static Future<void> withdraw() => RecordPreferences().remove(preferenceKey);
 
   static Future<bool> request(BuildContext context) async {
     final access = MemberRecordScope.instance.capture();

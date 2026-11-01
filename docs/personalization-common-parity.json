@@ -1,0 +1,45 @@
+{
+  "lib/care_personalization.dart": {
+    "equal": true,
+    "canonicalHashes": {
+      "onaria": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+      "buddhist": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+      "catholic": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+      "sorua": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57"
+    }
+  },
+  "lib/common_emotion_examples.dart": {
+    "equal": true,
+    "canonicalHashes": {
+      "onaria": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+      "buddhist": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+      "catholic": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+      "sorua": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a"
+    }
+  },
+  "lib/all_emotion_examples.dart": {
+    "equal": true,
+    "canonicalHashes": {
+      "onaria": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+      "buddhist": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+      "catholic": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+      "sorua": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774"
+    }
+  },
+  "lib/care_request_budget.dart": {
+    "equal": true,
+    "canonicalHashes": {
+      "onaria": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3",
+      "buddhist": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3",
+      "sorua": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3"
+    }
+  },
+  "backend/src/care_personalization.js": {
+    "equal": true,
+    "hashes": {
+      "onaria": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593",
+      "buddhist": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593",
+      "sorua": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593"
+    }
+  }
+}

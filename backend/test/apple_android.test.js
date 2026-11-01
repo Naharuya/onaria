@@ -111,3 +111,34 @@ test('revocation grant stays server-local and is consumed once within proof TTL'
   assert.throws(() => auth.consumeGrant(proof));
   assert.throws(() => auth.resolve(proof));
 });
+
+
+test('hour-late callback gives private recovery and a fresh attempt still works', async () => {
+  const { default: express } = await import('express');
+  const { auth, calls, advance } = fixture(); const stale = auth.challenge();
+  advance(3600000);
+  const app = express(); app.use(auth.router());
+  const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/callback`, {method:'POST', headers:{'content-type':'application/x-www-form-urlencoded'}, body:new URLSearchParams({state:stale.state,id_token:'private-jwt',code:'private-code'}),redirect:'manual'});
+    assert.equal(response.status,401); assert.match(response.headers.get('content-type'),/text\/html/);
+    assert.equal(response.headers.get('cache-control'),'no-store');
+    assert.equal(response.headers.get('referrer-policy'),'no-referrer');
+    const body=await response.text(); assert.match(body,/다시 시작/);
+    for(const secret of [stale.state,stale.nonce,'private-jwt','private-code']) assert.ok(!body.includes(secret));
+    assert.equal(calls.length,0); assert.equal(response.headers.get('location'),null);
+    const fresh=auth.challenge(); await auth.callback({state:fresh.state,id_token:'fresh',code:'fresh'});
+    assert.equal(calls.length,1);
+  } finally {server.closeAllConnections(); await new Promise(resolve=>server.close(resolve));}
+});
+
+
+test('callback rejection diagnostics expose only fixed reasons and cannot break authentication',async()=>{
+ let clock=1000;const reasons=[];
+ const auth=createAppleAndroidAuth({serviceId:'fixture.web',redirectUri:'https://fixture.invalid/v1/auth/apple/android/callback',now:()=>clock,onFailure:reason=>{reasons.push(reason);throw Error('diagnostic sink failure');},verify:async()=>{throw Error('must not verify');}});
+ const stale=auth.challenge();clock+=300000;
+ await assert.rejects(auth.callback({state:stale.state,id_token:'private-token',code:'private-code'}));
+ await assert.rejects(auth.callback({state:stale.state}));
+ await assert.rejects(auth.callback({state:'private-state'}));
+ assert.deepEqual(reasons,['state_expired','state_unknown','state_invalid']);
+});

@@ -1,3 +1,13 @@
+import {createPublicationService} from './content_release_service.js';
+import {createPublicationRepository} from './content_release_repository.js';
+import {sendContentCatalog} from './content_release_http.js';
+import {commonAdminRouter} from './common_admin_router.js';
+import {createAdminRepository} from './common_admin_repository.js';
+import {createAdminAccounts} from './admin_accounts.js';
+import {createAuditLog} from './audit_log.js';
+import {requirePermission} from './admin_rbac.js';
+import { dataRightsRouter } from './privacy/data_rights.js';
+import { publicContent } from './public_content.js';
 import cors from 'cors';
 import { AccountMergeError, mergeHash } from './account_merge_store.js';
 import express from 'express';
@@ -8,7 +18,7 @@ import { ZodError } from 'zod';
 import { assessRequestCrisis, crisisResponse } from './crisis.js';
 import { logSafetyAssessment } from './safety_event.js';
 import { requestSchema, responseSchema } from './schema.js';
-import { memberSchema, publicMember } from './member_schema.js';
+import { memberSchema, legacyMemberSchema, publicMember } from './member_schema.js';
 import { createMemberStore } from './member_store.js';
 import { routeAgent } from './ai_router.js';
 import { IdentityError } from './auth/identity_verifier.js';
@@ -18,8 +28,14 @@ import { websiteRouter } from './website.js';
 import { createWebMetrics, modelUsageSample } from './web_metrics.js';
 import { createFeedbackMetrics, feedbackSchema } from './feedback.js';
 
-export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleRevocation = null, appleAndroidAuth = null, memberSessions = null, deletionManifest = null, accountMergeEnabled = false, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics() }) {
+export function createApp({ generate, adminSettings, allowedOrigins = [], appToken = '', adminToken = '', logger = console, memberStore = createMemberStore(), identity = { required: false, verify: null }, providerIdentity = null, appleRevocation = null, appleAndroidAuth = null, memberSessions = null, deletionManifest = null, accountMergeEnabled = false, production = false, trustProxy = false, publicOrigin = 'https://onaria.ai.kr', allowAdminBearer = !production, webMetrics = createWebMetrics(), adminRepository = null, deletionVerifier = null, backupInspector = null, adminAccounts = null, audit = createAuditLog(), contentReleaseRepository = null, contentReleaseService = null }) {
   const app = express();
+  const publicationStore=contentReleaseRepository??(contentReleaseService?null:createPublicationRepository());
+  const publications=contentReleaseService??createPublicationService({project:'onaria',repository:publicationStore});
+  app.locals.contentPublications=publications;
+  app.locals.closePublications=()=>{if(!contentReleaseRepository)publicationStore?.close();};
+  const commonRepository = adminRepository ?? createAdminRepository();
+  app.locals.closeCommonAdmin = () => { if (!adminRepository) commonRepository.close(); };
   const startedAt = new Date();
   const metrics = { requests: 0, chats: 0, crises: 0, errors: 0, statusCodes: {} };
   const feedback = createFeedbackMetrics();
@@ -42,6 +58,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   app.use(helmet());
   app.use(appLinksRouter());
   app.use(cors({ origin(origin, cb) { cb(null, !origin || allowedOrigins.includes(origin)); } }));
+  app.get('/v1/content/verses', (req,res)=>publicContent(req,res,{publications}));
   app.use('/v1', (_req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
@@ -61,7 +78,17 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
 
   app.get('/health', (_req, res) => res.json({ status: 'ok', version: process.env.ONARIA_VERSION || '1.0.0', build: process.env.ONARIA_BUILD || '20' }));
-  app.use('/v1/admin', adminAuth({ token: adminToken, production, allowBearer: allowAdminBearer }));
+
+  app.get('/v1/content/approval-manifest',(req,res)=>sendContentCatalog(req,res,publications.publicManifest()));
+  app.use('/v1/admin', adminAuth({ token: adminToken, production, allowBearer: allowAdminBearer, accounts: adminAccounts, audit }));
+  app.use('/v1/admin/common', commonAdminRouter({project:'onaria',repository:commonRepository,publications,accounts:adminAccounts,audit,members:()=>({total:memberStore.getAdminOverview?.()?.total}),verifyDeletion:deletionVerifier,inspectBackup:backupInspector}));
+  const need = permission => requirePermission(permission);
+  app.use('/v1/admin/settings', (req,res,next)=>need(req.method==='GET'?'settings:read':'settings:write')(req,res,next));
+  app.use('/v1/admin', (req,res,next)=>{
+    if(req.path==='/overview')return need('overview:read')(req,res,next);
+    if(req.path==='/feedback'||req.path==='/content-reports')return need('feedback:read')(req,res,next);
+    return next();
+  });
   app.use('/v1/admin/settings', (req, res, next) => {
     if (!adminSettings) return res.status(503).json({ message: '설정 저장소를 사용할 수 없습니다.' });
     next();
@@ -101,7 +128,9 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
     res.set('Cache-Control', 'no-cache');
     res.sendFile(fileURLToPath(new URL('../public/admin.html', import.meta.url)));
   });
+  app.get('/admin/common', (_req,res)=>res.sendFile(fileURLToPath(new URL('../public/common-admin.html',import.meta.url))));
   app.use('/admin', express.static(fileURLToPath(new URL('../public', import.meta.url)), { index: false, maxAge: 0, dotfiles: 'deny' }));
+  app.use(dataRightsRouter({websiteOwnsAccountDeletion:true}));
   app.use(websiteRouter({ publicOrigin }));
   app.get('/v1/admin/overview', (req, res) => {
     res.set('Cache-Control', 'no-store');
@@ -129,7 +158,7 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
   });
   app.post('/v1/auth/signup', (req, res, next) => {
     try {
-      const member = memberStore.create(memberSchema.parse(req.body));
+      const member = memberStore.create(legacyMemberSchema.parse(req.body));
       return res.status(201).json({ member: publicMember(member) });
     } catch (error) {
       if (error.code === 'PHONE_EXISTS') return res.status(409).json({ message: error.message });
@@ -382,8 +411,15 @@ export function createApp({ generate, adminSettings, allowedOrigins = [], appTok
       const agent = routeAgent({ requestedAgent: body.agentMode, userMessage: body.userMessage, verseLanguage: body.verseLanguage });
       // Client session IDs are not credentials. Keep anonymous chat stateless so
       // reusing another client's ID cannot retrieve their private context.
+      // Client hints never grant publication. Recheck the server-owned distribution registry after safety.
+      const approvedIds=new Set(publications.publicManifest().entries.map(item=>item.reference));
+      body.allowedVerseIds=body.allowedVerseIds.filter(id=>approvedIds.has(id));
+      if(body.verseCandidates)body.verseCandidates=body.verseCandidates.filter(item=>approvedIds.has(item.id));
+      if(body.session.selectedVerse&&!approvedIds.has(body.session.selectedVerse))body.session={...body.session,selectedVerse:null};
       const memorySummary = body.session.conversationMemory || body.session.conversationSummary || '';
+      const generationStarted = performance.now();
       const result = responseSchema.parse(await generate(body, agent, memorySummary, trustedIdentity));
+      res.set('Server-Timing', 'generation;dur=' + (performance.now() - generationStarted).toFixed(1));
       if (result.riskLevel > 0 || result.stage === 'crisis') {
         metrics.crises += 1;
         webMetrics.safety({ level: Math.max(1, result.riskLevel), kind: 'response_crisis' });

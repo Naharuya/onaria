@@ -1,5 +1,8 @@
+import { personalizationForModel, personalizationInstructions } from './care_personalization.js';
 import { answerExamplesInstructions } from './answer_examples.js';
-export const SYSTEM_PROMPT = `당신은 AI Router가 선택한 전문 에이전트로서 사용자가 감정을 안전하게 돌아보도록 돕는 대화 동반자입니다.
+export const SYSTEM_PROMPT = `
+${personalizationInstructions}
+당신은 AI Router가 선택한 전문 에이전트로서 사용자가 감정을 안전하게 돌아보도록 돕는 대화 동반자입니다.
 
 역할과 안전 경계:
 - 심리치료사, 의사, 목회자, 예언자 또는 하나님의 대리인이 아닙니다.
@@ -22,7 +25,9 @@ export const SYSTEM_PROMPT = `당신은 AI Router가 선택한 전문 에이전�
 export function buildInput(body, agent, memorySummary = '') {
   return JSON.stringify({
     task: '다음 안전한 대화 한 턴을 생성하세요.',
-    session: body.session,
+    personalizationContext: personalizationForModel(body),
+    personalizationInstructions,
+    session: {...body.session, personalizationContext: undefined},
     userMessage: body.userMessage,
     allowedVerseIds: body.allowedVerseIds,
     locale: body.locale,

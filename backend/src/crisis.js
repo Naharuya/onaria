@@ -24,7 +24,11 @@ export function assessCrisis(raw) {
 // Session hints may only raise risk, never lower the current input assessment.
 export function assessRequestCrisis(body) {
   const session = body.session || {};
-  const current = assessCrisis(body.userMessage);
+  const extra = session.personalizationContext;
+  const contextRisk = assessCrisis([extra?.emotion, extra?.situation,
+    ...(extra?.alreadyAnswered || []), ...(extra?.askedQuestions || [])].filter(Boolean).join(' '));
+  const inputRisk = assessCrisis(body.userMessage);
+  const current = contextRisk.level > inputRisk.level ? contextRisk : inputRisk;
   const custom = assessCrisis(session.customEmotion || '');
   const prior = Number.isInteger(session.riskLevel) && session.riskLevel >= 0 && session.riskLevel <= 3 ? session.riskLevel : 0;
   const level = Math.max(current.level, custom.level, prior, session.currentStage === 'crisis' ? 1 : 0);

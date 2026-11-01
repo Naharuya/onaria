@@ -2,3 +2,5 @@
 #include "Generated.xcconfig"
 #include? "Kakao.local.xcconfig"
 #include "NaverKeys.xcconfig"
+
+ARI_APP_DISPLAY_NAME = ONARIA DEV

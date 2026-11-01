@@ -1,0 +1,4406 @@
+{
+  "sourceHashes": {
+    "onaria/lib/features/conversation_page.dart": "6e2bb26433c8214db3d7a19b3f36ddbf26bd7f1ad34a2f97c5d8d8f925f966a8",
+    "onaria/lib/features/emotion_situation_examples.dart": "68d9fbbe3d6a9c90ae18e1bb99ca92333706633d0380797d63c7029e3967b3a4",
+    "onaria/lib/features/conversation_question_examples.dart": "e7f3fa1a7046fff094517f41aed992b9962df06a9565503a7c42db66aca3b063",
+    "onaria/lib/src/api/llm_models.dart": "4967e5f93cf4424036510fc2ce150627356811e437d1b84fd39d6bd355216c4b",
+    "onaria/backend/src/local_conversation_service.js": "eebed59875bde29ead90c767eba4bf3850c1634d08db0042448c1ba93c16d726",
+    "onaria/backend/src/prompt.js": "deebb3b92378a8d742c17186ef61ea20db24391a4d21a6f429c27c537a2885cf",
+    "onaria/backend/src/schema.js": "bccd8a9841b100d9511df67b95ccc8b0c8ab2dfa3a8ef260849833bfbb85efbe",
+    "onaria/backend/src/crisis.js": "423a92d5d6724cc6660dfcd4d2af619edd50d5cd817e899680c7b544b304a722",
+    "buddhist/lib/features/conversation_page.dart": "795e4339fc42c526799bd334456e1e9381b1e1b32a89a01bece3e10b5ddc7884",
+    "buddhist/lib/features/emotion_situation_examples.dart": "68d9fbbe3d6a9c90ae18e1bb99ca92333706633d0380797d63c7029e3967b3a4",
+    "buddhist/lib/features/emotion_response_style.dart": "e73438bc8cac30ac84b2902cb929659595d9925b1952fbb753e7902348f52542",
+    "buddhist/lib/features/conversation_question_examples.dart": "c69557e59fd77228df4a24fe41f83575fa09253651eb70c2e58febb9bf6be726",
+    "buddhist/lib/src/api/llm_models.dart": "97a73f2cf90d00039402709b67306e38063acbdf1b103c26fb29cacc0fd692e2",
+    "buddhist/backend/src/local_conversation_service.js": "2b43f38c216e356c82bce59224eb9a41cd9d4fc22521126bd2911b014bd4bcc5",
+    "buddhist/backend/src/prompt.js": "4e39d586c945947af4d539e46f36593075bf1c345576f1fcd6b3db5540100a9e",
+    "buddhist/backend/src/schema.js": "61a7f70742d0cdc4f4f866e61c254fdfc6b226f29a285d47480e025d68caf513",
+    "buddhist/backend/src/crisis.js": "423a92d5d6724cc6660dfcd4d2af619edd50d5cd817e899680c7b544b304a722",
+    "catholic/lib/src/reflection/adaptive_context.dart": "be92136c1e2211c1f6df5b98eb6f30066b2fe558105f0b316d60d44439e54b48",
+    "catholic/lib/src/journey/session_journey.dart": "1a76d354022de656bb0589f3a350361c8db4b8a21054e643567e9beabba65818",
+    "catholic/lib/src/flow/flow_conversation.dart": "722ef993e5992c56caebd4e1ca4dfb7542a8f7365103925afc019594a0c281ee",
+    "sorua/lib/features/conversation_page.dart": "12335afa60b4f35905b5ac508780b5d9a585d013251fa6c64feaf259a39ce7bd",
+    "sorua/lib/features/emotion_situation_examples.dart": "68d9fbbe3d6a9c90ae18e1bb99ca92333706633d0380797d63c7029e3967b3a4",
+    "sorua/lib/features/conversation_question_examples.dart": "f05ce9d841f668a7dc8207568637abe6cf1b74d5697ac35502f56b5eef6ad78d",
+    "sorua/lib/src/api/llm_models.dart": "4967e5f93cf4424036510fc2ce150627356811e437d1b84fd39d6bd355216c4b",
+    "sorua/backend/src/local_conversation_service.js": "eebed59875bde29ead90c767eba4bf3850c1634d08db0042448c1ba93c16d726",
+    "sorua/backend/src/prompt.js": "deebb3b92378a8d742c17186ef61ea20db24391a4d21a6f429c27c537a2885cf",
+    "sorua/backend/src/sorua_conversation_service.js": "4e725c5edd7a7622a18bd7a6520a21de470739555c5668e8285f2974d76ad83a",
+    "sorua/backend/src/schema.js": "a5d932d57b66bc0e8b64c0fdc85b96c326b74f74a25927ab517b5dfc61fad790",
+    "sorua/backend/src/crisis.js": "423a92d5d6724cc6660dfcd4d2af619edd50d5cd817e899680c7b544b304a722"
+  },
+  "byEmotion": {
+    "불안": [
+      "내일 있을 중요한 일이 자꾸 걱정돼요.",
+      "미래가 불투명해서 마음이 불안하고 떨려요.",
+      "갑자기 안 좋은 일이 생길까 봐 불안한 마음이 커요.",
+      "답장을 기다리는 동안 여러 걱정이 떠올라요.",
+      "해야 할 일이 겹쳐 어디부터 시작할지 불안해요.",
+      "실수했던 일이 다시 생길까 봐 신경이 쓰여요.",
+      "작은 일이 조금 신경 쓰여요.",
+      "다가올 일을 생각하면 살짝 걱정돼요.",
+      "걱정이 커서 지금은 짧게 이야기하고 싶어요.",
+      "생각이 계속 이어져 잠시 쉬고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "외로움": [
+      "문득 세상에 나 혼자 남겨진 것 같은 기분이 들어요.",
+      "진심으로 내 마음을 이해해줄 사람이 없는 것 같아 외로워요.",
+      "혼자 있는 시간이 길어지니 마음이 공허해지네요.",
+      "사람들과 함께 있어도 제 마음은 혼자인 것 같아요.",
+      "편하게 안부를 나눌 사람이 그리워요.",
+      "주말에 혼자 시간을 보내니 누군가와 이야기하고 싶어요.",
+      "오늘은 누군가의 안부가 조금 궁금해요.",
+      "혼자 보내니 가끔 이야기를 나누고 싶어요.",
+      "외로움이 크게 느껴져 누군가와 함께 있고 싶어요.",
+      "지금은 제 이야기를 들어 줄 사람이 그리워요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "지침": [
+      "요즘 업무가 너무 많아 몸과 마음이 다 타버린 것 같아요.",
+      "아무것도 하고 싶지 않고 그저 쉬고만 싶어요.",
+      "반복되는 일상에 지쳐서 에너지가 하나도 없어요.",
+      "충분히 쉬지 못한 채 할 일을 이어가고 있어요.",
+      "사람들을 챙기느라 제 마음을 돌볼 여유가 없었어요.",
+      "작은 일도 시작하기 어려울 만큼 지쳐 있어요.",
+      "기운이 조금 줄어 잠깐 쉬고 싶어요.",
+      "오늘 할 일 사이에 여유가 조금 필요해요.",
+      "많이 지쳐서 지금은 쉬는 시간이 필요해요.",
+      "작은 일도 버거워 할 일을 줄이고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "분노": [
+      "상대방이 무례하게 행동해서 화를 참기 힘들어요.",
+      "정당하지 못한 상황을 겪으니 너무 억울하고 화가 나요.",
+      "자꾸만 짜증이 나고 마음이 날카로워져 있어요.",
+      "제 의견을 듣지 않고 결정해서 속상하고 화가 나요.",
+      "약속이 지켜지지 않아 마음이 상했어요.",
+      "참아 온 감정이 쌓여 작은 말에도 예민해져요.",
+      "그 말이 조금 거슬렸어요.",
+      "약속이 바뀌어서 살짝 짜증이 났어요.",
+      "화가 많이 나서 잠깐 거리를 두고 싶어요.",
+      "바로 반응하기보다 제 마음을 먼저 말하고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "슬픔": [
+      "이유 없이 자꾸만 눈물이 나고 마음이 울적해요.",
+      "소중한 것을 잃어버린 것 같은 상실감이 커요.",
+      "가슴 한구석이 먹먹하고 슬픈 기분이 가시질 않아요.",
+      "기대했던 일이 잘되지 않아 마음이 가라앉아요.",
+      "멀어진 사람을 생각하면 슬퍼져요.",
+      "괜찮은 척했지만 오늘은 속상한 마음을 말하고 싶어요.",
+      "기대했던 일이 조금 아쉽게 느껴져요.",
+      "오늘은 평소보다 마음이 조금 가라앉아요.",
+      "슬픔이 크게 느껴져 지금은 짧게 이야기하고 싶어요.",
+      "해결책보다는 제 마음을 들어줬으면 좋겠어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "복잡함": [
+      "여러 가지 고민이 겹쳐서 머릿속이 너무 복잡해요.",
+      "내 마음을 나도 잘 모르겠어서 답답한 기분이에요.",
+      "어떤 선택을 해야 할지 몰라 마음이 갈팡질팡해요.",
+      "좋으면서도 걱정돼서 마음을 한마디로 표현하기 어려워요.",
+      "일과 관계 사이에서 무엇을 먼저 챙길지 고민돼요.",
+      "여러 감정이 번갈아 올라와 잠시 정리하고 싶어요.",
+      "작은 고민 두 가지 사이에서 망설여져요.",
+      "어떤 일부터 할지 잠깐 정리하고 싶어요.",
+      "여러 생각이 겹쳐 지금은 하나만 이야기하고 싶어요.",
+      "정리를 재촉하지 않고 잠깐 기다려줬으면 좋겠어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "감사": [
+      "오늘 하루를 평안하게 보낼 수 있음에 감사해요.",
+      "주변 사람들의 따뜻한 말 한마디가 큰 힘이 되었어요.",
+      "작은 일에서도 감사를 발견하니 마음이 풍요로워지네요.",
+      "누군가 제 수고를 알아봐 줘서 고마웠어요.",
+      "바쁜 하루에 잠깐 쉴 여유가 생겨 감사해요.",
+      "힘든 일을 함께해 준 사람에게 고마움을 전하고 싶어요.",
+      "누군가 문을 잡아줘서 고마웠어요.",
+      "평범한 하루에 작은 고마움이 느껴져요.",
+      "큰 도움을 받아 고마운 마음을 꼭 전하고 싶어요.",
+      "많이 고마워서 그 순간을 오래 기억하고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "기쁨": [
+      "오랫동안 기다려온 기쁜 소식을 들었어요.",
+      "내가 좋아하는 일을 할 수 있어서 너무 즐거워요.",
+      "함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요.",
+      "작은 목표를 마쳐서 뿌듯하고 기뻐요.",
+      "반가운 사람을 만나 즐겁게 이야기했어요.",
+      "좋아하는 음악을 들으며 기분이 밝아졌어요.",
+      "작은 일을 마쳐서 살짝 기분이 좋아요.",
+      "좋아하는 노래를 듣고 조금 즐거워졌어요.",
+      "정말 기쁜 일이 생겨 누군가와 나누고 싶어요.",
+      "오래 기다린 일이 이루어져 마음이 가득 차요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "공포": [
+      "새로운 도전을 앞두고 실패할까 봐 너무 무서워요.",
+      "안 좋은 일이 일어날 것 같은 예감에 마음이 졸여요.",
+      "어두운 밤이나 혼자 있는 상황이 두렵게 느껴질 때가 있어요.",
+      "낯선 장소에 가야 해서 겁이 나요.",
+      "중요한 말을 꺼내려니 상대의 반응이 두려워요.",
+      "익숙한 것이 바뀌는 상황을 받아들이기 어려워요.",
+      "낯선 일을 앞두고 조금 겁이 나요.",
+      "처음 가는 곳이라 살짝 조심스러워요.",
+      "두려움이 크게 느껴져 익숙한 곳에 머물고 싶어요.",
+      "지금은 제가 선택할 수 있는 것부터 알고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "혐오": [
+      "누군가의 비도덕적인 행동을 보고 마음이 상했어요.",
+      "정말 싫어하는 상황에 놓이게 되어 기분이 좋지 않아요.",
+      "받아들이기 힘든 일을 겪고 거부감이 강하게 들어요.",
+      "제 기준과 맞지 않는 말에 불편함을 느꼈어요.",
+      "원하지 않는 일을 반복해서 요구받아 거부감이 들어요.",
+      "그 상황에서 잠시 거리를 두고 마음을 살피고 싶어요.",
+      "그 행동이 조금 불편했어요.",
+      "제 취향과 맞지 않아 잠깐 거리를 두고 싶어요.",
+      "불편함이 커서 지금은 거리를 두고 싶어요.",
+      "제 경계를 존중받는 방식으로 이야기하고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "놀람": [
+      "생각지도 못한 깜짝 파티를 받아서 놀랐어요.",
+      "갑작스러운 변화에 어떻게 대처해야 할지 얼떨떨해요.",
+      "믿기지 않는 놀라운 이야기를 들어서 가슴이 두근거려요.",
+      "예상하지 못한 소식을 듣고 마음이 흔들렸어요.",
+      "갑자기 계획이 바뀌어 아직 실감이 나지 않아요.",
+      "뜻밖의 배려를 받아 놀라면서도 고마웠어요.",
+      "뜻밖의 소식에 조금 놀랐어요.",
+      "갑자기 계획이 바뀌어 잠깐 얼떨떨해요.",
+      "너무 뜻밖의 일이라 아직 어떤 느낌인지 모르겠어요.",
+      "큰 소식을 듣고 반가움과 당황스러움이 함께 있어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "행복": [
+      "날씨가 너무 좋아서 걷는 것만으로도 행복해요.",
+      "사랑하는 가족과 함께 맛있는 음식을 먹어 행복해요.",
+      "지금 이 평화로운 순간이 오래도록 유지되면 좋겠어요.",
+      "평범한 하루가 편안하게 흘러가서 행복해요.",
+      "좋아하는 사람과 산책하며 마음이 따뜻해졌어요.",
+      "제 속도로 하루를 보내니 만족스러워요.",
+      "별일 없는 하루가 조금 편안하게 느껴져요.",
+      "좋아하는 차를 마시며 작은 만족을 느껴요.",
+      "지금의 행복을 소중한 사람과 나누고 싶어요.",
+      "정말 만족스러운 순간이라 충분히 느끼고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "기대": [
+      "조만간 떠날 여행을 생각하니 벌써부터 설레요.",
+      "새로운 일을 시작하게 되어 기분 좋은 긴장감이 들어요.",
+      "내일은 어떤 즐거운 일이 생길지 기대하며 기다리고 있어요.",
+      "오랜만에 만날 사람을 생각하니 설레요.",
+      "새롭게 배울 일이 생겨 기대가 돼요.",
+      "작은 계획을 세우며 즐거운 변화를 기다려요.",
+      "작은 약속이 조금 기다려져요.",
+      "새로 배울 일이 생겨 살짝 설레요.",
+      "기다리던 일이 다가와 설렘이 아주 커요.",
+      "많이 기대되지만 결과를 서두르지 않고 기다리고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "감탄": [
+      "아름다운 노을을 보며 자연의 신비로움에 감탄했어요.",
+      "누군가의 훌륭한 성품이나 성취를 보고 큰 감명을 받았어요.",
+      "예술 작품을 보며 말로 표현하기 힘든 감동을 느꼈어요.",
+      "꾸준히 노력하는 사람을 보며 존경하는 마음이 들었어요.",
+      "누군가의 세심한 배려가 오래 마음에 남아요.",
+      "평소 지나치던 풍경이 새롭게 아름답게 느껴졌어요.",
+      "작은 배려를 보고 마음이 조금 움직였어요.",
+      "익숙한 풍경이 오늘은 새롭게 보여요.",
+      "깊이 감동받아서 그 장면을 오래 기억하고 싶어요.",
+      "누군가의 노력에 크게 마음이 움직였어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "벅찬": [
+      "너무 큰 사랑과 격려를 받아서 마음이 벅차올라요.",
+      "나에게 주어진 축복이 너무 과분하다는 생각이 들어요.",
+      "가슴이 꽉 찬 것 같은 벅찬 감동에 말을 잇기 힘들어요.",
+      "오랫동안 바라던 일을 이루어 감정이 북받쳐요.",
+      "많은 사람이 응원해 줘서 마음이 가득 차올랐어요.",
+      "소중한 순간을 맞아 기쁨을 어떻게 표현할지 모르겠어요.",
+      "작은 응원이 마음에 남았어요.",
+      "할 일이 조금 겹쳐 마음을 정리하고 싶어요.",
+      "기쁜 감동이 커서 말로 다 표현하기 어려워요.",
+      "감당하기 버거워서 지금은 짧게 이야기하고 싶어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ],
+    "질투": [
+      "나보다 앞서가는 사람을 보니 자꾸 비교하게 돼요.",
+      "내가 갖고 싶던 걸 가진 친구를 보며 질투심이 생겨요.",
+      "타인의 행복이 마냥 축하해주기 힘들 때가 있어 괴로워요.",
+      "다른 사람의 성과를 보며 제 속도가 느리게 느껴져요.",
+      "가까운 사람이 다른 사람을 더 챙기는 것 같아 서운해요.",
+      "비교하는 마음 뒤에 제가 원하는 것이 무엇인지 살펴보고 싶어요.",
+      "친구의 소식에 잠깐 비교하는 마음이 들었어요.",
+      "다른 사람의 물건이 조금 부러웠어요.",
+      "비교하는 마음이 커서 제 바람부터 이야기하고 싶어요.",
+      "지금은 저를 더 탓하지 않고 마음을 들어줬으면 좋겠어요.",
+      "오늘 누군가와 나눈 말이 마음에 남아요",
+      "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+      "작지만 소중한 순간이 있었어요",
+      "여러 마음이 함께 느껴져요",
+      "무슨 일인지 아직 정리되지 않았어요"
+    ]
+  },
+  "provenance": [
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "내일 있을 중요한 일이 자꾸 걱정돼요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "미래가 불투명해서 마음이 불안하고 떨려요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "갑자기 안 좋은 일이 생길까 봐 불안한 마음이 커요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "답장을 기다리는 동안 여러 걱정이 떠올라요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "해야 할 일이 겹쳐 어디부터 시작할지 불안해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "실수했던 일이 다시 생길까 봐 신경이 쓰여요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "문득 세상에 나 혼자 남겨진 것 같은 기분이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "진심으로 내 마음을 이해해줄 사람이 없는 것 같아 외로워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "혼자 있는 시간이 길어지니 마음이 공허해지네요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "사람들과 함께 있어도 제 마음은 혼자인 것 같아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "편하게 안부를 나눌 사람이 그리워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "주말에 혼자 시간을 보내니 누군가와 이야기하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "요즘 업무가 너무 많아 몸과 마음이 다 타버린 것 같아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "아무것도 하고 싶지 않고 그저 쉬고만 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "반복되는 일상에 지쳐서 에너지가 하나도 없어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "충분히 쉬지 못한 채 할 일을 이어가고 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "사람들을 챙기느라 제 마음을 돌볼 여유가 없었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "작은 일도 시작하기 어려울 만큼 지쳐 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "상대방이 무례하게 행동해서 화를 참기 힘들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "정당하지 못한 상황을 겪으니 너무 억울하고 화가 나요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "자꾸만 짜증이 나고 마음이 날카로워져 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "제 의견을 듣지 않고 결정해서 속상하고 화가 나요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "약속이 지켜지지 않아 마음이 상했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "참아 온 감정이 쌓여 작은 말에도 예민해져요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "이유 없이 자꾸만 눈물이 나고 마음이 울적해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "소중한 것을 잃어버린 것 같은 상실감이 커요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "가슴 한구석이 먹먹하고 슬픈 기분이 가시질 않아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "기대했던 일이 잘되지 않아 마음이 가라앉아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "멀어진 사람을 생각하면 슬퍼져요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "괜찮은 척했지만 오늘은 속상한 마음을 말하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 가지 고민이 겹쳐서 머릿속이 너무 복잡해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "내 마음을 나도 잘 모르겠어서 답답한 기분이에요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "어떤 선택을 해야 할지 몰라 마음이 갈팡질팡해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "좋으면서도 걱정돼서 마음을 한마디로 표현하기 어려워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "일과 관계 사이에서 무엇을 먼저 챙길지 고민돼요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 감정이 번갈아 올라와 잠시 정리하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "오늘 하루를 평안하게 보낼 수 있음에 감사해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "주변 사람들의 따뜻한 말 한마디가 큰 힘이 되었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "작은 일에서도 감사를 발견하니 마음이 풍요로워지네요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "누군가 제 수고를 알아봐 줘서 고마웠어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "바쁜 하루에 잠깐 쉴 여유가 생겨 감사해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "힘든 일을 함께해 준 사람에게 고마움을 전하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "오랫동안 기다려온 기쁜 소식을 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "내가 좋아하는 일을 할 수 있어서 너무 즐거워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "작은 목표를 마쳐서 뿌듯하고 기뻐요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "반가운 사람을 만나 즐겁게 이야기했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "좋아하는 음악을 들으며 기분이 밝아졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "새로운 도전을 앞두고 실패할까 봐 너무 무서워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "안 좋은 일이 일어날 것 같은 예감에 마음이 졸여요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "어두운 밤이나 혼자 있는 상황이 두렵게 느껴질 때가 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "낯선 장소에 가야 해서 겁이 나요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "중요한 말을 꺼내려니 상대의 반응이 두려워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "익숙한 것이 바뀌는 상황을 받아들이기 어려워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "누군가의 비도덕적인 행동을 보고 마음이 상했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "정말 싫어하는 상황에 놓이게 되어 기분이 좋지 않아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "받아들이기 힘든 일을 겪고 거부감이 강하게 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "제 기준과 맞지 않는 말에 불편함을 느꼈어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "원하지 않는 일을 반복해서 요구받아 거부감이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "그 상황에서 잠시 거리를 두고 마음을 살피고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "생각지도 못한 깜짝 파티를 받아서 놀랐어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑작스러운 변화에 어떻게 대처해야 할지 얼떨떨해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "믿기지 않는 놀라운 이야기를 들어서 가슴이 두근거려요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "예상하지 못한 소식을 듣고 마음이 흔들렸어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑자기 계획이 바뀌어 아직 실감이 나지 않아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "뜻밖의 배려를 받아 놀라면서도 고마웠어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "날씨가 너무 좋아서 걷는 것만으로도 행복해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "사랑하는 가족과 함께 맛있는 음식을 먹어 행복해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "지금 이 평화로운 순간이 오래도록 유지되면 좋겠어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "평범한 하루가 편안하게 흘러가서 행복해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "좋아하는 사람과 산책하며 마음이 따뜻해졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "제 속도로 하루를 보내니 만족스러워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "조만간 떠날 여행을 생각하니 벌써부터 설레요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새로운 일을 시작하게 되어 기분 좋은 긴장감이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "내일은 어떤 즐거운 일이 생길지 기대하며 기다리고 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "오랜만에 만날 사람을 생각하니 설레요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새롭게 배울 일이 생겨 기대가 돼요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "작은 계획을 세우며 즐거운 변화를 기다려요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "아름다운 노을을 보며 자연의 신비로움에 감탄했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 훌륭한 성품이나 성취를 보고 큰 감명을 받았어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "예술 작품을 보며 말로 표현하기 힘든 감동을 느꼈어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "꾸준히 노력하는 사람을 보며 존경하는 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 세심한 배려가 오래 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "평소 지나치던 풍경이 새롭게 아름답게 느껴졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "너무 큰 사랑과 격려를 받아서 마음이 벅차올라요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "나에게 주어진 축복이 너무 과분하다는 생각이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "가슴이 꽉 찬 것 같은 벅찬 감동에 말을 잇기 힘들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "오랫동안 바라던 일을 이루어 감정이 북받쳐요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "많은 사람이 응원해 줘서 마음이 가득 차올랐어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "소중한 순간을 맞아 기쁨을 어떻게 표현할지 모르겠어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "나보다 앞서가는 사람을 보니 자꾸 비교하게 돼요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "내가 갖고 싶던 걸 가진 친구를 보며 질투심이 생겨요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "타인의 행복이 마냥 축하해주기 힘들 때가 있어 괴로워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "다른 사람의 성과를 보며 제 속도가 느리게 느껴져요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "가까운 사람이 다른 사람을 더 챙기는 것 같아 서운해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "비교하는 마음 뒤에 제가 원하는 것이 무엇인지 살펴보고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "내일 있을 중요한 일이 자꾸 걱정돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "미래가 불투명해서 마음이 불안하고 떨려요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "갑자기 안 좋은 일이 생길까 봐 불안한 마음이 커요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "답장을 기다리는 동안 여러 걱정이 떠올라요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "해야 할 일이 겹쳐 어디부터 시작할지 불안해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "실수했던 일이 다시 생길까 봐 신경이 쓰여요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "문득 세상에 나 혼자 남겨진 것 같은 기분이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "진심으로 내 마음을 이해해줄 사람이 없는 것 같아 외로워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "혼자 있는 시간이 길어지니 마음이 공허해지네요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "사람들과 함께 있어도 제 마음은 혼자인 것 같아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "편하게 안부를 나눌 사람이 그리워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "주말에 혼자 시간을 보내니 누군가와 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "요즘 업무가 너무 많아 몸과 마음이 다 타버린 것 같아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "아무것도 하고 싶지 않고 그저 쉬고만 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "반복되는 일상에 지쳐서 에너지가 하나도 없어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "충분히 쉬지 못한 채 할 일을 이어가고 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "사람들을 챙기느라 제 마음을 돌볼 여유가 없었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "작은 일도 시작하기 어려울 만큼 지쳐 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "상대방이 무례하게 행동해서 화를 참기 힘들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "정당하지 못한 상황을 겪으니 너무 억울하고 화가 나요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "자꾸만 짜증이 나고 마음이 날카로워져 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "제 의견을 듣지 않고 결정해서 속상하고 화가 나요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "약속이 지켜지지 않아 마음이 상했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "참아 온 감정이 쌓여 작은 말에도 예민해져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "이유 없이 자꾸만 눈물이 나고 마음이 울적해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "소중한 것을 잃어버린 것 같은 상실감이 커요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "가슴 한구석이 먹먹하고 슬픈 기분이 가시질 않아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "기대했던 일이 잘되지 않아 마음이 가라앉아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "멀어진 사람을 생각하면 슬퍼져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "괜찮은 척했지만 오늘은 속상한 마음을 말하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 가지 고민이 겹쳐서 머릿속이 너무 복잡해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "내 마음을 나도 잘 모르겠어서 답답한 기분이에요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "어떤 선택을 해야 할지 몰라 마음이 갈팡질팡해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "좋으면서도 걱정돼서 마음을 한마디로 표현하기 어려워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "일과 관계 사이에서 무엇을 먼저 챙길지 고민돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 감정이 번갈아 올라와 잠시 정리하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "오늘 하루를 평안하게 보낼 수 있음에 감사해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "주변 사람들의 따뜻한 말 한마디가 큰 힘이 되었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "작은 일에서도 감사를 발견하니 마음이 풍요로워지네요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "누군가 제 수고를 알아봐 줘서 고마웠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "바쁜 하루에 잠깐 쉴 여유가 생겨 감사해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "힘든 일을 함께해 준 사람에게 고마움을 전하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "오랫동안 기다려온 기쁜 소식을 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "내가 좋아하는 일을 할 수 있어서 너무 즐거워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "작은 목표를 마쳐서 뿌듯하고 기뻐요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "반가운 사람을 만나 즐겁게 이야기했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "좋아하는 음악을 들으며 기분이 밝아졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "새로운 도전을 앞두고 실패할까 봐 너무 무서워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "안 좋은 일이 일어날 것 같은 예감에 마음이 졸여요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "어두운 밤이나 혼자 있는 상황이 두렵게 느껴질 때가 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "낯선 장소에 가야 해서 겁이 나요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "중요한 말을 꺼내려니 상대의 반응이 두려워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "익숙한 것이 바뀌는 상황을 받아들이기 어려워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "누군가의 비도덕적인 행동을 보고 마음이 상했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "정말 싫어하는 상황에 놓이게 되어 기분이 좋지 않아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "받아들이기 힘든 일을 겪고 거부감이 강하게 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "제 기준과 맞지 않는 말에 불편함을 느꼈어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "원하지 않는 일을 반복해서 요구받아 거부감이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "그 상황에서 잠시 거리를 두고 마음을 살피고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "생각지도 못한 깜짝 파티를 받아서 놀랐어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑작스러운 변화에 어떻게 대처해야 할지 얼떨떨해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "믿기지 않는 놀라운 이야기를 들어서 가슴이 두근거려요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "예상하지 못한 소식을 듣고 마음이 흔들렸어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑자기 계획이 바뀌어 아직 실감이 나지 않아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "뜻밖의 배려를 받아 놀라면서도 고마웠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "날씨가 너무 좋아서 걷는 것만으로도 행복해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "사랑하는 가족과 함께 맛있는 음식을 먹어 행복해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "지금 이 평화로운 순간이 오래도록 유지되면 좋겠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "평범한 하루가 편안하게 흘러가서 행복해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "좋아하는 사람과 산책하며 마음이 따뜻해졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "제 속도로 하루를 보내니 만족스러워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "조만간 떠날 여행을 생각하니 벌써부터 설레요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새로운 일을 시작하게 되어 기분 좋은 긴장감이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "내일은 어떤 즐거운 일이 생길지 기대하며 기다리고 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "오랜만에 만날 사람을 생각하니 설레요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새롭게 배울 일이 생겨 기대가 돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "작은 계획을 세우며 즐거운 변화를 기다려요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "아름다운 노을을 보며 자연의 신비로움에 감탄했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 훌륭한 성품이나 성취를 보고 큰 감명을 받았어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "예술 작품을 보며 말로 표현하기 힘든 감동을 느꼈어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "꾸준히 노력하는 사람을 보며 존경하는 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 세심한 배려가 오래 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "평소 지나치던 풍경이 새롭게 아름답게 느껴졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "너무 큰 사랑과 격려를 받아서 마음이 벅차올라요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "나에게 주어진 축복이 너무 과분하다는 생각이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "가슴이 꽉 찬 것 같은 벅찬 감동에 말을 잇기 힘들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "오랫동안 바라던 일을 이루어 감정이 북받쳐요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "많은 사람이 응원해 줘서 마음이 가득 차올랐어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "소중한 순간을 맞아 기쁨을 어떻게 표현할지 모르겠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "나보다 앞서가는 사람을 보니 자꾸 비교하게 돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "내가 갖고 싶던 걸 가진 친구를 보며 질투심이 생겨요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "타인의 행복이 마냥 축하해주기 힘들 때가 있어 괴로워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "다른 사람의 성과를 보며 제 속도가 느리게 느껴져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "가까운 사람이 다른 사람을 더 챙기는 것 같아 서운해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "비교하는 마음 뒤에 제가 원하는 것이 무엇인지 살펴보고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "불안",
+      "text": "작은 일이 조금 신경 쓰여요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "불안",
+      "text": "다가올 일을 생각하면 살짝 걱정돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "외로움",
+      "text": "오늘은 누군가의 안부가 조금 궁금해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "외로움",
+      "text": "혼자 보내니 가끔 이야기를 나누고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "지침",
+      "text": "기운이 조금 줄어 잠깐 쉬고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "지침",
+      "text": "오늘 할 일 사이에 여유가 조금 필요해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "분노",
+      "text": "그 말이 조금 거슬렸어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "분노",
+      "text": "약속이 바뀌어서 살짝 짜증이 났어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "슬픔",
+      "text": "기대했던 일이 조금 아쉽게 느껴져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "슬픔",
+      "text": "오늘은 평소보다 마음이 조금 가라앉아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "복잡함",
+      "text": "작은 고민 두 가지 사이에서 망설여져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "복잡함",
+      "text": "어떤 일부터 할지 잠깐 정리하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감사",
+      "text": "누군가 문을 잡아줘서 고마웠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감사",
+      "text": "평범한 하루에 작은 고마움이 느껴져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기쁨",
+      "text": "작은 일을 마쳐서 살짝 기분이 좋아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기쁨",
+      "text": "좋아하는 노래를 듣고 조금 즐거워졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "공포",
+      "text": "낯선 일을 앞두고 조금 겁이 나요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "공포",
+      "text": "처음 가는 곳이라 살짝 조심스러워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "혐오",
+      "text": "그 행동이 조금 불편했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "혐오",
+      "text": "제 취향과 맞지 않아 잠깐 거리를 두고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "놀람",
+      "text": "뜻밖의 소식에 조금 놀랐어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "놀람",
+      "text": "갑자기 계획이 바뀌어 잠깐 얼떨떨해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "행복",
+      "text": "별일 없는 하루가 조금 편안하게 느껴져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "행복",
+      "text": "좋아하는 차를 마시며 작은 만족을 느껴요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기대",
+      "text": "작은 약속이 조금 기다려져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기대",
+      "text": "새로 배울 일이 생겨 살짝 설레요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감탄",
+      "text": "작은 배려를 보고 마음이 조금 움직였어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감탄",
+      "text": "익숙한 풍경이 오늘은 새롭게 보여요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "벅찬",
+      "text": "작은 응원이 마음에 남았어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "벅찬",
+      "text": "할 일이 조금 겹쳐 마음을 정리하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "질투",
+      "text": "친구의 소식에 잠깐 비교하는 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "질투",
+      "text": "다른 사람의 물건이 조금 부러웠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "불안",
+      "text": "걱정이 커서 지금은 짧게 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "불안",
+      "text": "생각이 계속 이어져 잠시 쉬고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "외로움",
+      "text": "외로움이 크게 느껴져 누군가와 함께 있고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "외로움",
+      "text": "지금은 제 이야기를 들어 줄 사람이 그리워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "지침",
+      "text": "많이 지쳐서 지금은 쉬는 시간이 필요해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "지침",
+      "text": "작은 일도 버거워 할 일을 줄이고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "분노",
+      "text": "화가 많이 나서 잠깐 거리를 두고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "분노",
+      "text": "바로 반응하기보다 제 마음을 먼저 말하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "슬픔",
+      "text": "슬픔이 크게 느껴져 지금은 짧게 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "슬픔",
+      "text": "해결책보다는 제 마음을 들어줬으면 좋겠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "복잡함",
+      "text": "여러 생각이 겹쳐 지금은 하나만 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "복잡함",
+      "text": "정리를 재촉하지 않고 잠깐 기다려줬으면 좋겠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감사",
+      "text": "큰 도움을 받아 고마운 마음을 꼭 전하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감사",
+      "text": "많이 고마워서 그 순간을 오래 기억하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기쁨",
+      "text": "정말 기쁜 일이 생겨 누군가와 나누고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기쁨",
+      "text": "오래 기다린 일이 이루어져 마음이 가득 차요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "공포",
+      "text": "두려움이 크게 느껴져 익숙한 곳에 머물고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "공포",
+      "text": "지금은 제가 선택할 수 있는 것부터 알고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "혐오",
+      "text": "불편함이 커서 지금은 거리를 두고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "혐오",
+      "text": "제 경계를 존중받는 방식으로 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "놀람",
+      "text": "너무 뜻밖의 일이라 아직 어떤 느낌인지 모르겠어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "놀람",
+      "text": "큰 소식을 듣고 반가움과 당황스러움이 함께 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "행복",
+      "text": "지금의 행복을 소중한 사람과 나누고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "행복",
+      "text": "정말 만족스러운 순간이라 충분히 느끼고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기대",
+      "text": "기다리던 일이 다가와 설렘이 아주 커요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "기대",
+      "text": "많이 기대되지만 결과를 서두르지 않고 기다리고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감탄",
+      "text": "깊이 감동받아서 그 장면을 오래 기억하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "감탄",
+      "text": "누군가의 노력에 크게 마음이 움직였어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "벅찬",
+      "text": "기쁜 감동이 커서 말로 다 표현하기 어려워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "벅찬",
+      "text": "감당하기 버거워서 지금은 짧게 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "질투",
+      "text": "비교하는 마음이 커서 제 바람부터 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/emotion_response_style.dart",
+      "emotion": "질투",
+      "text": "지금은 저를 더 탓하지 않고 마음을 들어줬으면 좋겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "내일 있을 중요한 일이 자꾸 걱정돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "미래가 불투명해서 마음이 불안하고 떨려요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "갑자기 안 좋은 일이 생길까 봐 불안한 마음이 커요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "답장을 기다리는 동안 여러 걱정이 떠올라요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "해야 할 일이 겹쳐 어디부터 시작할지 불안해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "불안",
+      "text": "실수했던 일이 다시 생길까 봐 신경이 쓰여요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "문득 세상에 나 혼자 남겨진 것 같은 기분이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "진심으로 내 마음을 이해해줄 사람이 없는 것 같아 외로워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "혼자 있는 시간이 길어지니 마음이 공허해지네요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "사람들과 함께 있어도 제 마음은 혼자인 것 같아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "편하게 안부를 나눌 사람이 그리워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "외로움",
+      "text": "주말에 혼자 시간을 보내니 누군가와 이야기하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "요즘 업무가 너무 많아 몸과 마음이 다 타버린 것 같아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "아무것도 하고 싶지 않고 그저 쉬고만 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "반복되는 일상에 지쳐서 에너지가 하나도 없어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "충분히 쉬지 못한 채 할 일을 이어가고 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "사람들을 챙기느라 제 마음을 돌볼 여유가 없었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "지침",
+      "text": "작은 일도 시작하기 어려울 만큼 지쳐 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "상대방이 무례하게 행동해서 화를 참기 힘들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "정당하지 못한 상황을 겪으니 너무 억울하고 화가 나요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "자꾸만 짜증이 나고 마음이 날카로워져 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "제 의견을 듣지 않고 결정해서 속상하고 화가 나요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "약속이 지켜지지 않아 마음이 상했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "분노",
+      "text": "참아 온 감정이 쌓여 작은 말에도 예민해져요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "이유 없이 자꾸만 눈물이 나고 마음이 울적해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "소중한 것을 잃어버린 것 같은 상실감이 커요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "가슴 한구석이 먹먹하고 슬픈 기분이 가시질 않아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "기대했던 일이 잘되지 않아 마음이 가라앉아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "멀어진 사람을 생각하면 슬퍼져요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "슬픔",
+      "text": "괜찮은 척했지만 오늘은 속상한 마음을 말하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 가지 고민이 겹쳐서 머릿속이 너무 복잡해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "내 마음을 나도 잘 모르겠어서 답답한 기분이에요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "어떤 선택을 해야 할지 몰라 마음이 갈팡질팡해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "좋으면서도 걱정돼서 마음을 한마디로 표현하기 어려워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "일과 관계 사이에서 무엇을 먼저 챙길지 고민돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "복잡함",
+      "text": "여러 감정이 번갈아 올라와 잠시 정리하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "오늘 하루를 평안하게 보낼 수 있음에 감사해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "주변 사람들의 따뜻한 말 한마디가 큰 힘이 되었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "작은 일에서도 감사를 발견하니 마음이 풍요로워지네요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "누군가 제 수고를 알아봐 줘서 고마웠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "바쁜 하루에 잠깐 쉴 여유가 생겨 감사해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감사",
+      "text": "힘든 일을 함께해 준 사람에게 고마움을 전하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "오랫동안 기다려온 기쁜 소식을 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "내가 좋아하는 일을 할 수 있어서 너무 즐거워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "함께 웃고 떠들 수 있는 사람이 곁에 있어 기뻐요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "작은 목표를 마쳐서 뿌듯하고 기뻐요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "반가운 사람을 만나 즐겁게 이야기했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기쁨",
+      "text": "좋아하는 음악을 들으며 기분이 밝아졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "새로운 도전을 앞두고 실패할까 봐 너무 무서워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "안 좋은 일이 일어날 것 같은 예감에 마음이 졸여요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "어두운 밤이나 혼자 있는 상황이 두렵게 느껴질 때가 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "낯선 장소에 가야 해서 겁이 나요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "중요한 말을 꺼내려니 상대의 반응이 두려워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "공포",
+      "text": "익숙한 것이 바뀌는 상황을 받아들이기 어려워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "누군가의 비도덕적인 행동을 보고 마음이 상했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "정말 싫어하는 상황에 놓이게 되어 기분이 좋지 않아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "받아들이기 힘든 일을 겪고 거부감이 강하게 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "제 기준과 맞지 않는 말에 불편함을 느꼈어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "원하지 않는 일을 반복해서 요구받아 거부감이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "혐오",
+      "text": "그 상황에서 잠시 거리를 두고 마음을 살피고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "생각지도 못한 깜짝 파티를 받아서 놀랐어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑작스러운 변화에 어떻게 대처해야 할지 얼떨떨해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "믿기지 않는 놀라운 이야기를 들어서 가슴이 두근거려요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "예상하지 못한 소식을 듣고 마음이 흔들렸어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "갑자기 계획이 바뀌어 아직 실감이 나지 않아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "놀람",
+      "text": "뜻밖의 배려를 받아 놀라면서도 고마웠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "날씨가 너무 좋아서 걷는 것만으로도 행복해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "사랑하는 가족과 함께 맛있는 음식을 먹어 행복해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "지금 이 평화로운 순간이 오래도록 유지되면 좋겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "평범한 하루가 편안하게 흘러가서 행복해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "좋아하는 사람과 산책하며 마음이 따뜻해졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "행복",
+      "text": "제 속도로 하루를 보내니 만족스러워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "조만간 떠날 여행을 생각하니 벌써부터 설레요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새로운 일을 시작하게 되어 기분 좋은 긴장감이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "내일은 어떤 즐거운 일이 생길지 기대하며 기다리고 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "오랜만에 만날 사람을 생각하니 설레요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "새롭게 배울 일이 생겨 기대가 돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "기대",
+      "text": "작은 계획을 세우며 즐거운 변화를 기다려요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "아름다운 노을을 보며 자연의 신비로움에 감탄했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 훌륭한 성품이나 성취를 보고 큰 감명을 받았어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "예술 작품을 보며 말로 표현하기 힘든 감동을 느꼈어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "꾸준히 노력하는 사람을 보며 존경하는 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "누군가의 세심한 배려가 오래 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "감탄",
+      "text": "평소 지나치던 풍경이 새롭게 아름답게 느껴졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "너무 큰 사랑과 격려를 받아서 마음이 벅차올라요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "나에게 주어진 축복이 너무 과분하다는 생각이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "가슴이 꽉 찬 것 같은 벅찬 감동에 말을 잇기 힘들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "오랫동안 바라던 일을 이루어 감정이 북받쳐요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "많은 사람이 응원해 줘서 마음이 가득 차올랐어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "벅찬",
+      "text": "소중한 순간을 맞아 기쁨을 어떻게 표현할지 모르겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "나보다 앞서가는 사람을 보니 자꾸 비교하게 돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "내가 갖고 싶던 걸 가진 친구를 보며 질투심이 생겨요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "타인의 행복이 마냥 축하해주기 힘들 때가 있어 괴로워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "다른 사람의 성과를 보며 제 속도가 느리게 느껴져요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "가까운 사람이 다른 사람을 더 챙기는 것 같아 서운해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/emotion_situation_examples.dart",
+      "emotion": "질투",
+      "text": "비교하는 마음 뒤에 제가 원하는 것이 무엇인지 살펴보고 싶어요."
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "불안",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "불안",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "불안",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "불안",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "불안",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "외로움",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "외로움",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "외로움",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "외로움",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "외로움",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "지침",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "지침",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "지침",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "지침",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "지침",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "분노",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "분노",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "분노",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "분노",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "분노",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "슬픔",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "슬픔",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "슬픔",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "슬픔",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "슬픔",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "복잡함",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "복잡함",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "복잡함",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "복잡함",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "복잡함",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감사",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감사",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감사",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감사",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감사",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기쁨",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기쁨",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기쁨",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기쁨",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기쁨",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "공포",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "공포",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "공포",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "공포",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "공포",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "혐오",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "혐오",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "혐오",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "혐오",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "혐오",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "놀람",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "놀람",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "놀람",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "놀람",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "놀람",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "행복",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "행복",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "행복",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "행복",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "행복",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기대",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기대",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기대",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기대",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "기대",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감탄",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감탄",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감탄",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감탄",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "감탄",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "벅찬",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "벅찬",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "벅찬",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "벅찬",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "벅찬",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "질투",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "질투",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "질투",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "질투",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "emotion": "질투",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    }
+  ],
+  "conversationExamples": [
+    "저는 뜻밖의 일이라 잠시 생각할 시간이 필요했어요.",
+    "저는 기쁘면서도 잘 해낼 수 있을지 생각했어요.",
+    "저는 아직 제 생각을 정리하고 있어요.",
+    "저는 가슴이 두근거려요.",
+    "저는 몸에 힘이 들어가는 느낌이에요.",
+    "저는 몸의 느낌이 아직 뚜렷하지 않아요.",
+    "저는 뜻밖의 소식을 듣던 순간이 기억에 남아요.",
+    "저는 여러 마음이 함께 들었던 순간이 남아요.",
+    "저는 잠시 멈춰 바라보던 순간이 남아요.",
+    "저는 기쁘고 설레는 쪽에 가까워요.",
+    "저는 부담스러운 쪽에 가까워요.",
+    "저는 여러 마음이 섞여 아직 잘 모르겠어요.",
+    "저는 오늘 아침부터 이런 마음이 들었어요.",
+    "저는 며칠 전부터 조금씩 이런 기분이 들기 시작했어요.",
+    "저는 최근에 여러 일이 겹치면서 이런 마음이 들었어요.",
+    "저는 어제 혼자 집에 돌아왔을 때 그 마음이 가장 크게 느껴졌어요.",
+    "저는 가까운 사람과 대화하던 순간에 그 마음이 크게 느껴졌어요.",
+    "저는 오늘 해야 할 일을 생각할 때 그 마음이 가장 크게 느껴졌어요.",
+    "저는 상대방의 표정이 가장 기억에 남아요.",
+    "저는 그곳의 조용한 분위기가 가장 마음에 남아요.",
+    "저는 잠시 멈춰 주변을 바라보던 장면이 기억에 남아요.",
+    "저는 하늘이 붉게 물들던 장면이 가장 기억에 남아요.",
+    "저는 빛이 주변 풍경에 은은하게 번지던 모습이 마음에 남아요.",
+    "저는 잠시 멈춰 그 풍경을 바라보던 순간이 가장 기억에 남아요.",
+    "저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요.",
+    "저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요.",
+    "저는 마음이 따뜻해지던 순간이 기억에 남아요.",
+    "저는 저도 모르게 미소 짓던 순간이 기억에 남아요.",
+    "저는 상대방이 제게 했던 말이 가장 마음에 남아요.",
+    "저는 제 마음을 제대로 표현하지 못한 순간이 기억에 남아요.",
+    "저는 누군가 저를 챙겨 주었던 순간이 가장 마음에 남아요.",
+    "저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요.",
+    "저는 이런 순간을 오래 기억하고 싶다고 생각했어요.",
+    "저는 오늘 이 순간이 참 소중하다고 생각했어요.",
+    "저는 이 기쁜 마음을 나누고 싶다고 생각했어요.",
+    "저는 내가 또 잘못한 건 아닐까 생각했어요.",
+    "저는 앞으로도 계속 힘들까 봐 걱정했어요.",
+    "저는 누군가 제 마음을 이해해 주길 바랐어요.",
+    "저는 제 이야기를 잘 들어 주는 친구가 떠올라요.",
+    "저는 가까운 가족에게 이야기하고 싶어요.",
+    "저는 믿을 수 있는 상담자에게 도움을 청하고 싶어요.",
+    "저는 집의 조용한 공간에서 쉬고 싶어요.",
+    "저는 가까운 공원에서 잠시 걷고 싶어요.",
+    "저는 익숙하고 편안한 곳에 머물고 싶어요.",
+    "저는 입가에 저절로 미소가 지어져요.",
+    "저는 가슴이 따뜻해지는 느낌이 들어요.",
+    "저는 몸이 가볍고 기운이 나는 것 같아요.",
+    "저는 어깨에 힘이 들어가 있어요.",
+    "저는 가슴이 두근거리는 느낌이 들어요.",
+    "저는 몸이 무겁고 기운이 없는 것 같아요.",
+    "저는 제 이야기를 들어 준 사람이 고마워요.",
+    "저는 오늘 잠깐이라도 편히 쉴 수 있어 감사해요.",
+    "저는 작은 일을 끝까지 해낸 제 자신에게 고마워요.",
+    "저는 기대한 만큼 해내지 못할까 봐 걱정돼요.",
+    "저는 다른 사람에게 실망을 줄까 봐 두려워요.",
+    "저는 앞으로 어떻게 될지 몰라 불안해요.",
+    "저는 잠시 멈추고 천천히 숨을 쉬어 볼게요.",
+    "저는 지금 마음을 한 문장으로 적어 볼게요.",
+    "저는 믿을 수 있는 사람에게 안부를 전해 볼게요.",
+    "저는 기쁘고 즐거운 마음이 가장 컸어요.",
+    "저는 고맙고 따뜻한 마음이 들었어요.",
+    "저는 설레고 기대되는 마음이 들었어요.",
+    "저는 서운하고 슬픈 마음이 가장 컸어요.",
+    "저는 불안하고 걱정되는 마음이 컸어요.",
+    "지금은 그냥 위로받고 싶어요.",
+    "저는 혼자가 아니라는 말을 듣고 싶어요.",
+    "저는 힘든 일을 함께 정리해 줄 도움이 필요해요.",
+    "저는 반갑고 기쁜 느낌에 가까워요.",
+    "저는 당황스럽고 버거운 느낌에 가까워요.",
+    "그 순간이 제게 어떤 의미인지 더 생각해 보고 싶었어요.",
+    "제 마음을 서두르지 않고 이해해 보고 싶었어요.",
+    "숨을 천천히 쉬니 몸의 느낌이 조금 또렷해져요.",
+    "아직 몸에서 느껴지는 것은 잘 모르겠어요.",
+    "판단 없이 제 이야기를 들어 주면 좋겠어요.",
+    "지금은 혼자 정리할 시간을 갖고 싶어요.",
+    "오늘은 저를 위해 잠깐 쉬는 시간을 정해 볼게요.",
+    "지금 할 수 있는 일 하나만 차분히 해 볼게요.",
+    "작은 배려를 건네 준 사람이 떠올라요.",
+    "평범하게 하루를 보낸 순간이 고마워요.",
+    "제가 바꿀 수 없는 일까지 책임지려 할까 봐 걱정돼요.",
+    "제 마음을 솔직히 전했을 때의 반응이 걱정돼요.",
+    "여러 감정이 함께 있어서 조금 더 살펴보고 싶어요.",
+    "아직 이름을 붙이기 어렵지만 천천히 이야기해 보고 싶어요.",
+    "오늘 누군가와 나눈 말이 마음에 남아요",
+    "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요",
+    "작지만 소중한 순간이 있었어요",
+    "여러 마음이 함께 느껴져요",
+    "무슨 일인지 아직 정리되지 않았어요",
+    "짧게라도 축하한다는 말을 듣고 싶었어요",
+    "저를 기억하고 있다는 느낌이 필요했어요",
+    "제가 먼저 마음을 전하고 싶지만 망설여져요",
+    "지금은 이야기하기보다 조금 쉬고 싶어요",
+    "무엇을 바랐는지 아직 잘 모르겠어요",
+    "한꺼번에 해야 할 일이 많아 순서를 정하고 싶어요",
+    "누군가에게 도움을 부탁하고 싶어요",
+    "실수할까 걱정되는 마음이 있어요",
+    "잠깐 쉬면서 다시 살펴보고 싶어요",
+    "무엇이 부담인지 아직 잘 모르겠어요",
+    "함께해 준 사람이 있어 고마웠어요",
+    "제 속도로 해냈다는 점이 소중했어요",
+    "편안하게 쉴 수 있어 좋았어요",
+    "작은 배려가 오래 마음에 남아요",
+    "좋은 이유를 조금 더 생각해 보고 싶어요",
+    "여러 마음이 겹쳐 한마디로 표현하기 어려워요",
+    "누군가 내 마음을 알아주면 좋겠어요",
+    "몸과 마음이 바빠 잠시 쉬고 싶어요",
+    "지금 느끼는 마음을 천천히 살펴보고 싶어요",
+    "아직 이름 붙이기 어려운 마음이에요",
+    "오늘 미뤄도 되는 일 하나를 정하고 싶어요",
+    "편한 자리에 앉아 잠시 쉬고 싶어요",
+    "알림을 끄고 조용한 시간을 갖고 싶어요",
+    "도움을 부탁할 일을 골라보고 싶어요",
+    "어떻게 쉴지 조금 더 생각하고 싶어요",
+    "편한 사람에게 안부를 전하고 싶어요",
+    "지금 필요한 도움을 구체적으로 부탁하고 싶어요",
+    "차분히 말할 첫 문장을 정하고 싶어요",
+    "함께 있어 달라고 말하고 싶어요",
+    "지금은 조금 더 생각해 보고 싶어요",
+    "지금 할 수 있는 일 하나만 정하고 싶어요",
+    "나중에 해도 되는 일은 잠시 놓고 싶어요",
+    "생각을 짧은 단어로 정리하고 싶어요",
+    "주변 물건 하나만 정돈하고 싶어요",
+    "필요한 도움이 무엇인지 더 생각하고 싶어요",
+    "고마운 사람에게 마음을 전하고 싶어요",
+    "오늘의 좋은 순간을 적어두고 싶어요",
+    "지금의 기쁨을 천천히 느끼고 싶어요",
+    "작은 배려로 좋은 마음을 나누고 싶어요",
+    "어떻게 이어갈지 더 생각하고 싶어요",
+    "잠시 쉬면서 마음을 돌보고 싶어요",
+    "믿을 만한 사람과 이야기를 나누고 싶어요",
+    "지금 할 수 있는 작은 일 하나만 정하고 싶어요",
+    "조용히 앉아 내 마음을 살펴보고 싶어요",
+    "필요한 도움이 무엇인지 조금 더 생각하고 싶어요",
+    "해야 할 일이 많아 잠깐 멈추고 싶었어요",
+    "작은 일이지만 나에게 의미 있는 순간이 있었어요",
+    "여러 마음이 겹쳐서 한마디로 말하기 어려워요",
+    "누군가 내 마음을 알아주면 좋겠다고 느꼈어요",
+    "몸이 긴장되고 마음도 바빠졌어요",
+    "그 마음을 조금 더 천천히 살펴보고 싶어요",
+    "잠시 쉬면서 숨을 천천히 고르고 싶어요",
+    "믿을 만한 사람에게 이야기를 나누고 싶어요",
+    "조용히 앉아 내 마음을 돌보고 싶어요"
+  ],
+  "conversationProvenance": [
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 뜻밖의 일이라 잠시 생각할 시간이 필요했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘면서도 잘 해낼 수 있을지 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 아직 제 생각을 정리하고 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 두근거려요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸에 힘이 들어가는 느낌이에요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸의 느낌이 아직 뚜렷하지 않아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 뜻밖의 소식을 듣던 순간이 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 여러 마음이 함께 들었던 순간이 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 바라보던 순간이 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘고 설레는 쪽에 가까워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 부담스러운 쪽에 가까워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 여러 마음이 섞여 아직 잘 모르겠어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 아침부터 이런 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 며칠 전부터 조금씩 이런 기분이 들기 시작했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 최근에 여러 일이 겹치면서 이런 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어제 혼자 집에 돌아왔을 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 사람과 대화하던 순간에 그 마음이 크게 느껴졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 해야 할 일을 생각할 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방의 표정이 가장 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그곳의 조용한 분위기가 가장 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 주변을 바라보던 장면이 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 하늘이 붉게 물들던 장면이 가장 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 빛이 주변 풍경에 은은하게 번지던 모습이 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 그 풍경을 바라보던 순간이 가장 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 마음이 따뜻해지던 순간이 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 저도 모르게 미소 짓던 순간이 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방이 제게 했던 말이 가장 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 마음을 제대로 표현하지 못한 순간이 기억에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 저를 챙겨 주었던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이런 순간을 오래 기억하고 싶다고 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 이 순간이 참 소중하다고 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이 기쁜 마음을 나누고 싶다고 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 내가 또 잘못한 건 아닐까 생각했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로도 계속 힘들까 봐 걱정했어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 제 마음을 이해해 주길 바랐어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 잘 들어 주는 친구가 떠올라요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 가족에게 이야기하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 상담자에게 도움을 청하고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 집의 조용한 공간에서 쉬고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 공원에서 잠시 걷고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 익숙하고 편안한 곳에 머물고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 입가에 저절로 미소가 지어져요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 따뜻해지는 느낌이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 가볍고 기운이 나는 것 같아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어깨에 힘이 들어가 있어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 두근거리는 느낌이 들어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 무겁고 기운이 없는 것 같아요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 들어 준 사람이 고마워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 잠깐이라도 편히 쉴 수 있어 감사해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 작은 일을 끝까지 해낸 제 자신에게 고마워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기대한 만큼 해내지 못할까 봐 걱정돼요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 다른 사람에게 실망을 줄까 봐 두려워요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로 어떻게 될지 몰라 불안해요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈추고 천천히 숨을 쉬어 볼게요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 지금 마음을 한 문장으로 적어 볼게요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 사람에게 안부를 전해 볼게요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘고 즐거운 마음이 가장 컸어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 설레고 기대되는 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 서운하고 슬픈 마음이 가장 컸어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 불안하고 걱정되는 마음이 컸어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "지금은 그냥 위로받고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 혼자가 아니라는 말을 듣고 싶어요."
+    },
+    {
+      "app": "onaria",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 힘든 일을 함께 정리해 줄 도움이 필요해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 반갑고 기쁜 느낌에 가까워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 당황스럽고 버거운 느낌에 가까워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 아침부터 이런 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 며칠 전부터 조금씩 이런 기분이 들기 시작했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 최근에 여러 일이 겹치면서 이런 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어제 혼자 집에 돌아왔을 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 사람과 대화하던 순간에 그 마음이 크게 느껴졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 해야 할 일을 생각할 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방의 표정이 가장 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그곳의 조용한 분위기가 가장 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 주변을 바라보던 장면이 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 하늘이 붉게 물들던 장면이 가장 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 빛이 주변 풍경에 은은하게 번지던 모습이 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 그 풍경을 바라보던 순간이 가장 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 마음이 따뜻해지던 순간이 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 저도 모르게 미소 짓던 순간이 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방이 제게 했던 말이 가장 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 마음을 제대로 표현하지 못한 순간이 기억에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 저를 챙겨 주었던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이런 순간을 오래 기억하고 싶다고 생각했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 이 순간이 참 소중하다고 생각했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이 기쁜 마음을 나누고 싶다고 생각했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 내가 또 잘못한 건 아닐까 생각했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로도 계속 힘들까 봐 걱정했어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 제 마음을 이해해 주길 바랐어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 잘 들어 주는 친구가 떠올라요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 가족에게 이야기하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 상담자에게 도움을 청하고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 집의 조용한 공간에서 쉬고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 공원에서 잠시 걷고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 익숙하고 편안한 곳에 머물고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 입가에 저절로 미소가 지어져요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 따뜻해지는 느낌이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 가볍고 기운이 나는 것 같아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어깨에 힘이 들어가 있어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 두근거리는 느낌이 들어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 무겁고 기운이 없는 것 같아요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 들어 준 사람이 고마워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 잠깐이라도 편히 쉴 수 있어 감사해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 작은 일을 끝까지 해낸 제 자신에게 고마워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기대한 만큼 해내지 못할까 봐 걱정돼요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 다른 사람에게 실망을 줄까 봐 두려워요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로 어떻게 될지 몰라 불안해요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈추고 천천히 숨을 쉬어 볼게요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 지금 마음을 한 문장으로 적어 볼게요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 사람에게 안부를 전해 볼게요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘고 즐거운 마음이 가장 컸어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 설레고 기대되는 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 서운하고 슬픈 마음이 가장 컸어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 불안하고 걱정되는 마음이 컸어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "지금은 그냥 위로받고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 혼자가 아니라는 말을 듣고 싶어요."
+    },
+    {
+      "app": "buddhist",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 힘든 일을 함께 정리해 줄 도움이 필요해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 뜻밖의 일이라 잠시 생각할 시간이 필요했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘면서도 잘 해낼 수 있을지 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 아직 제 생각을 정리하고 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 두근거려요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸에 힘이 들어가는 느낌이에요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸의 느낌이 아직 뚜렷하지 않아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 뜻밖의 소식을 듣던 순간이 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 여러 마음이 함께 들었던 순간이 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 바라보던 순간이 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘고 설레는 쪽에 가까워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 부담스러운 쪽에 가까워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 여러 마음이 섞여 아직 잘 모르겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 아침부터 이런 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 며칠 전부터 조금씩 이런 기분이 들기 시작했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 최근에 여러 일이 겹치면서 이런 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어제 혼자 집에 돌아왔을 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 사람과 대화하던 순간에 그 마음이 크게 느껴졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 해야 할 일을 생각할 때 그 마음이 가장 크게 느껴졌어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방의 표정이 가장 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그곳의 조용한 분위기가 가장 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 주변을 바라보던 장면이 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 하늘이 붉게 물들던 장면이 가장 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 빛이 주변 풍경에 은은하게 번지던 모습이 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈춰 그 풍경을 바라보던 순간이 가장 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃으며 이야기하던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 그 순간 느꼈던 기쁨이 가장 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 마음이 따뜻해지던 순간이 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 저도 모르게 미소 짓던 순간이 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 상대방이 제게 했던 말이 가장 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 마음을 제대로 표현하지 못한 순간이 기억에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 저를 챙겨 주었던 순간이 가장 마음에 남아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 함께 웃을 수 있는 사람이 있어 참 좋다고 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이런 순간을 오래 기억하고 싶다고 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 이 순간이 참 소중하다고 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 이 기쁜 마음을 나누고 싶다고 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 내가 또 잘못한 건 아닐까 생각했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로도 계속 힘들까 봐 걱정했어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 누군가 제 마음을 이해해 주길 바랐어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 잘 들어 주는 친구가 떠올라요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 가족에게 이야기하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 상담자에게 도움을 청하고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 집의 조용한 공간에서 쉬고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가까운 공원에서 잠시 걷고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 익숙하고 편안한 곳에 머물고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 입가에 저절로 미소가 지어져요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 따뜻해지는 느낌이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 가볍고 기운이 나는 것 같아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 어깨에 힘이 들어가 있어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 가슴이 두근거리는 느낌이 들어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 몸이 무겁고 기운이 없는 것 같아요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 제 이야기를 들어 준 사람이 고마워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 오늘 잠깐이라도 편히 쉴 수 있어 감사해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 작은 일을 끝까지 해낸 제 자신에게 고마워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기대한 만큼 해내지 못할까 봐 걱정돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 다른 사람에게 실망을 줄까 봐 두려워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 앞으로 어떻게 될지 몰라 불안해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 잠시 멈추고 천천히 숨을 쉬어 볼게요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 지금 마음을 한 문장으로 적어 볼게요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 믿을 수 있는 사람에게 안부를 전해 볼게요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 기쁘고 즐거운 마음이 가장 컸어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 설레고 기대되는 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 서운하고 슬픈 마음이 가장 컸어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 불안하고 걱정되는 마음이 컸어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 고맙고 따뜻한 마음이 들었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "지금은 그냥 위로받고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 혼자가 아니라는 말을 듣고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "저는 힘든 일을 함께 정리해 줄 도움이 필요해요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "그 순간이 제게 어떤 의미인지 더 생각해 보고 싶었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "제 마음을 서두르지 않고 이해해 보고 싶었어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "숨을 천천히 쉬니 몸의 느낌이 조금 또렷해져요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "아직 몸에서 느껴지는 것은 잘 모르겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "판단 없이 제 이야기를 들어 주면 좋겠어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "지금은 혼자 정리할 시간을 갖고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "오늘은 저를 위해 잠깐 쉬는 시간을 정해 볼게요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "지금 할 수 있는 일 하나만 차분히 해 볼게요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "작은 배려를 건네 준 사람이 떠올라요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "평범하게 하루를 보낸 순간이 고마워요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "제가 바꿀 수 없는 일까지 책임지려 할까 봐 걱정돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "제 마음을 솔직히 전했을 때의 반응이 걱정돼요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "여러 감정이 함께 있어서 조금 더 살펴보고 싶어요."
+    },
+    {
+      "app": "sorua",
+      "path": "lib/features/conversation_question_examples.dart",
+      "text": "아직 이름을 붙이기 어렵지만 천천히 이야기해 보고 싶어요."
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "해야 할 일이 겹쳐 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "작지만 소중한 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "여러 마음이 함께 느껴져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "짧게라도 축하한다는 말을 듣고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "저를 기억하고 있다는 느낌이 필요했어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "제가 먼저 마음을 전하고 싶지만 망설여져요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금은 이야기하기보다 조금 쉬고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "무엇을 바랐는지 아직 잘 모르겠어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "한꺼번에 해야 할 일이 많아 순서를 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "누군가에게 도움을 부탁하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "실수할까 걱정되는 마음이 있어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "잠깐 쉬면서 다시 살펴보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "무엇이 부담인지 아직 잘 모르겠어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "함께해 준 사람이 있어 고마웠어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "제 속도로 해냈다는 점이 소중했어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "편안하게 쉴 수 있어 좋았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "작은 배려가 오래 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "좋은 이유를 조금 더 생각해 보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "여러 마음이 겹쳐 한마디로 표현하기 어려워요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "누군가 내 마음을 알아주면 좋겠어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "몸과 마음이 바빠 잠시 쉬고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금 느끼는 마음을 천천히 살펴보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "아직 이름 붙이기 어려운 마음이에요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "오늘 미뤄도 되는 일 하나를 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "편한 자리에 앉아 잠시 쉬고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "알림을 끄고 조용한 시간을 갖고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "도움을 부탁할 일을 골라보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "어떻게 쉴지 조금 더 생각하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "편한 사람에게 안부를 전하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금 필요한 도움을 구체적으로 부탁하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "차분히 말할 첫 문장을 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "함께 있어 달라고 말하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금은 조금 더 생각해 보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금 할 수 있는 일 하나만 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "나중에 해도 되는 일은 잠시 놓고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "생각을 짧은 단어로 정리하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "주변 물건 하나만 정돈하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "필요한 도움이 무엇인지 더 생각하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "고마운 사람에게 마음을 전하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "오늘의 좋은 순간을 적어두고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금의 기쁨을 천천히 느끼고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "작은 배려로 좋은 마음을 나누고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "어떻게 이어갈지 더 생각하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "잠시 쉬면서 마음을 돌보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "믿을 만한 사람과 이야기를 나누고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "지금 할 수 있는 작은 일 하나만 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "조용히 앉아 내 마음을 살펴보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/reflection/adaptive_context.dart",
+      "text": "필요한 도움이 무엇인지 조금 더 생각하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "오늘 누군가와 나눈 말이 마음에 남아요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "해야 할 일이 많아 잠깐 멈추고 싶었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "작은 일이지만 나에게 의미 있는 순간이 있었어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "무슨 일인지 아직 정리되지 않았어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "여러 마음이 겹쳐서 한마디로 말하기 어려워요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "누군가 내 마음을 알아주면 좋겠다고 느꼈어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "몸이 긴장되고 마음도 바빠졌어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "그 마음을 조금 더 천천히 살펴보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "잠시 쉬면서 숨을 천천히 고르고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "믿을 만한 사람에게 이야기를 나누고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "지금 할 수 있는 작은 일 하나만 정하고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "조용히 앉아 내 마음을 돌보고 싶어요"
+    },
+    {
+      "app": "catholic",
+      "path": "lib/src/journey/session_journey.dart",
+      "text": "필요한 도움이 무엇인지 조금 더 생각하고 싶어요"
+    }
+  ],
+  "conversationTemplates": [
+    "$mood 마음이 들었던 순간을 이야기하고 싶어요",
+    "$mood 마음이 가장 먼저 느껴졌어요"
+  ]
+}

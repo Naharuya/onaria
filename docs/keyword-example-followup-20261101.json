@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-01T23:03:34.682041+09:00",
+  "results": [
+    {
+      "project": "onaria",
+      "testExitCode": 0,
+      "analysisExitCode": 0,
+      "passed": 28,
+      "backendPassed": 44,
+      "backendExitCode": 0,
+      "sha256": "7667664f899920c56f7ef5143139ea98dc8d8498dcf2aac408d593c825458503"
+    },
+    {
+      "project": "buddhist",
+      "testExitCode": 0,
+      "analysisExitCode": 0,
+      "passed": 28,
+      "backendPassed": 44,
+      "backendExitCode": 0,
+      "sha256": "7667664f899920c56f7ef5143139ea98dc8d8498dcf2aac408d593c825458503"
+    },
+    {
+      "project": "catholic",
+      "testExitCode": 0,
+      "analysisExitCode": 0,
+      "passed": 24,
+      "backendPassed": 44,
+      "backendExitCode": 0,
+      "sha256": "7667664f899920c56f7ef5143139ea98dc8d8498dcf2aac408d593c825458503"
+    },
+    {
+      "project": "sorua",
+      "testExitCode": 0,
+      "analysisExitCode": 0,
+      "passed": 28,
+      "backendPassed": 44,
+      "backendExitCode": 0,
+      "sha256": "7667664f899920c56f7ef5143139ea98dc8d8498dcf2aac408d593c825458503"
+    }
+  ],
+  "build": "NOT RUN: keyword matcher only; focused analysis and tests run",
+  "device": "NOT RUN",
+  "production": "NOT RUN",
+  "ci": "NOT RUN",
+  "commit": "NOT RUN",
+  "push": "NOT RUN"
+}

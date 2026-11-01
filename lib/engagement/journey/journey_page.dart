@@ -1,3 +1,4 @@
+import '../../language_text.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../app/space_scaffold.dart';
@@ -118,125 +119,146 @@ class _JourneyPageState extends State<JourneyPage> with WidgetsBindingObserver {
                   ? const Center(child: CircularProgressIndicator())
                   : Center(
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 620),
-                        child: ListView(padding: const EdgeInsets.all(20), children: [
-                      const Text('하루에 한 번, 나를 돌보는 시간',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 12),
-                      const Text(
-                          '연속으로 하지 않아도 괜찮아요. 쉬어 간 날에도 기록은 남고, 다음에 이어갈 수 있어요. 한 줄 기록은 이 기기에만 저장해요.'),
-                      const SizedBox(height: 20),
-                      if (journey == null)
-                        FilledButton(
-                            onPressed: _busy || controller.catalog.isEmpty
-                                ? null
-                                : () => _run(controller.startJourney),
-                            child: const Text('여정 시작하기'))
-                      else ...[
-                        Text('${journey.checkins.length} / 7일 기록',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        LinearProgressIndicator(
-                            value: journey.checkins.length / 7,
-                            semanticsLabel:
-                                '7일 중 ${journey.checkins.length}일 완료'),
-                        const SizedBox(height: 20),
-                        if (journey.complete) ...[
-                          const Text('일곱 번의 돌봄을 함께했어요.',
-                              style: TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 12),
-                          FilledButton.icon(
-                              onPressed: _busy
-                                  ? null
-                                  : () => Navigator.of(context)
-                                          .push(MaterialPageRoute<void>(
-                                        builder: (_) => SharePreviewPage(
-                                            content: ShareCardContent.journey(
-                                          controller.catalog.where((verse) =>
-                                              journey.savedVerseIds
-                                                  .contains(verse.id)),
-                                        )),
-                                      )),
-                              icon: const Icon(Icons.ios_share),
-                              label: const Text('여정 카드 미리보기')),
-                        ] else if (!canComplete)
-                          const Text('오늘의 기록을 남겼어요. 다음 날 편할 때 이어가요.')
-                        else if (verse == null)
-                          const Text('오늘의 말씀을 불러오지 못했어요. 잠시 후 다시 열어 주세요.')
-                        else ...[
-                          Text('${journey.currentDay}일째 · ${verse.reference}',
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 12),
-                          Text(verse.text),
-                          const SizedBox(height: 12),
-                          Text(verse.reflectionQuestion),
-                          const SizedBox(height: 16),
-                          Text(
-                              '오늘의 작은 실천: ${journeyActions[journey.currentDay - 1]}'),
-                          const SizedBox(height: 20),
-                          const Text('지금의 마음'),
-                          Wrap(spacing: 8, children: [
-                            for (final mood in journeyMoods)
-                              ChoiceChip(
-                                  label: Text(mood),
-                                  selected: _mood == mood,
-                                  onSelected: _busy
-                                      ? null
-                                      : (_) => setState(() => _mood = mood)),
-                          ]),
-                          const SizedBox(height: 12),
-                          TextField(
-                              key: const ValueKey('journey-note'),
-                              controller: _note,
-                              enabled: !_busy,
-                              minLines: 2,
-                              maxLines: 4,
-                              maxLength: 120,
-                              decoration: const InputDecoration(
-                                  labelText: '오늘의 한 줄',
-                                  hintText: '지금 기억하고 싶은 작은 순간을 적어 주세요.'),
-                              onChanged: (_) => setState(() {})),
-                          FilledButton(
-                              onPressed: _busy ||
-                                      _mood == null ||
-                                      _note.text.trim().isEmpty
-                                  ? null
-                                  : () => _run(
-                                      () => controller.finishJourneyDay(
-                                          _mood!, _note.text),
-                                      clear: true),
-                              child: const Text('오늘의 기록 남기기')),
-                        ],
-                        const SizedBox(height: 24),
-                        for (final checkin in journey.checkins.reversed)
-                          Card(
-                              child: ExpansionTile(
-                            title: Text('${checkin.day}일째 · ${checkin.date}'),
-                            subtitle: Text(checkin.mood),
-                            childrenPadding: const EdgeInsets.all(16),
-                            expandedCrossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(checkin.note),
-                              const SizedBox(height: 8),
-                              Text(checkin.action)
-                            ],
-                          )),
-                        const SizedBox(height: 16),
-                        TextButton.icon(
-                            onPressed: _busy ? null : () => _delete(controller),
-                            icon: const Icon(Icons.delete_outline),
-                            label: const Text('여정 기록 삭제')),
-                      ],
-                      if (_busy)
-                        const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator())),
-                    ]))),
+                          constraints: const BoxConstraints(maxWidth: 620),
+                          child: ListView(
+                              padding: const EdgeInsets.all(20),
+                              children: [
+                                const Text('하루에 한 번, 나를 돌보는 시간',
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 12),
+                                const Text(
+                                    '연속으로 하지 않아도 괜찮아요. 쉬어 간 날에도 기록은 남고, 다음에 이어갈 수 있어요. 한 줄 기록은 이 기기에만 저장해요.'),
+                                const SizedBox(height: 20),
+                                if (journey == null)
+                                  FilledButton(
+                                      onPressed: _busy ||
+                                              controller.catalog.isEmpty
+                                          ? null
+                                          : () => _run(controller.startJourney),
+                                      child: const Text('여정 시작하기'))
+                                else ...[
+                                  Text('${journey.checkins.length} / 7일 기록',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                  LinearProgressIndicator(
+                                      value: journey.checkins.length / 7,
+                                      semanticsLabel:
+                                          '7일 중 ${journey.checkins.length}일 완료'),
+                                  const SizedBox(height: 20),
+                                  if (journey.complete) ...[
+                                    const Text('일곱 번의 돌봄을 함께했어요.',
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 12),
+                                    FilledButton.icon(
+                                        onPressed: _busy
+                                            ? null
+                                            : () => Navigator.of(context).push(
+                                                    MaterialPageRoute<void>(
+                                                  builder: (_) =>
+                                                      SharePreviewPage(
+                                                          content:
+                                                              ShareCardContent
+                                                                  .journey(
+                                                    controller.catalog.where(
+                                                        (verse) => journey
+                                                            .savedVerseIds
+                                                            .contains(
+                                                                verse.id)),
+                                                  )),
+                                                )),
+                                        icon: const Icon(Icons.ios_share),
+                                        label: const Text('여정 카드 미리보기')),
+                                  ] else if (!canComplete)
+                                    const Text('오늘의 기록을 남겼어요. 다음 날 편할 때 이어가요.')
+                                  else if (verse == null)
+                                    const Text(
+                                        '오늘의 말씀을 불러오지 못했어요. 잠시 후 다시 열어 주세요.')
+                                  else ...[
+                                    Text(
+                                        '${journey.currentDay}일째 · ${verse.reference}',
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 12),
+                                    LanguageText(verse.text),
+                                    const SizedBox(height: 12),
+                                    Text(verse.reflectionQuestion),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                        '오늘의 작은 실천: ${journeyActions[journey.currentDay - 1]}'),
+                                    const SizedBox(height: 20),
+                                    const Text('지금의 마음'),
+                                    Wrap(spacing: 8, children: [
+                                      for (final mood in journeyMoods)
+                                        ChoiceChip(
+                                            label: Text(mood),
+                                            selected: _mood == mood,
+                                            onSelected: _busy
+                                                ? null
+                                                : (_) => setState(
+                                                    () => _mood = mood)),
+                                    ]),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                        key: const ValueKey('journey-note'),
+                                        controller: _note,
+                                        enabled: !_busy,
+                                        minLines: 2,
+                                        maxLines: 4,
+                                        maxLength: 120,
+                                        decoration: const InputDecoration(
+                                            labelText: '오늘의 한 줄',
+                                            hintText:
+                                                '지금 기억하고 싶은 작은 순간을 적어 주세요.'),
+                                        onChanged: (_) => setState(() {})),
+                                    FilledButton(
+                                        onPressed: _busy ||
+                                                _mood == null ||
+                                                _note.text.trim().isEmpty
+                                            ? null
+                                            : () => _run(
+                                                () =>
+                                                    controller.finishJourneyDay(
+                                                        _mood!, _note.text),
+                                                clear: true),
+                                        child: const Text('오늘의 기록 남기기')),
+                                  ],
+                                  const SizedBox(height: 24),
+                                  for (final checkin
+                                      in journey.checkins.reversed)
+                                    Card(
+                                        child: ExpansionTile(
+                                      title: Text(
+                                          '${checkin.day}일째 · ${checkin.date}'),
+                                      subtitle: Text(checkin.mood),
+                                      childrenPadding: const EdgeInsets.all(16),
+                                      expandedCrossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(checkin.note),
+                                        const SizedBox(height: 8),
+                                        Text(checkin.action)
+                                      ],
+                                    )),
+                                  const SizedBox(height: 16),
+                                  TextButton.icon(
+                                      onPressed: _busy
+                                          ? null
+                                          : () => _delete(controller),
+                                      icon: const Icon(Icons.delete_outline),
+                                      label: const Text('여정 기록 삭제')),
+                                ],
+                                if (_busy)
+                                  const Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Center(
+                                          child: CircularProgressIndicator())),
+                              ]))),
         ));
   }
 }

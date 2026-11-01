@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -30,6 +31,7 @@ class KakaoLoginService {
     MemberSessionStore? sessions,
     Random? random,
     bool? enabled,
+    this.loginTimeout = const Duration(seconds: 90),
   })  : gateway = gateway ?? KakaoSdkLoginGateway(),
         sessions = sessions ?? MemberSessionStore.instance,
         _random = random ?? Random.secure(),
@@ -39,8 +41,38 @@ class KakaoLoginService {
   final MemberSessionStore sessions;
   final Random _random;
   final bool _enabled;
+  final Duration loginTimeout;
+  static Future<KakaoCredential>? _pendingAuthentication;
 
   Future<KakaoCredential> authenticate() async {
+    if (_pendingAuthentication != null) {
+      throw const KakaoLoginException(
+          '이전 카카오 인증이 진행 중이에요. 로그인 창을 닫고 잠시 기다려 주세요.');
+    }
+    final attempt = _authenticate();
+    _pendingAuthentication = attempt;
+    void release() {
+      if (identical(_pendingAuthentication, attempt)) {
+        _pendingAuthentication = null;
+      }
+    }
+
+    // A caller timeout cannot cancel the SDK's external authentication UI.
+    unawaited(attempt.then<void>((_) => release(),
+        onError: (Object _, StackTrace __) => release()));
+    try {
+      return await attempt.timeout(loginTimeout);
+    } on TimeoutException {
+      throw const KakaoLoginException(
+          '카카오 인증 응답이 지연되고 있어요. 로그인 창을 닫고 다시 시도해 주세요.');
+    } on KakaoLoginException {
+      rethrow;
+    } catch (_) {
+      throw const KakaoLoginException('카카오 인증을 완료하지 못했어요. 다시 시도해 주세요.');
+    }
+  }
+
+  Future<KakaoCredential> _authenticate() async {
     if (!_enabled) {
       throw const KakaoLoginException('카카오 로그인이 아직 설정되지 않았습니다.');
     }

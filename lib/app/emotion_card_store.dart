@@ -1,3 +1,4 @@
+import 'record_preferences.dart';
 import 'dart:convert';
 import 'member_record_scope.dart';
 
@@ -33,7 +34,7 @@ class EmotionCardStats {
 
 class EmotionCardStore {
   EmotionCardStore({SharedPreferencesAsync? preferences})
-      : _preferences = preferences ?? SharedPreferencesAsync();
+      : _preferences = RecordPreferences(preferences: preferences);
 
   final RecordAccess _access = MemberRecordScope.instance.capture();
   String get _presetKey {

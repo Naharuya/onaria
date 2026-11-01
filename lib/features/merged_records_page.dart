@@ -1,3 +1,4 @@
+import '../language_text.dart';
 import 'package:flutter/material.dart';
 import '../app/api_config.dart';
 import '../app/asset_loader.dart';
@@ -87,7 +88,7 @@ class _MergedRecordsPageState extends State<MergedRecordsPage> {
                     children: [
                       Padding(
                           padding: const EdgeInsets.all(16),
-                          child: SelectableText(card.fullText))
+                          child: LanguageSelectableText(card.fullText))
                     ]),
               if (entry.$2.draft != null)
                 ExpansionTile(title: const Text('저장했던 임시 문장'), children: [

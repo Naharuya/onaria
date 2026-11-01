@@ -1,5 +1,8 @@
+import '../src/safety/crisis_detector.dart';
+import '../personal_keywords.dart';
+import '../personal_keyword_panel.dart';
+import '../care_flow.dart';
 import 'package:flutter/material.dart';
-import '../app/onaria_emblem.dart';
 import '../app/app_theme.dart';
 import '../app/space_scaffold.dart';
 import '../onaria.dart';
@@ -33,6 +36,8 @@ class _EmotionCardEntry {
 }
 
 class _CheckInPageState extends State<CheckInPage> {
+  late final _keywordLearning =
+      PersonalKeywordLearning(isCurrent: () => _recordAccess.current);
   EmotionType? _emotion;
   bool _otherEmotion = false;
   final _customEmotion = TextEditingController();
@@ -57,7 +62,7 @@ class _CheckInPageState extends State<CheckInPage> {
     EmotionType.complexity: '🫧',
     EmotionType.gratitude: '🌿',
     EmotionType.joy: '☀️',
-    EmotionType.fear: '🌑',
+    EmotionType.fear: '😨',
     EmotionType.disgust: '🌵',
     EmotionType.surprise: '⚡',
     EmotionType.happiness: '🌈',
@@ -105,6 +110,8 @@ class _CheckInPageState extends State<CheckInPage> {
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               children: [
+                const CareFlowProgress(
+                    step: CareStep.emotion, contentLabel: '말씀'),
                 Row(children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -117,7 +124,7 @@ class _CheckInPageState extends State<CheckInPage> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text('onaria',
+                  const Text('ONARIA',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
@@ -125,23 +132,27 @@ class _CheckInPageState extends State<CheckInPage> {
                   const Spacer(),
                   const AccountMenuButton(),
                 ]),
-                const SizedBox(height: 16),
-                const Center(child: OnariaEmblem()),
-                Text('모든 마음은 저마다의 길이 있습니다',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: AppTheme.of(context).ink,
-                        fontSize: 14,
-                        letterSpacing: 1.2,
-                        height: 1.6)),
-                const SizedBox(height: 6),
-                Text('EVERY HEART HAS ITS OWN WAY',
-                    textAlign: TextAlign.center,
+                const SizedBox(height: 30),
+                Text('기독교 마음돌봄 전문 브랜드',
                     style: TextStyle(
                         color: AppTheme.of(context).green,
-                        fontSize: 9,
-                        letterSpacing: 2)),
-                const SizedBox(height: 24),
+                        fontSize: 11,
+                        letterSpacing: 1.2)),
+                const SizedBox(height: 14),
+                Text('마음이 머무는 곳,\n다시 빛을 만나는 시간.',
+                    style: TextStyle(
+                        color: AppTheme.of(context).ink,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                        letterSpacing: -1.1)),
+                const SizedBox(height: 12),
+                Text('말로 다 하지 못한 오늘의 마음.\n당신의 속도로 천천히 꺼내어 보세요.',
+                    style: TextStyle(
+                        color: AppTheme.of(context).muted,
+                        fontSize: 13,
+                        height: 1.8)),
+                const SizedBox(height: 28),
                 Container(
                   padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
                   decoration: BoxDecoration(
@@ -153,20 +164,20 @@ class _CheckInPageState extends State<CheckInPage> {
                           AppTheme.of(context).panel
                         ]),
                     border: Border.all(color: AppTheme.of(context).border),
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                           color: AppTheme.of(context)
                               .green
-                              .withValues(alpha: 0.12),
-                          blurRadius: 18,
+                              .withValues(alpha: 0.05),
+                          blurRadius: 22,
                           offset: Offset(0, 8))
                     ],
                   ),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('매일 3분 마음대화',
+                        Text('A MOMENT FOR YOUR HEART',
                             style: TextStyle(
                                 color: AppTheme.of(context).gold,
                                 fontSize: 12,
@@ -176,9 +187,9 @@ class _CheckInPageState extends State<CheckInPage> {
                         Text('오늘 마음은\n어떤가요?',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.w700,
-                                height: 1.15)),
+                                fontSize: 27,
+                                fontWeight: FontWeight.w500,
+                                height: 1.4)),
                         SizedBox(height: 12),
                         Text('판단하지 않고, 천천히 마음을 살펴보는 시간입니다.',
                             style: TextStyle(
@@ -344,6 +355,9 @@ class _CheckInPageState extends State<CheckInPage> {
                     ),
                   ],
                 ),
+                PersonalKeywordPanel(
+                    learning: _keywordLearning,
+                    onSelected: _selectPromotedKeyword),
                 if (_otherEmotion) ...[
                   const SizedBox(height: 16),
                   TextField(
@@ -443,6 +457,7 @@ class _CheckInPageState extends State<CheckInPage> {
 
   @override
   void dispose() {
+    _keywordLearning.clear();
     _customEmotion.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -516,11 +531,8 @@ class _CheckInPageState extends State<CheckInPage> {
     final emotion = _emotion ?? EmotionType.complexity;
     setState(() => _startingConversation = true);
     final consumed = await _dailyUsageStore.tryConsume();
-    if (_otherEmotion) {
-      await _emotionCardStore.recordCustom(customEmotion!);
-    } else if (_promotedKeyword != null) {
-      await _emotionCardStore.recordCustom(_promotedKeyword!);
-    } else {
+    // Preserve old saved cards, but route new automatic additions through the common session policy.
+    if (!_otherEmotion && _promotedKeyword == null) {
       await _emotionCardStore.recordPreset(emotion);
     }
     if (!mounted) return;
@@ -532,8 +544,14 @@ class _CheckInPageState extends State<CheckInPage> {
       _dailyUsageCount++;
       _startingConversation = false;
     });
+    if (_otherEmotion && customEmotion != null) {
+      _keywordLearning.observe(customEmotion,
+          emotion: emotion.label,
+          safe: !const CrisisDetector().assess(customEmotion).isCrisis);
+    }
     await Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => ConversationPage(
+        keywordLearning: _keywordLearning,
         emotion: emotion,
         customEmotion: customEmotion,
         intensity: _intensity.round(),

@@ -17,6 +17,12 @@ export const memberSchema = z.object({
   loginProvider: z.enum(['phone', 'apple', 'naver', 'kakao', 'google']).default('phone'),
   providerUserId: z.string().trim().min(1).max(200).optional(),
 });
+// The legacy route has no provider verifier; it must never bind a social identity.
+export const legacyMemberSchema = memberSchema.extend({
+  loginProvider: z.literal('phone').default('phone'),
+  providerUserId: z.never().optional(),
+});
+
 export function publicMember(member) {
   return { id: member.id, name: member.name, phone: member.phone ?? null, churchName: member.church_name, loginProvider: member.login_provider, createdAt: member.created_at };
 }

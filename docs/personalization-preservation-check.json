@@ -1,0 +1,10 @@
+{
+  "lib/features/emotion_situation_examples.dart": {
+    "originalLiteralCount": 97,
+    "missingExampleText": []
+  },
+  "lib/features/conversation_question_examples.dart": {
+    "originalLiteralCount": 104,
+    "missingExampleText": []
+  }
+}

@@ -47,12 +47,11 @@ void main() {
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
           const MethodChannel('plugin.csdcorp.com/speech_to_text'),
           (_) async => true);
-      await tester.runAsync(
-          () => rootBundle.loadString('assets/data/bible_verses_ko.json'));
+      await tester.runAsync(() => Future.wait([rootBundle.loadString('assets/data/bible_verses_ko.json'), rootBundle.loadString('assets/data/content_release_baseline.json')]));
       final client = _OfflineClient();
       await tester.pumpWidget(MaterialApp(
           theme: AppTheme.light,
-          home: ConversationPage(
+          home: ConversationPage(animateComposerBorder: false,
               emotion: EmotionType.admiration,
               intensity: 5,
               apiClient: client)));
@@ -66,6 +65,10 @@ void main() {
           await tester.pump();
         }
         await tester.pumpAndSettle();
+      }
+      for (var wait = 0; wait < 40 && find.widgetWithText(OutlinedButton, '오늘의 말씀 음성으로 듣기').evaluate().isEmpty; wait++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 25)));
+        await tester.pump();
       }
       final play = tester.widget<OutlinedButton>(
           find.widgetWithText(OutlinedButton, '오늘의 말씀 음성으로 듣기'));

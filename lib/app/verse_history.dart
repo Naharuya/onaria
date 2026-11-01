@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'record_preferences.dart';
 import 'member_record_scope.dart';
 import '../src/verses/verse_models.dart';
 
@@ -8,14 +8,14 @@ class VerseHistory {
   static Future<void> delete() {
     final access = MemberRecordScope.instance.capture();
     access.requireCurrent();
-    return SharedPreferencesAsync().remove(access.key(storageKey));
+    return RecordPreferences().remove(access.key(storageKey));
   }
 
   Future<BibleVerse?> choose(List<BibleVerse> candidates) async {
     if (candidates.isEmpty) return null;
     final access = MemberRecordScope.instance.capture();
     final key = access.key(storageKey);
-    final preferences = SharedPreferencesAsync();
+    final preferences = RecordPreferences();
     var recent = <String>[];
     try {
       recent = await preferences.getStringList(key) ?? [];

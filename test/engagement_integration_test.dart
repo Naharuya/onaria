@@ -214,7 +214,7 @@ void main() {
     expect(gateway.plans, isNotEmpty);
     Navigator.of(tester.element(find.byTooltip('메뉴'))).push(
         MaterialPageRoute<void>(
-            builder: (_) => const ConversationPage(
+            builder: (_) => const ConversationPage(animateComposerBorder: false,
                 emotion: EmotionType.anxiety, intensity: 5)));
     await settle(tester);
     await tester.enterText(find.byType(TextField), '죽고싶어요');

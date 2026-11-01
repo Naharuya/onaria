@@ -1,12 +1,13 @@
 name: onaria
 description: 감정 기반 AI 신앙 대화 onaria MVP 앱.
-version: 1.0.0+24
+version: 1.0.0+28
 publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
+  crypto: 3.0.7
   flutter:
     sdk: flutter
   flutter_local_notifications: 22.3.0
@@ -40,6 +41,13 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/data/content_release_baseline.json
+    - assets/fonts/OFL-NotoSansKR.txt
     - assets/data/bible_verses_ko.json
     - assets/prompts/system_prompt_ko.txt
     - assets/images/
+
+  fonts:
+    - family: AriWebKorean
+      fonts:
+        - asset: assets/fonts/NotoSansKR.ttf

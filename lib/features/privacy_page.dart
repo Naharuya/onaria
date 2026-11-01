@@ -1,7 +1,8 @@
+import '../data_rights.dart';
+import '../app/record_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app/conversation_draft.dart';
 import '../app/api_config.dart';
@@ -336,6 +337,42 @@ class _PrivacyPageState extends State<PrivacyPage> {
     }
   }
 
+  Future<void> _deleteAllLocal() async {
+    if (_busy) return;
+    final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (c) => AlertDialog(
+                title: const Text(DataRightsCopy.localDelete),
+                content: const Text(DataRightsCopy.localScope),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(c, false),
+                      child: const Text('취소')),
+                  FilledButton(
+                      onPressed: () => Navigator.pop(c, true),
+                      child: const Text('삭제'))
+                ]));
+    if (confirmed != true || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    var success = false;
+    try {
+      await RecordPreferences.deleteCurrent();
+      success = true;
+    } catch (_) {
+      // A partial or unverified deletion is never a success.
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (messenger.mounted)
+        messenger.showSnackBar(SnackBar(
+            content: Text(success
+                ? DataRightsCopy.localSuccess
+                : DataRightsCopy.deletionFailed)));
+    });
+  }
+
   Future<void> _delete(String name, Future<void> Function() action) async {
     if (_busy) return;
     final confirmed = await showDialog<bool>(
@@ -473,12 +510,19 @@ class _PrivacyPageState extends State<PrivacyPage> {
           ] else ...[
             const Text('로그인하면 연결된 계정 관리와 회원탈퇴를 사용할 수 있어요.'),
           ],
+          const DataRightsNotice(),
           const SizedBox(height: 24),
+          OutlinedButton.icon(
+              key: const ValueKey('delete-all-local-records'),
+              onPressed: _busy ? null : _deleteAllLocal,
+              icon: const Icon(Icons.delete_sweep_outlined),
+              label: const Text(DataRightsCopy.localDelete)),
+          const SizedBox(height: 12),
           OutlinedButton(
               onPressed: _busy
                   ? null
                   : () => _delete('임시 문장을', () async {
-                        await SharedPreferencesAsync()
+                        await RecordPreferences()
                             .setBool(ConversationDraft.autoSaveKey, false);
                         await ConversationDraft.delete();
                       }),

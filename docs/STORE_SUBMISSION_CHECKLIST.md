@@ -1,5 +1,7 @@
 # ONARIA MVP Store Submission Checklist
 
+> 이 체크리스트는 초기 등록 준비와 Build19 시점의 스냅샷입니다. 아래 체크값·1년 보유 후보·“미제출”을 현재 사실이나 활성 정책으로 사용하지 않습니다. 이후 [Build24 통합](releases/ONARIA_MAIN_INTEGRATION_2026-10-11.md), [보유·파기/Apple 제출 기록](releases/ONARIA_RETENTION_IMPLEMENTATION_2026-10-11.md), [Play 준비의 최신 후속 기록](releases/ONARIA_GOOGLE_PLAY_READINESS_2026-10-19.md)을 대조합니다. 이번 Markdown 검토는 운영·스토어 상태를 새로 확인한 결과가 아닙니다.
+
 기준일: 2026-10-07
 
 이 문서는 ONARIA MVP를 Google Play와 Apple App Store에 등록하기 위한 실행 체크리스트다.

@@ -1,0 +1,89 @@
+{
+  "project": "onaria",
+  "date": "2026-11-01",
+  "commit": "40cd65851553238c426b32f5af2639e76f24f64b",
+  "implemented": "common administrative contract and UI; isolated service adapters",
+  "backendTests": {
+    "passed": 555,
+    "failed": 0,
+    "command": "node --test --test-concurrency=2"
+  },
+  "focusedTestsIncluded": 17,
+  "browser": {
+    "project": "onaria",
+    "result": "PASS",
+    "flows": [
+      "login-or-elevated-session",
+      "request-create",
+      "inquiry-assign-resolve",
+      "unverified-backup",
+      "audit",
+      "mobile-desktop"
+    ],
+    "pageErrors": []
+  },
+  "sourceReview": {
+    "syntaxAndSecretIssues": [],
+    "commonCoreSha256": "fe9d776867a4562fefb5a1405501dea7dda2787049cb9600d6f654357d6ec0c7",
+    "commonUiSha256": "363bf9e4aca3f20326b9a28692a402227a9423bb15c094bfb1490dfeed086422"
+  },
+  "sourceSha256": {
+    "AGENTS.md": "48e05914a2c9d6f47f6785f6cac42223c26646d113b42771e157e5bc695c1f05",
+    "README.md": "e7660543d805097d3cd510b05357054ddfc265c5d891c2cf102558a36a33811f",
+    "backend/public/admin.html": "d4b519edeaa53fc813744ae233742bd854a81b7071728a9251202f6516b442b1",
+    "backend/public/common-admin.css": "1f530c09f0a1b16c893bf1ca3909a3c8c59c65fad2dbca34dea95edb500fe25d",
+    "backend/public/common-admin.html": "f67f0a4314fa4a407f9f59d22d88642bbc91a021aa35270ad2acc32e16494e95",
+    "backend/public/common-admin.mjs": "363bf9e4aca3f20326b9a28692a402227a9423bb15c094bfb1490dfeed086422",
+    "backend/src/admin_accounts.js": "bf9d1fb17253d266f19064ff8dfb569f80ad5747eb1b4f83ce530eea62095284",
+    "backend/src/admin_auth.js": "7bd8a4885f4107063208616310c7cdd46155d0ea4d42b2ed794dbcc92034da2a",
+    "backend/src/admin_rbac.js": "a37e0e55318936e26a9944f52464fcb7071c5021359da6375b388e0074a53e13",
+    "backend/src/app.js": "aaec50bec2389fb99f75a2c71f26c98b780d4251a4f694d3252f68104f84449e",
+    "backend/src/audit_log.js": "5ad484a30df9579d314231feb06d60ebe496b0d97e7cbf702dcda4c99f2c1b3f",
+    "backend/src/common_admin.js": "fe9d776867a4562fefb5a1405501dea7dda2787049cb9600d6f654357d6ec0c7",
+    "backend/src/common_admin_repository.js": "74c76ec06f08f79d17956d0e0a2c629c7182cc0bbcbdac81756dc52e1ee46dbc",
+    "backend/src/common_admin_router.js": "baacb0f85020adf7357ba4f0a2cb912323cc2c7018ba1a7519068b125d7f93b5",
+    "backend/src/server.js": "99b23ca0ca6a5655dd0e1874641688a865e52cecbaefc7a8d42179dd504d5636",
+    "backend/test/common_admin.test.js": "e11ea673427c6d7bd917de3cba19eadba3fb6caffbef2f5a0bf3da3481c584aa",
+    "backend/test/common_admin_integration.test.js": "7fe64eb073dfa5abe9e51d7b344913e46d715e1b9d02e73a67fc27fbdbe3dbf7",
+    "docs/ADMIN_COMMON_REVIEW_20261101.md": "490d69009ab57a31145ad2b5861bcc12d6d9bfc4823747bfbb3137d2b02be91d",
+    "docs/ADMIN_COMMON_STANDARD.md": "6d6937537dd19b754533eda0f8148a1bce0fb5cf6bf21d9a3cd6d78331b6d6df"
+  },
+  "changedFiles": [
+    "AGENTS.md",
+    "README.md",
+    "backend/public/admin.html",
+    "backend/public/common-admin.css",
+    "backend/public/common-admin.html",
+    "backend/public/common-admin.mjs",
+    "backend/src/admin_accounts.js",
+    "backend/src/admin_auth.js",
+    "backend/src/admin_rbac.js",
+    "backend/src/app.js",
+    "backend/src/audit_log.js",
+    "backend/src/common_admin.js",
+    "backend/src/common_admin_repository.js",
+    "backend/src/common_admin_router.js",
+    "backend/src/server.js",
+    "backend/test/common_admin.test.js",
+    "backend/test/common_admin_integration.test.js",
+    "docs/ADMIN_COMMON_REVIEW_20261101.md",
+    "docs/ADMIN_COMMON_STANDARD.md",
+    "docs/admin-common-verification-20261101.json"
+  ],
+  "mobileSourceChanged": false,
+  "mobileBuild": "NOT RUN: backend/admin web only",
+  "productionDeployed": false,
+  "productionMigrationRun": false,
+  "deviceInstalled": false,
+  "storeChanged": false,
+  "commitCreated": false,
+  "pushed": false,
+  "defaultDeletionVerifierConnected": false,
+  "defaultBackupInspectorConnected": false,
+  "inquiryEmailSent": false,
+  "commonReviewAutomaticallyPublishes": false,
+  "diffCheck": {
+    "exitCode": 0,
+    "output": ""
+  }
+}

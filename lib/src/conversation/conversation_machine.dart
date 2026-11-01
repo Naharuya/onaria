@@ -81,11 +81,17 @@ class ConversationMachine {
       );
     }
 
-    final nextStage = _sanitizeStage(session, response);
+    var nextStage = _sanitizeStage(session, response);
     final nextTurn = session.turnCount + 1;
+    // Reaching the conversation budget must not strand a safe journey.
+    // Explicit termination and crisis responses still take precedence.
+    if (nextTurn >= maxCoreTurns + maxExtraTurns &&
+        !response.shouldEndConversation &&
+        nextStage != ConversationStage.ended) {
+      nextStage = ConversationStage.verseOffer;
+    }
     final shouldEnd = response.shouldEndConversation ||
-        nextStage == ConversationStage.ended ||
-        nextTurn >= maxCoreTurns + maxExtraTurns;
+        nextStage == ConversationStage.ended;
 
     return ConversationTransition(
       session: session.copyWith(

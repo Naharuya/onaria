@@ -62,3 +62,12 @@ android/local.properties.before-*
 
 # Local dependency directories or links are never release source.
 backend/node_modules
+
+# Local pre-change copies (not release inputs)
+.app-channel-backups/
+
+# Local immutable production artifacts; no credentials or user databases.
+/.local/production-common-20261101/
+
+# Local credentials, device backups and temporary verification artifacts
+/.local/

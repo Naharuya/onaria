@@ -10,7 +10,7 @@ void main() {
     emotionIntensity: 4,
   );
 
-  test('adaptive response continues beyond three turns and closes at five', () {
+  test('adaptive response continues beyond three turns and offers a next step at five', () {
     const response = LlmConversationResponse(
       message: '지금 필요한 것을 더 살펴볼게요.',
       question: '어떤 도움이 필요할까요?',
@@ -28,9 +28,9 @@ void main() {
       expect(
           result.uiAction,
           turn == 5
-              ? ConversationUiAction.end
+              ? ConversationUiAction.showVerseConsent
               : ConversationUiAction.showMessage);
-      expect(result.session.isEnded, turn == 5);
+      expect(result.session.isEnded, isFalse);
       session = result.session;
     }
     final parsed = LlmConversationResponse.fromJson(response.toJson());

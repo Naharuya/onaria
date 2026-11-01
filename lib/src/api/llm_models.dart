@@ -1,8 +1,10 @@
+import '../../care_request_budget.dart';
 import '../conversation/conversation_models.dart';
 
 class LlmConversationRequest {
   const LlmConversationRequest({
     required this.session,
+    this.personalizationContext,
     required this.userMessage,
     required this.systemPromptVersion,
     this.allowedVerseIds = const [],
@@ -13,6 +15,7 @@ class LlmConversationRequest {
     this.externalAiConsentVersion,
   });
 
+  final Map<String, dynamic>? personalizationContext;
   final ConversationSession session;
   final String userMessage;
   final String systemPromptVersion;
@@ -23,8 +26,12 @@ class LlmConversationRequest {
   final String verseLanguage;
   final String? externalAiConsentVersion;
 
-  Map<String, dynamic> toJson() => {
-        'session': session.toJson(),
+  Map<String, dynamic> toJson() => boundedCareRequest({
+        'session': {
+          ...session.toJson(),
+          if (personalizationContext != null)
+            'personalizationContext': personalizationContext
+        },
         'userMessage': userMessage,
         'systemPromptVersion': systemPromptVersion,
         'allowedVerseIds': allowedVerseIds,
@@ -34,7 +41,7 @@ class LlmConversationRequest {
         'verseLanguage': verseLanguage,
         if (externalAiConsentVersion != null)
           'externalAiConsentVersion': externalAiConsentVersion,
-      };
+      });
 }
 
 class LlmConversationResponse {

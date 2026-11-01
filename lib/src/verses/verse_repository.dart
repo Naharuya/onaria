@@ -18,7 +18,6 @@ class VerseRepository {
   List<BibleVerse>? _cache;
 
   Future<List<BibleVerse>> loadAll() async {
-    if (_cache != null) return _cache!;
     final raw = await _loader.loadString(assetPath);
     final decoded = jsonDecode(raw);
     if (decoded is! Map<String, dynamic> || decoded['verses'] is! List) {
@@ -37,7 +36,8 @@ class VerseRepository {
     int limit = 3,
   }) async {
     final verses = await loadAll();
-    final matches = verses.where((verse) => verse.emotions.contains(emotion)).toList();
+    final matches =
+        verses.where((verse) => verse.emotions.contains(emotion)).toList();
 
     matches.sort((a, b) {
       final aScore = a.tags.where(preferredTags.contains).length;

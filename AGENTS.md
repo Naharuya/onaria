@@ -16,13 +16,14 @@ WEBSITE=https://onaria.ai.kr
 ADMIN=https://onaria.ai.kr/admin
 
 ## 프로젝트 규칙
-- release signing은 기존 android/soul-bible-release.jks를 재사용한다.
+- release signing은 `android/key.properties`가 가리키는 기존 승인 서명키를 재사용하고 `scripts/android-release.mjs`의 alias·인증서 검증을 유지한다. 구형 `soul-bible-release.jks` 파일명으로 설정을 되돌리지 않는다. 현재 키 경로 보존·기존 인증서 대조 기록은 `docs/releases/ONARIA_GOOGLE_PLAY_READINESS_2026-10-19.md`의 후속 AAB 검증을 참고하며 키 생성·교체는 별도 승인 Gate다.
 - 정식 실기기 업데이트는 Release 계열로 통일한다. USB/무선 설치는 scripts/install-onaria-release.ps1 경로를 재사용하고 인증서·package·버전 검증 후 adb install -r만 실행한다.
 - debug/release 설치를 혼용하지 않는다. Flutter run/IDE Run과 CI Debug APK를 정식 앱 업데이트에 사용하지 않는다.
 - .debug suffix는 데이터·로그인·딥링크·알림·provider authority 영향 분석과 사용자 승인 후에만 적용한다.
 - production API에서 http/localhost/127.0.0.1/raw IP/기존 Cafe24 도메인을 금지한다. 기존 Debug override는 보존한다.
 - RAMI/K-Stock은 수정하지 않는다. 별도 프로젝트 지침 작성처럼 사용자가 명시한 범위만 예외로 한다.
 - crisis input은 modelCalls=0, OpenAI client 생성=0, Psychology/Religion 호출=0 및 고정 local crisis 응답을 보장한다. Safety parity와 false-positive 회귀를 유지한다.
+- 선택적 답변 평가와 반복 문구의 능동적 추가 저장 관련 작업은 `docs/FEEDBACK_ADAPTIVE_PHRASE_POLICY_2026-10-24.md`의 사용자 확정 목적과 실제 데이터 흐름 구분을 따른다.
 - RAG 근거 없는 경전·교리를 생성하지 않는다. 종교 인용 무결성을 비용보다 우선한다.
 - Cafe24 배포는 CI artifact 방식이며 승인 없이 운영 서버를 변경하지 않는다.
 - Web/Admin 인증·CSRF·민감 데이터 cache 정책과 기존 API contract를 보존한다.
@@ -86,3 +87,31 @@ NEXT ACTION:
 - 계정/개인정보 수집 기능은 안전한 본인확인 기반 삭제 경로가 없으면 출시 Gate를 통과시키지 않는다.
 - 국외이전은 실제 데이터 흐름을 기준으로 판단하며 내부 검토 일정은 외부 고지에 사용하지 않는다.
 - Play Data Safety / Apple App Privacy / 개인정보처리방침 / 이용약관은 실제 구현과 항상 동일하게 유지한다.
+
+## 앱 표시 채널 공통 기준 (2026-10-31 사용자 지시)
+- DEV / TEST / 정식 이름은 docs/APP_CHANNEL_STANDARD.md와 scripts/build-app-channel.py를 따른다. 기기 검증 빌드는 명시적으로 dev/test를 선택하고 정식 배포는 prod를 선택한다. Release가 정식 배포를 뜻하지 않는다. 기존 서명·인증서·버전·설치 검증을 유지한다. 표시 이름만 바꾸며 서버·DB·ID 분리를 완료했다고 주장하지 않는다. 별도 지시 없는 설치·배포·commit/push는 하지 않는다.
+
+## 콘텐츠 전달·캐시 공통 기준 (2026-10-31)
+- 사용자 지시에 따라 docs/CONTENT_DELIVERY_STANDARD.md를 따른다. 기본 콘텐츠 로컬 우선, 자체 서버 조회·백그라운드 갱신, 공개 캐시/개인 데이터 분리, 앱 독립성과 출처/권리/초안 상태를 유지한다. 코드 적용과 운영 배포·실기기·실측 완료를 구분한다.
+
+## 공통 사용자 흐름 (2026-10-31 사용자 지시)
+- docs/COMMON_CARE_FLOW.md의 감정→대화→전통별 콘텐츠→실천→카드·기록 계약과 두 common_care_flow 테스트를 유지한다. 앱별 콘텐츠·계정·서버·키·저장 정책은 독립적이다. 현재 철학 대상은 SORUA이며 이전 philosophy 시안을 현재 제품으로 비교하지 않는다. 공통 단계 수정 시 다른 세 앱과 대조하되 기존 안전/권리/동의 검사를 생략하거나 운영 서비스를 임의 활성화하지 않는다.
+
+## 기록·삭제 공통 사용자 계약 (2026-11-01)
+- docs/DATA_RIGHTS_STANDARD.md와 docs/DATA_RIGHTS_REVIEW_20261101.md를 따른다. 로컬 기록 삭제·서버 기록 삭제·탈퇴·동의 철회·로그아웃을 구분하고 실패·미확인을 완료로 안내하지 않는다. 현재 비교 대상은 SORUA이며 philosophy 시안을 다시 기준으로 삼지 않는다.
+- 네 앱의 DataRightsCopy/DataRightsNotice 공통 문구와 관련 회귀를 유지한다. 저장 위치·AI 제공자·보유기간은 실제 앱별 동작대로 표시하며 계정·서버·키는 합치지 않는다. 운영 배포·실기기·스토어 양식 검증과 코드/합성 테스트를 구분한다.
+
+## 원문·번역 언어 색상 (2026-11-01 사용자 확정)
+- docs/LANGUAGE_COLORS_20261101.md에 따라 읽기 콘텐츠의 한글은 기존 기본색을 상속하고 영문·한자만 LanguageText/LanguageSelectableText로 구분한다. 본문·선택·복사·출처/AI 초안 고지를 유지하며 앱별 브랜드·계정·데이터를 합치지 않는다.
+
+
+## 관리자 공통 기준 (2026-11-01 사용자 지시)
+- docs/ADMIN_COMMON_STANDARD.md의 공통 인증·7개 역할·요청/문의·감사·백업 증거 상태와 앱별 콘텐츠 검수 프로필을 따른다. 기본 작업은 common_admin 계층과 공통 관리 UI를 함께 대조하고 계정·서버·DB·키를 공유하지 않는다. 삭제 처리 승인과 본인확인/실제 완료를 구분하며 미연결 확인기를 PASS로 표시하지 않는다. 기존 콘텐츠 게시 Gate와 관리자 비활성 기본값을 유지한다.
+
+
+## 공통 변경 운영 반영 (2026-11-01 사용자 배포 지시)
+- docs/PRODUCTION_COMMON_DEPLOYMENT_20261101.md와 docs/production-common-deployment-20261101.json이 이 대화 공통 변경의 최신 운영 반영 근거다. 과거 미배포 보고서와 구분한다. 웹·서버 배포와 앱마켓/실기기 배포를 혼동하지 않고, MAEON 관리자 잠금 및 미연결 삭제 완료/백업 증거 어댑터 상태를 유지한다.
+
+
+## 감정 카드·예시 공통 추가 지시 (2026-11-01)
+- docs/EMOTION_EXAMPLE_STANDARD_20261101.md를 따른다. 원문 합본을 보존하고 대화 예시5개·선택 문구 제외/보충을 유지한다. 개인 키워드는 안전한 직접 입력만 이번 사용 중 계산하며 예시 선택을 학습하지 않는다. 추가 기능 끄기·초기화·계정 경계와 기존 Safety를 유지한다. 운영 배포/영구 저장/스토어 제출은 검증 결과와 구분한다.

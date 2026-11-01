@@ -1,3 +1,4 @@
+import '../language_text.dart';
 import 'package:flutter/material.dart';
 import '../app/mind_card_store.dart';
 import '../app/app_theme.dart';
@@ -197,7 +198,7 @@ class _SavedCardsPageState extends State<SavedCardsPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(card.dateLabel),
-        content: SingleChildScrollView(child: Text(card.fullText)),
+        content: SingleChildScrollView(child: LanguageText(card.fullText)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context), child: const Text('확인'))

@@ -1,0 +1,239 @@
+{
+  "PROJECT": "ONARIA",
+  "CURRENT COMMIT": "40cd65851553238c426b32f5af2639e76f24f64b",
+  "ISSUE FOUND": "Personalization criteria and example banks differed across independent apps",
+  "PRIORITY": "P1 core conversation",
+  "ROOT CAUSE": "Separate routing rules and incomplete session context",
+  "IMPLEMENTED": [
+    "shared emotion/intensity/situation/help/answered-content rules",
+    "all reviewed examples preserved and accessible",
+    "independent religious/philosophical framing and clinical mode preserved",
+    "bounded session-only history; existing consent, crisis, content and account gates retained"
+  ],
+  "CHANGED FILES": [
+    "lib/care_personalization.dart",
+    "lib/common_emotion_examples.dart",
+    "lib/all_emotion_examples.dart",
+    "test/care_personalization_test.dart",
+    "docs/COMMON_CARE_FLOW.md",
+    "docs/COMMON_PERSONALIZATION_20261031.md",
+    "docs/personalization-example-inventory.json",
+    "docs/personalization-preservation-check.json",
+    "lib/care_request_budget.dart",
+    "test/care_request_budget_test.dart",
+    "lib/features/conversation_page.dart",
+    "lib/features/emotion_situation_examples.dart",
+    "lib/src/api/llm_models.dart",
+    "test/emotion_situation_examples_test.dart",
+    "test/conversation_examples_test.dart",
+    "backend/src/care_personalization.js",
+    "backend/src/schema.js",
+    "backend/src/crisis.js",
+    "backend/test/care_personalization.test.js",
+    "backend/src/local_conversation_service.js",
+    "backend/src/prompt.js",
+    "docs/PERSONALIZATION_IMPLEMENTATION_20261031.json",
+    "docs/personalization-common-parity.json"
+  ],
+  "TEST": {
+    "fullSuite": {
+      "exitCode": 0,
+      "seconds": 780,
+      "log": "/tmp/personalization-recheck-onaria-flutter.log",
+      "counts": {
+        "passed": 220,
+        "skipped": 1,
+        "failed": 0
+      }
+    },
+    "finalCurrentSourceGate": {
+      "analyze": {
+        "exitCode": 0,
+        "log": "/tmp/personalization-gate-onaria-analyze.log"
+      },
+      "flutter": {
+        "exitCode": 0,
+        "log": "/tmp/personalization-gate-onaria-flutter.log",
+        "counts": {
+          "passed": 6,
+          "skipped": 0,
+          "failed": 0
+        }
+      },
+      "node": {
+        "exitCode": 0,
+        "log": "/tmp/personalization-gate-onaria-node.log",
+        "counts": {
+          "tests": 39,
+          "pass": 39,
+          "fail": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "finalRequestBudgetAndCore": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-budget-final-onaria-flutter.log",
+      "counts": {
+        "passed": 5,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "finalBackendRegression": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-budget-final-onaria-node.log",
+      "counts": {
+        "tests": 39,
+        "pass": 39,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "backendFullBeforeFinalWireBudget": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-backend-full-onaria.log",
+      "counts": {
+        "tests": 533,
+        "pass": 533,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "paidLiveModelCalls": "NOT RUN"
+  },
+  "BUILD": {
+    "web": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-budget-final-onaria-web.log"
+    },
+    "android": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-budget-final-onaria-android.log"
+    },
+    "ios": {
+      "exitCode": 0,
+      "log": "/tmp/personalization-budget-final-onaria-ios.log"
+    },
+    "artifacts": {
+      "android": {
+        "path": "/Users/ari/ARI/projects/onaria/build/app/outputs/flutter-apk/app-debug.apk",
+        "sha256": "3176f386c3cde699ccfe76d8863728ce5f5bd785d443b6feb34d4ab66150c5ee",
+        "bytes": 198762644,
+        "channel": "TEST",
+        "installed": false,
+        "package": "com.onaria.app",
+        "versionCode": "28",
+        "versionName": "1.0.0",
+        "displayName": "ONARIA TEST"
+      },
+      "web": {
+        "path": "/Users/ari/ARI/projects/onaria/build/web",
+        "mainDartJsSha256": "9ae52c0ce9ccfb40d3abbc59acd91c94b17e3673ebe2d1d519e99257b75a45db",
+        "channel": "TEST",
+        "deployed": false
+      },
+      "ios": {
+        "path": "/Users/ari/ARI/projects/onaria/build/ios/iphonesimulator/Runner.app",
+        "bundleId": "com.onaria.app",
+        "displayName": "ONARIA TEST",
+        "buildNumber": "28",
+        "channel": "TEST",
+        "installed": false
+      }
+    }
+  },
+  "DEVICE": "NOT RUN: no device installation requested",
+  "API": "Local schema/factory tests only; no production deployment or activation",
+  "CI": "NOT RUN: no commit/push requested",
+  "COMMIT": "NOT RUN",
+  "PUSH": "NOT RUN",
+  "REMAINING RISKS": [
+    "Local routing is deterministic and does not understand every free-form sentence",
+    "Past text may be shortened in server/model context; local original text remains",
+    "Production deployment, device and live provider verification remain separate"
+  ],
+  "NEXT ACTION": "Review current-source implementation; production deployment and device installation are separate scope",
+  "status": "IMPLEMENTATION_AND_LOCAL_QA_COMPLETE_NOT_DEPLOYED",
+  "updatedAt": "2026-10-31T08:02:44.465942+00:00",
+  "sourceHashes": {
+    "lib/care_personalization.dart": "7c73ede2c917e258e9c3021e85aecb389d80dc14571e9d657b796f254e665b30",
+    "lib/common_emotion_examples.dart": "cbc074be9d225e1298142ba8e9ec477ed8c3e4f97958dc706809fe71fcadf847",
+    "lib/all_emotion_examples.dart": "96c6cb4a85d895390e7763749a3646b2a8340699b77a9e4b9d8d4e0a2b4b16bd",
+    "test/care_personalization_test.dart": "ad896f73123e7306742664f99d25a5549f0058a004cc76a8675c83f991303a50",
+    "docs/COMMON_CARE_FLOW.md": "20467af78e90389516363f37e405d67b08631033d546cc6fffd882438731847a",
+    "docs/COMMON_PERSONALIZATION_20261031.md": "7d4d0482d7a001be745bdc2e83bc0340ca876ce586df5de5c4ae5eac3965aa71",
+    "docs/personalization-example-inventory.json": "e63af2372500f1cfe6298b2f2f182274e54f517817b4cc755c3810f967b09b51",
+    "docs/personalization-preservation-check.json": "13f79fef7a955807ca8acc4811735343515f732c8afda3c8a170d64f097db5ef",
+    "lib/care_request_budget.dart": "c02098ce5844eb26c7f9e6c0c2d2e379a777632da700544a8b017e7c5c3da136",
+    "test/care_request_budget_test.dart": "4887f20d15a1ff9b66d2143fc3761bbe4db475bc363b59d3d6b74971c4c2b4a0",
+    "lib/features/conversation_page.dart": "13b4a5d13c4ccf9684f669cb9d1b25d5cec53eb1ffe102107603ade2355f7199",
+    "lib/features/emotion_situation_examples.dart": "499503e7be868a8e7b3d9cd65e9cea8998c5557d149b8b476d6c74f05c69afbf",
+    "lib/src/api/llm_models.dart": "23d9fdca35c7617f2747ab64b8817ebeb39d3a2ad2632382a49eecc4793c0380",
+    "test/emotion_situation_examples_test.dart": "8f1b2c68cd1eb560723d6b3b3710f6c503f3c481dcb9a7499d36b8eb50b003c6",
+    "test/conversation_examples_test.dart": "1304b44b245918d5227d0719bb7cc6bd84273b1c48f510805b72e2cca7a23c11",
+    "backend/src/care_personalization.js": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593",
+    "backend/src/schema.js": "9099fed24396f9eb232622680d937b04233a4cd9d9dd82622b52f77ed83a81d4",
+    "backend/src/crisis.js": "ed987368444273b039ded527c71b54dcc77e6961cdc32d3302e77dcdc209ad24",
+    "backend/test/care_personalization.test.js": "7dcdfd304dd2dadb4b0f6357f4df81a6c39df65b53df863525d5754bef2ba388",
+    "backend/src/local_conversation_service.js": "30ca439eb20055f68b5930bf3ad077838577af84bb5cbb37eafeacd8bf3d4e40",
+    "backend/src/prompt.js": "f6eec95552019ad8754901324a41f57aad260641785e6042fb774283b92db7f1"
+  },
+  "commonSourceParity": {
+    "lib/care_personalization.dart": {
+      "equal": true,
+      "canonicalHashes": {
+        "onaria": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+        "buddhist": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+        "catholic": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57",
+        "sorua": "6b0cd1b0e4b98d707fb19ee0a46c384e95536701909f9d91ac9c6cfa0c3d4a57"
+      }
+    },
+    "lib/common_emotion_examples.dart": {
+      "equal": true,
+      "canonicalHashes": {
+        "onaria": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+        "buddhist": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+        "catholic": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a",
+        "sorua": "3f90ee06c76159f9cb334add25153936eba9230f34bc9f036713f45353933e7a"
+      }
+    },
+    "lib/all_emotion_examples.dart": {
+      "equal": true,
+      "canonicalHashes": {
+        "onaria": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+        "buddhist": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+        "catholic": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774",
+        "sorua": "9aa75386f4c68b7d289cb5129fda56a3425f962a1ba9c5a3e2d1d95916f3f774"
+      }
+    },
+    "lib/care_request_budget.dart": {
+      "equal": true,
+      "canonicalHashes": {
+        "onaria": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3",
+        "buddhist": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3",
+        "sorua": "0e1dde7c258b526a0998ff41351a61541d0b7d4715548cc2af3851a33d520bf3"
+      }
+    },
+    "backend/src/care_personalization.js": {
+      "equal": true,
+      "hashes": {
+        "onaria": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593",
+        "buddhist": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593",
+        "sorua": "6c8d7889251eca7fced7cd80c90031b1c8a296f811021ccd8d7dd7fb431de593"
+      }
+    }
+  },
+  "exampleCounts": {
+    "canonicalEmotions": 16,
+    "perEmotion": 15,
+    "situationEntriesIncludingSharedDuplicates": 240,
+    "uniqueSituationTexts": 165,
+    "conversationTexts": 142,
+    "templates": 2,
+    "missingOriginalExamples": 0
+  },
+  "diffCheck": "PASS",
+  "secretLiteralScan": "PASS: owned public source only",
+  "syntheticMaxWirePayloadBytes": 14375
+}
